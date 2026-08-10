@@ -1,0 +1,8 @@
+{
+  "name": "HRMS Pro",
+  "description": "Enterprise Human Resource Management System with Employee, Leave, and Payroll Management.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

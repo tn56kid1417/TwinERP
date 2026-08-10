@@ -1,0 +1,222 @@
+import { motion } from 'motion/react';
+import React, { useEffect, useState } from 'react';
+import { Plus, Search, Trash2, Edit2, X, Check } from 'lucide-react';
+import { getEmployees, addEmployee, deleteEmployee, updateEmployee } from '../api';
+import { Employee } from '../types';
+import ConfirmationModal from '../components/ConfirmationModal';
+
+import { useAuth } from '../context/AuthContext';
+
+const EmployeeList = () => {
+  const { canViewAll, canEdit } = useAuth();
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [isAdding, setIsAdding] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: '', lastName: '', email: '', department: '', role: '', hireDate: '', shift: 'Morning'
+  });
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editShiftValue, setEditShiftValue] = useState('');
+  
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [employeeToDelete, setEmployeeToDelete] = useState<string | null>(null);
+
+  const loadEmployees = () => getEmployees().then(setEmployees).catch(console.error);
+
+  useEffect(() => {
+    loadEmployees();
+  }, []);
+
+  const handleAdd = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await addEmployee(formData);
+      setIsAdding(false);
+      setFormData({ firstName: '', lastName: '', email: '', department: '', role: '', hireDate: '', shift: 'Morning' });
+      loadEmployees();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const confirmDelete = (id: string) => {
+    setEmployeeToDelete(id);
+    setDeleteModalOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!employeeToDelete) return;
+    try {
+      await deleteEmployee(employeeToDelete);
+      loadEmployees();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setDeleteModalOpen(false);
+      setEmployeeToDelete(null);
+    }
+  };
+
+  const startEditing = (emp: Employee) => {
+    setEditingId(emp.id);
+    setEditShiftValue(emp.shift || 'Morning');
+  };
+
+  const cancelEditing = () => {
+    setEditingId(null);
+    setEditShiftValue('');
+  };
+
+  const saveEdit = async (id: string) => {
+    try {
+      await updateEmployee(id, { shift: editShiftValue });
+      setEditingId(null);
+      loadEmployees();
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  return (
+    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="p-8 max-w-7xl mx-auto h-full flex flex-col">
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-3xl font-medium text-slate-900 dark:text-white tracking-tight">Employees</h1>
+          <p className="text-slate-500 dark:text-slate-500 mt-1">Manage your team members and their details.</p>
+        </div>
+        {canEdit && (
+          <button 
+            onClick={() => setIsAdding(!isAdding)}
+            className="bg-indigo-600 hover:bg-indigo-500 text-slate-900 dark:text-white px-5 py-2.5 rounded text-[10px] uppercase font-bold tracking-widest flex items-center gap-2 transition-colors"
+          >
+            <Plus size={16} />
+            {isAdding ? 'Cancel' : 'Add Employee'}
+          </button>
+        )}
+      </div>
+
+      {canEdit && isAdding && (
+        <div className="bg-white dark:bg-[#1A1D23] rounded-xl border border-slate-200 dark:border-slate-800 p-6 mb-8">
+          <h2 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Add New Employee</h2>
+          <form onSubmit={handleAdd} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <input required type="text" placeholder="First Name" className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:border-indigo-500/50"
+              value={formData.firstName} onChange={e => setFormData({...formData, firstName: e.target.value})} />
+            <input required type="text" placeholder="Last Name" className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:border-indigo-500/50"
+              value={formData.lastName} onChange={e => setFormData({...formData, lastName: e.target.value})} />
+            <input required type="email" placeholder="Email Address" className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:border-indigo-500/50"
+              value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+            <input required type="text" placeholder="Department" className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:border-indigo-500/50"
+              value={formData.department} onChange={e => setFormData({...formData, department: e.target.value})} />
+            <input required type="text" placeholder="Role" className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:border-indigo-500/50"
+              value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})} />
+            <input required type="date" className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:border-indigo-500/50"
+              value={formData.hireDate} onChange={e => setFormData({...formData, hireDate: e.target.value})} />
+            <select required className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:border-indigo-500/50"
+              value={formData.shift} onChange={e => setFormData({...formData, shift: e.target.value})}>
+                <option value="Morning">Morning Shift</option>
+                <option value="Evening">Evening Shift</option>
+                <option value="Night">Night Shift</option>
+            </select>
+            <div className="lg:col-span-2 flex justify-end items-center">
+              <button type="submit" className="bg-indigo-600 hover:bg-indigo-500 text-slate-900 dark:text-white px-6 py-2 rounded text-[10px] uppercase font-bold tracking-widest transition-colors">Save Employee</button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      <div className="bg-white dark:bg-[#1A1D23] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden flex-1 flex flex-col">
+        <div className="flex-1 overflow-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-white/50 dark:bg-slate-900/50 text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-500 border-b border-slate-200/80 dark:border-slate-800/50">
+                <th className="px-6 py-3 font-semibold">Employee</th>
+                <th className="px-6 py-3 font-semibold">Contact</th>
+                <th className="px-6 py-3 font-semibold">Department</th>
+                <th className="px-6 py-3 font-semibold">Shift</th>
+                <th className="px-6 py-3 font-semibold">Hire Date</th>
+                {canEdit && <th className="px-6 py-3 font-semibold text-right">Actions</th>}
+              </tr>
+            </thead>
+            <tbody className="text-xs">
+              {employees.map((emp, idx) => (
+                <motion.tr initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.2, delay: idx * 0.05 }} key={emp.id} className="border-b border-slate-200/80 dark:border-slate-800/50 hover:bg-slate-800/30 transition-colors">
+                  <td className="px-6 py-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-7 h-7 rounded bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-semibold text-slate-700 dark:text-slate-300 text-[10px]">
+                        {emp.firstName.charAt(0)}{emp.lastName.charAt(0)}
+                      </div>
+                      <div>
+                        <p className="font-medium text-slate-800 dark:text-slate-200">{emp.firstName} {emp.lastName}</p>
+                        <p className="text-[10px] text-slate-500 dark:text-slate-500">{emp.role}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="px-6 py-4 text-slate-500 dark:text-slate-500 dark:text-slate-400">{emp.email}</td>
+                  <td className="px-6 py-4">
+                    <span className="px-2 py-0.5 bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 font-bold rounded-full">{emp.department}</span>
+                  </td>
+                  <td className="px-6 py-4">
+                    {editingId === emp.id && canEdit ? (
+                      <div className="flex items-center gap-2">
+                        <select 
+                          className="bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded px-2 py-1 text-xs focus:outline-none focus:border-indigo-500/50"
+                          value={editShiftValue}
+                          onChange={(e) => setEditShiftValue(e.target.value)}
+                        >
+                          <option value="Morning">Morning</option>
+                          <option value="Evening">Evening</option>
+                          <option value="Night">Night</option>
+                        </select>
+                        <button onClick={() => saveEdit(emp.id)} className="text-emerald-400 hover:text-emerald-300 transition-colors">
+                          <Check size={14} />
+                        </button>
+                        <button onClick={cancelEditing} className="text-red-400 hover:text-red-300 transition-colors">
+                          <X size={14} />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2 group">
+                        <span className="text-slate-700 dark:text-slate-300">{emp.shift || 'Not Assigned'}</span>
+                        {canEdit && (
+                          <button onClick={() => startEditing(emp)} className="opacity-0 group-hover:opacity-100 text-slate-500 dark:text-slate-500 hover:text-indigo-400 transition-all">
+                            <Edit2 size={12} />
+                          </button>
+                        )}
+                      </div>
+                    )}
+                  </td>
+                  <td className="px-6 py-4 text-slate-500 dark:text-slate-500 dark:text-slate-400 tracking-tighter">{emp.hireDate}</td>
+                  {canEdit && (
+                    <td className="px-6 py-4 text-right">
+                      <button onClick={() => confirmDelete(emp.id)} className="text-slate-600 hover:text-red-400 font-bold text-lg leading-none transition-colors">
+                        <Trash2 size={16} />
+                      </button>
+                    </td>
+                  )}
+                </motion.tr>
+              ))}
+              {employees.length === 0 && (
+                <tr>
+                  <td colSpan={canEdit ? 6 : 5} className="px-6 py-8 text-center text-slate-500 dark:text-slate-500">No employees found.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <ConfirmationModal
+        isOpen={deleteModalOpen}
+        title="Delete Employee"
+        message="Are you sure you want to delete this employee? This action cannot be undone and will permanently remove all related records."
+        confirmText="Delete"
+        onConfirm={handleDelete}
+        onCancel={() => {
+          setDeleteModalOpen(false);
+          setEmployeeToDelete(null);
+        }}
+      />
+    </motion.div>
+  );
+};
+
+export default EmployeeList;
