@@ -22,6 +22,7 @@ export const Calls: React.FC = () => {
   const [showLogForm, setShowLogForm] = useState(false)
   const [callStatus, setCallStatus] = useState<CallStatus>('Answered')
   const [callNotes, setCallNotes] = useState('')
+  const [followUpTime, setFollowUpTime] = useState('')
   const timerRef = useRef<number | null>(null)
 
   const chartData = useMemo(() => {
@@ -72,6 +73,8 @@ export const Calls: React.FC = () => {
     timerRef.current = window.setInterval(() => {
       setCallDuration((prev) => prev + 1)
     }, 1000)
+    
+    window.location.href = `tel:${lead.phone}`
   }
 
   const endCall = () => {
@@ -79,6 +82,28 @@ export const Calls: React.FC = () => {
     setIsCalling(false)
     setShowLogForm(true)
   }
+
+  useEffect(() => {
+    if (!isCalling) return;
+
+    const handleReturn = () => {
+      if (document.visibilityState === 'visible') {
+        endCall();
+      }
+    };
+
+    // Delay to allow the device to switch to the phone app
+    const timeoutId = window.setTimeout(() => {
+      document.addEventListener('visibilitychange', handleReturn);
+      window.addEventListener('focus', handleReturn);
+    }, 2000);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+      document.removeEventListener('visibilitychange', handleReturn);
+      window.removeEventListener('focus', handleReturn);
+    };
+  }, [isCalling]);
 
   const saveCallLog = async () => {
     if (!activeCallLead || !user) return
@@ -90,11 +115,13 @@ export const Calls: React.FC = () => {
       durationSeconds: callDuration,
       status: callStatus,
       notes: callNotes,
+      followUpTime: callStatus === 'Follow Up' ? followUpTime : undefined,
     })
     setShowLogForm(false)
     setActiveCallLead(null)
     setCallNotes('')
     setCallDuration(0)
+    setFollowUpTime('')
   }
 
   const formatDuration = (secs: number) => {
@@ -114,7 +141,7 @@ export const Calls: React.FC = () => {
     },
     {
       header: 'Lead Phone',
-      accessor: (row) => <span className="font-mono text-slate-700 dark:text-slate-300">{row.phoneNumber}</span>,
+      accessor: (row) => <a href={`tel:${row.phoneNumber}`} className="font-mono text-slate-700 dark:text-slate-300 hover:text-primary transition-colors">{row.phoneNumber}</a>,
     },
     {
       header: 'Duration',
@@ -125,17 +152,29 @@ export const Calls: React.FC = () => {
       accessor: (row) => {
         const variants: Record<string, string> = {
           'Answered': 'success',
-          'No Answer': 'warning',
+          'Not Connected 1': 'warning',
+          'Not Connected 2': 'warning',
+          'Not Connected 3': 'warning',
+          'Not Connected 4': 'warning',
+          'Not Connected 5': 'warning',
           'Busy': 'danger',
           'Voicemail': 'secondary',
           'Wrong Number': 'danger',
+          'Follow Up': 'info',
         }
         return <Badge variant={variants[row.status] as any || 'primary'}>{row.status}</Badge>
       },
     },
     {
       header: 'Notes',
-      accessor: (row) => <span className="text-slate-500 dark:text-slate-400 text-xs line-clamp-2 max-w-xs">{row.notes || '-'}</span>,
+      accessor: (row) => (
+        <div className="flex flex-col gap-1">
+          <span className="text-slate-500 dark:text-slate-400 text-xs line-clamp-2 max-w-xs">{row.notes || '-'}</span>
+          {row.followUpTime && (
+            <span className="text-xs font-semibold text-primary">Follow up: {formatDate(new Date(row.followUpTime))} {new Date(row.followUpTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+          )}
+        </div>
+      ),
     },
   ]
 
@@ -143,7 +182,7 @@ export const Calls: React.FC = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white dark:text-white flex items-center gap-2">
             <PhoneCall className="text-primary" /> Call Dialer & Logs
           </h1>
           <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
@@ -161,13 +200,13 @@ export const Calls: React.FC = () => {
         <CardContent className="pt-4 pb-2">
           <div className="h-48 w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
+              <BarChart data={chartData} margin={{ top: 5, right: 5, left: 0, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" className="dark:stroke-slate-800" />
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: '#64748b' }} width={30} />
                 <Tooltip 
                   cursor={{ fill: '#f1f5f9' }} 
-                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+                  contentStyle={{ backgroundColor: 'var(--chart-tooltip-bg)', color: 'var(--chart-tooltip-text)', borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                   formatter={(value: number) => [`${value} min`, 'Duration']}
                 />
                 <Bar dataKey="duration" fill="#6366f1" radius={[4, 4, 0, 0]} maxBarSize={40} />
@@ -196,8 +235,8 @@ export const Calls: React.FC = () => {
                           header: 'Lead Name',
                           accessor: (row) => (
                             <div>
-                              <div className="font-medium text-slate-900 dark:text-white">{row.name}</div>
-                              <div className="text-xs text-slate-500 font-mono mt-0.5">{row.phone}</div>
+                              <div className="font-medium text-slate-900 dark:text-white dark:text-white">{row.name}</div>
+                              <a href={`tel:${row.phone}`} className="text-xs text-slate-500 hover:text-primary transition-colors font-mono mt-0.5">{row.phone}</a>
                             </div>
                           ),
                         },
@@ -232,8 +271,8 @@ export const Calls: React.FC = () => {
                     </div>
                   </div>
                   <div className="text-center">
-                    <h3 className="text-xl font-bold text-slate-900 dark:text-white">{activeCallLead.name}</h3>
-                    <p className="text-slate-500 font-mono mt-1">{activeCallLead.phone}</p>
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white dark:text-white">{activeCallLead.name}</h3>
+                    <a href={`tel:${activeCallLead.phone}`} className="text-slate-500 hover:text-primary transition-colors font-mono mt-1 block">{activeCallLead.phone}</a>
                     <div className="text-2xl font-light text-slate-700 dark:text-slate-300 mt-4 font-mono">
                       {formatDuration(callDuration)}
                     </div>
@@ -248,7 +287,7 @@ export const Calls: React.FC = () => {
                 <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
                   <div className="p-3 bg-secondary/20 dark:bg-slate-800 rounded-lg flex justify-between items-center">
                     <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Duration:</span>
-                    <span className="text-sm font-bold font-mono text-slate-900 dark:text-white">{formatDuration(callDuration)}</span>
+                    <span className="text-sm font-bold font-mono text-slate-900 dark:text-white dark:text-white">{formatDuration(callDuration)}</span>
                   </div>
                   <div>
                     <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">
@@ -260,12 +299,55 @@ export const Calls: React.FC = () => {
                       onChange={(e) => setCallStatus(e.target.value as CallStatus)}
                     >
                       <option value="Answered">Answered</option>
-                      <option value="No Answer">No Answer</option>
+                      <option value="Not Connected 1">Not Connected 1</option>
+                      <option value="Not Connected 2">Not Connected 2</option>
+                      <option value="Not Connected 3">Not Connected 3</option>
+                      <option value="Not Connected 4">Not Connected 4</option>
+                      <option value="Not Connected 5">Not Connected 5</option>
                       <option value="Busy">Busy</option>
                       <option value="Voicemail">Voicemail</option>
                       <option value="Wrong Number">Wrong Number</option>
+                      <option value="Follow Up">Follow Up</option>
                     </select>
                   </div>
+                  {callStatus === 'Follow Up' && (
+                    <div className="animate-in fade-in duration-300">
+                      <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">
+                        Follow Up Time
+                      </label>
+                      <input
+                        type="datetime-local"
+                        className="w-full text-sm py-2 px-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg outline-none focus:border-primary text-slate-700 dark:text-slate-200"
+                        value={followUpTime}
+                        onChange={(e) => setFollowUpTime(e.target.value)}
+                      />
+                    </div>
+                  )}
+
+                  {(() => {
+                    const recentCalls = calls
+                      .filter(c => c.leadId === activeCallLead.id || (activeCallLead.id === '' && c.phoneNumber === activeCallLead.phone))
+                      .slice(0, 3)
+                    
+                    if (recentCalls.length === 0) return null
+                    
+                    return (
+                      <div className="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-100 dark:border-slate-800 mt-2">
+                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">
+                          Recent Activity
+                        </label>
+                        <div className="space-y-2">
+                          {recentCalls.map(c => (
+                            <div key={c.id} className="flex justify-between items-center text-xs">
+                              <span className="text-slate-500">{formatDate(c.startTime)} {new Date(c.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                              <span className="font-medium text-slate-700 dark:text-slate-300">{c.status}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )
+                  })()}
+
                   <div>
                     <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">
                       Call Notes

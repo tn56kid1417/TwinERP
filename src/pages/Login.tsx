@@ -91,7 +91,7 @@ const Login = () => {
                   onClick={() => handleQuickLogin(emp.email)}
                   className="flex items-center justify-start gap-2 bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700/50 text-slate-700 dark:text-slate-300 py-2 px-3 rounded-lg text-xs font-medium transition-colors text-left"
                 >
-                  <UserCircle size={14} className={emp.role === 'Admin' ? 'text-rose-400' : emp.role === 'CEO' ? 'text-amber-400' : emp.department === 'HR' ? 'text-indigo-400' : 'text-emerald-400'} flex-shrink-0 />
+                  <UserCircle size={14} className={`flex-shrink-0 ${emp.role === 'Admin' ? 'text-rose-400' : emp.role === 'CEO' ? 'text-amber-400' : emp.department === 'HR' ? 'text-indigo-400' : 'text-emerald-400'}`} />
                   <div className="truncate flex-1">
                     <div className="font-semibold text-slate-900 dark:text-white truncate">{emp.firstName} {emp.lastName}</div>
                     <div className="text-[10px] text-slate-500 truncate">{emp.role}</div>

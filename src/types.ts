@@ -6,6 +6,8 @@ export interface Employee {
   phone?: string;
   department: string;
   role: string;
+  designation?: string;
+  teamId?: string;
   hireDate: string;
   isActive: boolean;
   shift?: string;

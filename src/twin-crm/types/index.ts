@@ -1,4 +1,4 @@
-export type Role = 'COMPANY_ADMIN' | 'SALES_USER';
+export type Role = 'COMPANY_ADMIN' | 'SALES_USER' | 'MARKETING' | 'SALES_LEADER';
 
 export interface User {
   id: string;
@@ -9,6 +9,7 @@ export interface User {
   mobile?: string;
   companyId?: string; // Present for COMPANY_ADMIN and SALES_USER
   workspaceName?: string;
+  teamId?: string;
 }
 
 export type CompanySize = '1–10 Employees' | '11–50 Employees' | '51–100 Employees' | '101–500 Employees' | '500+ Employees';
@@ -72,12 +73,20 @@ export interface Purchase {
   product: string;
   amount: number;
   date: string;
+  paymentStatus?: 'expired' | 'Paid' | 'Pending';
+  paymentType?: 'Full' | 'Partial';
+  soldPrice?: number;
+  paymentLink?: string;
+  createdBy?: string;
+  approval?: 'Not Required' | 'Awaiting';
+  approver?: string;
+  expires?: string;
 }
 
-export type CallStatus = 'Answered' | 'No Answer' | 'Busy' | 'Voicemail' | 'Wrong Number';
+export type CallStatus = 'Answered' | 'Not Connected 1' | 'Not Connected 2' | 'Not Connected 3' | 'Not Connected 4' | 'Not Connected 5' | 'Busy' | 'Voicemail' | 'Wrong Number' | 'Follow Up';
 export interface CallLog {
   id: string;
-  leadId: string;
+  leadId?: string;
   userId: string;
   userName: string;
   phoneNumber: string;
@@ -85,4 +94,5 @@ export interface CallLog {
   durationSeconds: number;
   status: CallStatus;
   notes?: string;
+  followUpTime?: string;
 }

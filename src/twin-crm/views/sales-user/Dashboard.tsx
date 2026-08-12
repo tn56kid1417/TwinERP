@@ -53,7 +53,7 @@ export const SalesUserDashboard: React.FC = () => {
   
   const totalCalls = calls.length
   const answeredCalls = calls.filter(c => c.status === 'Answered').length
-  const missedCalls = calls.filter(c => c.status === 'No Answer' || c.status === 'Voicemail' || c.status === 'Busy').length
+  const missedCalls = calls.filter(c => c.status.startsWith('Not Connected') || c.status === 'Voicemail' || c.status === 'Busy').length
 
   const stats = [
     {
@@ -105,7 +105,7 @@ export const SalesUserDashboard: React.FC = () => {
       header: 'Prospect Contact',
       accessor: (row) => (
         <div className="text-left">
-          <h4 className="font-semibold text-slate-900 dark:text-slate-100 leading-snug">{row.name}</h4>
+          <h4 className="font-semibold text-slate-900 dark:text-white dark:text-slate-100 leading-snug">{row.name}</h4>
           <span className="text-xs text-slate-400 font-semibold">{row.companyName}</span>
         </div>
       ),
@@ -163,7 +163,7 @@ export const SalesUserDashboard: React.FC = () => {
                 <mod.icon size={20} />
               </div>
               <div>
-                <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">{mod.name}</h3>
+                <h3 className="font-semibold text-sm text-slate-900 dark:text-white dark:text-slate-100">{mod.name}</h3>
                 <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">{mod.desc}</p>
               </div>
             </CardContent>
@@ -183,7 +183,7 @@ export const SalesUserDashboard: React.FC = () => {
                 </div>
                 <div className="flex-1 text-left">
                   <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 block uppercase tracking-wider">{stat.title}</span>
-                  <span className="text-2xl font-extrabold text-slate-900 dark:text-slate-100 block mt-0.5 tracking-tight">{stat.value}</span>
+                  <span className="text-2xl font-extrabold text-slate-900 dark:text-white dark:text-slate-100 block mt-0.5 tracking-tight">{stat.value}</span>
                   <span className="text-[11px] text-slate-400 font-semibold block mt-0.5">{stat.description}</span>
                 </div>
               </CardContent>
@@ -231,7 +231,7 @@ export const SalesUserDashboard: React.FC = () => {
                         className="p-3 border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors cursor-pointer text-left space-y-1.5"
                       >
                         <div className="flex items-center justify-between">
-                          <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 leading-snug">{lead.name}</h4>
+                          <h4 className="text-sm font-bold text-slate-900 dark:text-white dark:text-slate-100 leading-snug">{lead.name}</h4>
                           <Badge variant="warning" className="text-[9px] font-bold">Follow Up</Badge>
                         </div>
                         <p className="text-xs text-slate-500 dark:text-slate-400">{lead.companyName}</p>
@@ -263,7 +263,7 @@ export const SalesUserDashboard: React.FC = () => {
                       <activity.icon size={14} />
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100">{activity.text}</h4>
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-white dark:text-slate-100">{activity.text}</h4>
                       <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{activity.detail}</p>
                       <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block mt-1.5">{activity.time}</span>
                     </div>

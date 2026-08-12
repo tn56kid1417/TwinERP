@@ -1,10 +1,10 @@
-import { LayoutDashboard, Users, Target, Users2, FileText, Settings } from 'lucide-react'
+import { LayoutDashboard, Users, Target, Users2, FileText, Settings, UploadCloud } from 'lucide-react'
 
 export interface NavItem {
   name: string
   href: string
   icon: any
-  adminOnly?: boolean // Hide from sales users
+  allowedRoles?: string[]
 }
 
 export const SIDEBAR_NAV: NavItem[] = [
@@ -17,12 +17,18 @@ export const SIDEBAR_NAV: NavItem[] = [
     name: 'Sales Reps',
     href: '/sales',
     icon: Users,
-    adminOnly: true,
+    allowedRoles: ['COMPANY_ADMIN'],
   },
   {
     name: 'Leads Board',
     href: '/leads',
     icon: Target,
+  },
+  {
+    name: 'Upload Leads',
+    href: '/upload-leads',
+    icon: UploadCloud,
+    allowedRoles: ['COMPANY_ADMIN', 'MARKETING'],
   },
   {
     name: 'Customers',
@@ -40,4 +46,5 @@ export const SIDEBAR_NAV: NavItem[] = [
     icon: Settings,
   },
 ]
+
 export default SIDEBAR_NAV

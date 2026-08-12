@@ -1,3 +1,4 @@
+cat << 'INNER_EOF' > src/pages/HRMUserAnalytics.tsx
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { User, Clock, Coffee, CalendarCheck, Users, Calendar, TrendingDown, TrendingUp, ChevronDown } from 'lucide-react';
@@ -230,3 +231,4 @@ const HRMUserAnalytics = () => {
 };
 
 export default HRMUserAnalytics;
+INNER_EOF

@@ -199,7 +199,7 @@ export const SalesUsers: React.FC = () => {
             {row.name.charAt(0)}
           </div>
           <div className="text-left">
-            <h4 className="font-semibold text-slate-800 leading-snug">{row.name}</h4>
+            <h4 className="font-semibold text-slate-800 dark:text-slate-100 leading-snug">{row.name}</h4>
             <span className="text-xs text-slate-400 flex items-center gap-1">
               <Mail size={12} /> {row.email}
             </span>
@@ -240,7 +240,7 @@ export const SalesUsers: React.FC = () => {
                 toast.error('Failed to generate report', { id: 'report' });
               }
             }}
-            className="p-2 border rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200 border-slate-200 dark:border-slate-800 cursor-pointer"
+            className="p-2 border rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:text-slate-100 dark:hover:text-slate-200 border-slate-200 dark:border-slate-800 cursor-pointer"
             title="Download Report"
           >
             <Download size={14} />
@@ -249,7 +249,7 @@ export const SalesUsers: React.FC = () => {
             variant="outline"
             size="sm"
             onClick={() => openEditModal(row)}
-            className="p-2 border rounded-lg hover:bg-slate-50 text-slate-500 hover:text-slate-800 cursor-pointer"
+            className="p-2 border rounded-lg hover:bg-slate-50 text-slate-500 hover:text-slate-800 dark:text-slate-100 cursor-pointer"
             title="Edit details"
           >
             <Edit2 size={14} />

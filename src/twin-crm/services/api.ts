@@ -313,6 +313,27 @@ api.defaults.adapter = async function mockAdapter(config: AxiosRequestConfig): P
       }
     }
 
+    // === ROUTE: /leads/batch ===
+    if (cleanPath === '/leads/batch' && method === 'post') {
+      const leads = db.getLeads()
+      const newLeads: Lead[] = body.map((b: any, index: number) => ({
+        id: `lead-${Date.now()}-${index}-${Math.random().toString(36).substr(2, 9)}`,
+        name: b.name,
+        companyName: b.companyName,
+        email: b.email,
+        phone: b.phone || '',
+        status: (b.status || 'New') as LeadStatus,
+        assignedUserId: b.assignedUserId || undefined,
+        assignedUserName: b.assignedUserName || undefined,
+        companyId: b.companyId,
+        value: Number(b.value) || 0,
+        createdDate: new Date().toISOString(),
+        updatedDate: new Date().toISOString(),
+      }))
+      db.saveLeads([...leads, ...newLeads])
+      return createMockResponse(config, 201, newLeads)
+    }
+
     // === ROUTE: /leads/:id ===
     if (cleanPath.startsWith('/leads/') && cleanPath.split('/').length === 3) {
       const leadId = cleanPath.split('/')[2]
@@ -473,6 +494,7 @@ api.defaults.adapter = async function mockAdapter(config: AxiosRequestConfig): P
           durationSeconds: body.durationSeconds || 0,
           status: body.status,
           notes: body.notes,
+          followUpTime: body.followUpTime,
         }
         db.saveCalls([...calls, newCall])
         return createMockResponse(config, 201, newCall)
@@ -497,10 +519,39 @@ api.defaults.adapter = async function mockAdapter(config: AxiosRequestConfig): P
           product: body.product,
           amount: Number(body.amount),
           date: new Date().toISOString(),
+          paymentStatus: body.paymentStatus,
+          paymentType: body.paymentType,
+          soldPrice: body.soldPrice,
+          paymentLink: body.paymentLink,
+          approver: body.approver,
+          expires: body.expires,
+          createdBy: body.createdBy,
         }
 
         db.savePurchases([...purchases, newPurchase])
         return createMockResponse(config, 201, newPurchase)
+      }
+    }
+
+    // === ROUTE: /purchases/:id ===
+    if (cleanPath.startsWith('/purchases/') && cleanPath.split('/').length === 3) {
+      const purchaseId = cleanPath.split('/')[2]
+      const purchases = db.getPurchases()
+      const foundPurchase = purchases.find((p) => p.id === purchaseId)
+      
+      if (foundPurchase) {
+        if (method === 'get') {
+          return createMockResponse(config, 200, foundPurchase)
+        }
+        
+        if (method === 'put') {
+          const updatedPurchase = { ...foundPurchase, ...body }
+          const newPurchases = purchases.map((p) => (p.id === purchaseId ? updatedPurchase : p))
+          db.savePurchases(newPurchases)
+          return createMockResponse(config, 200, updatedPurchase)
+        }
+      } else {
+        throw { response: createMockResponse(config, 404, { message: 'Purchase not found' }, 'Not Found') }
       }
     }
 

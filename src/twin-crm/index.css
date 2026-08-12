@@ -118,3 +118,18 @@ body {
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   overflow-x: hidden;
 }
+
+:root {
+  --chart-tooltip-bg: #ffffff;
+  --chart-tooltip-border: #e2e8f0;
+  --chart-tooltip-text: #1e293b;
+}
+.dark {
+  --chart-tooltip-bg: #0f172a;
+  --chart-tooltip-border: #1e293b;
+  --chart-tooltip-text: #f8fafc;
+}
+
+.recharts-wrapper {
+  font-family: var(--font-sans);
+}

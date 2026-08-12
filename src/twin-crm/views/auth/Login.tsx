@@ -59,7 +59,7 @@ export const Login: React.FC = () => {
   }
 
   // Quick login helper for demo purposes
-  const handleQuickLogin = (role: 'admin' | 'sales' | 'stark') => {
+  const handleQuickLogin = (role: 'admin' | 'sales' | 'stark' | 'leader1' | 'leader2') => {
     if (role === 'admin') {
       setValue('workspaceName', 'acme')
       setValue('email', 'admin@acme.com')
@@ -72,13 +72,21 @@ export const Login: React.FC = () => {
       setValue('workspaceName', 'stark')
       setValue('email', 'pepper@stark.com')
       setValue('password', 'password')
+    } else if (role === 'leader1') {
+      setValue('workspaceName', 'acme')
+      setValue('email', 'michael@acme.com')
+      setValue('password', 'password')
+    } else if (role === 'leader2') {
+      setValue('workspaceName', 'acme')
+      setValue('email', 'jim@acme.com')
+      setValue('password', 'password')
     }
   }
 
   return (
     <Card className="w-full bg-white border border-slate-200 shadow-lg">
       <CardHeader className="text-center pb-2">
-        <CardTitle className="text-xl font-bold flex items-center justify-center gap-2 text-slate-800">
+        <CardTitle className="text-xl font-bold flex items-center justify-center gap-2 text-slate-800 dark:text-slate-100">
           Workspace Login
         </CardTitle>
       </CardHeader>
@@ -123,7 +131,7 @@ export const Login: React.FC = () => {
           <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1 mb-2.5 uppercase tracking-wider">
             <ShieldCheck size={12} /> Pre-fill testing credentials
           </span>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-2 gap-2">
             <Button
               type="button"
               variant="outline"
@@ -146,10 +154,19 @@ export const Login: React.FC = () => {
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => handleQuickLogin('stark')}
+              onClick={() => handleQuickLogin('leader1')}
               className="text-[10px] px-1 font-bold h-8 cursor-pointer border-slate-200"
             >
-              Stark Admin
+              Acme Leader 1
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => handleQuickLogin('leader2')}
+              className="text-[10px] px-1 font-bold h-8 cursor-pointer border-slate-200"
+            >
+              Acme Leader 2
             </Button>
           </div>
         </div>

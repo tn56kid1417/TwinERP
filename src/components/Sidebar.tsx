@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Phone, Users, Clock, Calendar, FileText, LayoutDashboard, BarChart2, UserMinus, UserX, Award, Megaphone, LogOut, Mail, PartyPopper, Briefcase, Building, PieChart, Sun, Moon, UserPlus, Settings as SettingsIcon } from 'lucide-react';
+import { Phone, Users, Clock, Calendar, FileText, LayoutDashboard, BarChart2, UserMinus, UserX, Award, Megaphone, LogOut, Mail, PartyPopper, Briefcase, Building, PieChart, Sun, Moon, UserPlus, Settings as SettingsIcon, CreditCard , UploadCloud } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 type Module = 'HRM' | 'CRM' | 'Projects';
@@ -69,8 +69,10 @@ const Sidebar = () => {
   const crmNavItems = [
     { name: 'Dashboard', path: '/crm', icon: <LayoutDashboard size={20} />, hrOnly: false },
     { name: 'Leads', path: '/crm/leads', icon: <Users size={20} />, hrOnly: false },
+    ...(user?.department === 'Marketing' || user?.role === 'Marketing' || canViewAll ? [{ name: 'Upload Leads', path: '/crm/upload-leads', icon: <UploadCloud size={20} />, hrOnly: false }] : []),
     { name: 'Customers', path: '/crm/customers', icon: <Building size={20} />, hrOnly: false },
     { name: 'Calls', path: '/crm/calls', icon: <Phone size={20} />, hrOnly: false },
+    { name: 'Payments', path: '/crm/payments', icon: <CreditCard size={20} />, hrOnly: false },
 
     { name: 'Sales Team', path: '/crm/sales', icon: <UserPlus size={20} />, hrOnly: false },
     { name: 'Reports', path: '/crm/reports', icon: <BarChart2 size={20} />, hrOnly: false },

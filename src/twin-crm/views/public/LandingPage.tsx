@@ -14,7 +14,7 @@ export const LandingPage: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans">
+    <div className="min-h-screen bg-slate-50 text-slate-900 dark:text-white flex flex-col font-sans">
       
       {/* Navigation Bar */}
       <nav className="fixed top-0 left-0 right-0 h-16 border-b border-slate-200 bg-white/80 backdrop-blur-md z-50 flex items-center justify-between px-6 md:px-12">
@@ -52,7 +52,7 @@ export const LandingPage: React.FC = () => {
         <div className="inline-flex items-center gap-1.5 px-3 py-1 bg-primary/10 border border-primary/20 rounded-full text-xs font-bold text-primary uppercase tracking-wider">
           <Star size={12} className="fill-current" /> Next Generation Multi-Tenant CRM
         </div>
-        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-slate-900 leading-tight">
+        <h1 className="text-4xl md:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
           Scale Your Client Operations with <span className="text-primary">Twincord CRM</span>
         </h1>
         <p className="text-base md:text-lg text-slate-500 max-w-2xl leading-relaxed">
@@ -143,7 +143,7 @@ export const LandingPage: React.FC = () => {
                 <div className="space-y-2">
                   <h4 className="text-base font-bold text-slate-600">Starter</h4>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold text-slate-900">$29</span>
+                    <span className="text-4xl font-extrabold text-slate-900 dark:text-white">$29</span>
                     <span className="text-sm text-slate-500 font-medium">/month</span>
                   </div>
                   <p className="text-xs text-slate-500 leading-normal">Perfect for small initial agencies.</p>
@@ -168,7 +168,7 @@ export const LandingPage: React.FC = () => {
                 <div className="space-y-2">
                   <h4 className="text-base font-bold text-primary">Growth</h4>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold text-slate-900">$79</span>
+                    <span className="text-4xl font-extrabold text-slate-900 dark:text-white">$79</span>
                     <span className="text-sm text-slate-500 font-medium">/month</span>
                   </div>
                   <p className="text-xs text-slate-500 leading-normal">Optimized for growing companies.</p>
@@ -190,7 +190,7 @@ export const LandingPage: React.FC = () => {
                 <div className="space-y-2">
                   <h4 className="text-base font-bold text-slate-600">Enterprise</h4>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-4xl font-extrabold text-slate-900">$199</span>
+                    <span className="text-4xl font-extrabold text-slate-900 dark:text-white">$199</span>
                     <span className="text-sm text-slate-500 font-medium">/month</span>
                   </div>
                   <p className="text-xs text-slate-500 leading-normal">Tailored for giant corporate structures.</p>

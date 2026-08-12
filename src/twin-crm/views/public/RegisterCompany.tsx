@@ -117,7 +117,7 @@ export const RegisterCompany: React.FC = () => {
   }
 
   return (
-    <div className="relative min-h-screen bg-slate-50 text-slate-800 flex items-center justify-center p-4">
+    <div className="relative min-h-screen bg-slate-50 text-slate-800 dark:text-slate-100 flex items-center justify-center p-4">
       {/* Background blobs */}
       <div className="absolute top-1/4 -left-32 w-96 h-96 bg-primary/10 rounded-full mix-blend-multiply filter blur-3xl opacity-50" />
       <div className="absolute bottom-1/4 -right-32 w-96 h-96 bg-blue-500/10 rounded-full mix-blend-multiply filter blur-3xl opacity-50" />
@@ -136,7 +136,7 @@ export const RegisterCompany: React.FC = () => {
 
         <Card className="border border-border shadow-lg bg-card">
           <CardHeader className="pb-3">
-            <CardTitle className="text-center text-xl font-extrabold text-slate-800">
+            <CardTitle className="text-center text-xl font-extrabold text-slate-800 dark:text-slate-100">
               {step === 1 && 'Company Profile'}
               {step === 2 && 'Workspace Configuration'}
               {step === 3 && 'Administrative Profile'}
@@ -269,7 +269,7 @@ export const RegisterCompany: React.FC = () => {
                     Company Size
                   </label>
                   <select
-                    className="w-full text-sm py-2 px-3.5 bg-card border border-border text-slate-800 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 cursor-pointer"
+                    className="w-full text-sm py-2 px-3.5 bg-card border border-border text-slate-800 dark:text-slate-100 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 cursor-pointer"
                     {...register('companySize')}
                   >
                     <option value="1–10 Employees">1–10 Employees</option>
@@ -363,7 +363,7 @@ export const RegisterCompany: React.FC = () => {
                   <ShieldCheck size={36} />
                 </div>
                 <div className="space-y-2">
-                  <h3 className="text-lg font-bold text-slate-800">Workspace Created Successfully!</h3>
+                  <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Workspace Created Successfully!</h3>
                   <p className="text-sm text-slate-500 max-w-sm mx-auto leading-relaxed">
                     Your multi-tenant workspace profile for <strong>{watchedCompanyName}</strong> has been successfully provisioned.
                   </p>

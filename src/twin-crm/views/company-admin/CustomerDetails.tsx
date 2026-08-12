@@ -144,7 +144,7 @@ export const CustomerDetails: React.FC = () => {
               </div>
               <div className="flex items-center gap-3 text-sm text-slate-600">
                 <Award size={16} className="text-slate-400 flex-shrink-0" />
-                <span>Total Booked Revenue: <strong className="text-slate-900">{formatUSD(totalSpent)}</strong></span>
+                <span>Total Booked Revenue: <strong className="text-slate-900 dark:text-white">{formatUSD(totalSpent)}</strong></span>
               </div>
               <div className="flex items-center gap-3 text-sm text-slate-600">
                 <Calendar size={16} className="text-slate-400 flex-shrink-0" />
@@ -162,14 +162,14 @@ export const CustomerDetails: React.FC = () => {
               <div className="flex items-start gap-2.5">
                 <div className="w-2 h-2 rounded-full bg-success mt-1.5 flex-shrink-0" />
                 <div>
-                  <p className="font-bold text-slate-800">Lead Converted</p>
+                  <p className="font-bold text-slate-800 dark:text-slate-100">Lead Converted</p>
                   <p>Client database profile provisioned automatically on deal closure.</p>
                 </div>
               </div>
               <div className="flex items-start gap-2.5">
                 <div className="w-2 h-2 rounded-full bg-primary mt-1.5 flex-shrink-0 animate-pulse" />
                 <div>
-                  <p className="font-bold text-slate-800">Operational Onboarding</p>
+                  <p className="font-bold text-slate-800 dark:text-slate-100">Operational Onboarding</p>
                   <p>Arrange initial project setup demonstration with the assigned agent.</p>
                 </div>
               </div>
@@ -190,7 +190,7 @@ export const CustomerDetails: React.FC = () => {
                     'px-4 py-3.5 text-sm font-semibold border-b-2 transition-colors cursor-pointer flex items-center gap-2',
                     activeRightTab === 'notes'
                       ? 'border-primary text-primary'
-                      : 'border-transparent text-slate-500 hover:text-slate-800'
+                      : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-100'
                   )}
                 >
                   <MessageSquare size={16} /> Notes Log ({notes.length})
@@ -201,7 +201,7 @@ export const CustomerDetails: React.FC = () => {
                     'px-4 py-3.5 text-sm font-semibold border-b-2 transition-colors cursor-pointer flex items-center gap-2',
                     activeRightTab === 'purchases'
                       ? 'border-primary text-primary'
-                      : 'border-transparent text-slate-500 hover:text-slate-800'
+                      : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-100'
                   )}
                 >
                   <ShoppingBag size={16} /> Purchases ({purchases.length})
@@ -285,11 +285,11 @@ export const CustomerDetails: React.FC = () => {
                             <ShoppingBag size={18} />
                           </div>
                           <div>
-                            <h4 className="text-sm font-bold text-slate-800 leading-snug">{purchase.product}</h4>
+                            <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 leading-snug">{purchase.product}</h4>
                             <span className="text-xs text-slate-400">{formatDate(purchase.date)}</span>
                           </div>
                         </div>
-                        <span className="text-base font-extrabold text-slate-800">{formatUSD(purchase.amount)}</span>
+                        <span className="text-base font-extrabold text-slate-800 dark:text-slate-100">{formatUSD(purchase.amount)}</span>
                       </div>
                     ))
                   )}

@@ -15,10 +15,10 @@ export const Sidebar: React.FC = () => {
 
   // Filter navigation items by user role
   const filteredNav = SIDEBAR_NAV.filter(
-    (item) => !item.adminOnly || user.role === 'COMPANY_ADMIN'
+    (item) => !item.allowedRoles || item.allowedRoles.includes(user.role)
   )
 
-  const roleLabel = user.role === 'COMPANY_ADMIN' ? 'Company Admin' : 'Sales Rep'
+  const roleLabel = user.role.replace('_', ' ');
 
   return (
     <aside

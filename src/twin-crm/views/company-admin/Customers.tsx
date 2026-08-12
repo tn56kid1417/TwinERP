@@ -39,7 +39,7 @@ export const Customers: React.FC = () => {
             {row.name.charAt(0)}
           </div>
           <div className="text-left">
-            <h4 className="font-semibold text-slate-800 leading-snug">{row.name}</h4>
+            <h4 className="font-semibold text-slate-800 dark:text-slate-100 leading-snug">{row.name}</h4>
             <span className="text-xs text-slate-400 flex items-center gap-1">
               <Mail size={12} /> {row.email}
             </span>

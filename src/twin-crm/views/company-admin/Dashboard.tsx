@@ -12,6 +12,7 @@ import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
 import { formatUSD } from '../../utils/formatters'
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts'
+import { ActivityHeatmap } from '../../components/ActivityHeatmap'
 
 export const CompanyAdminDashboard: React.FC = () => {
   const navigate = useNavigate()
@@ -105,7 +106,7 @@ export const CompanyAdminDashboard: React.FC = () => {
       header: 'Prospect',
       accessor: (row) => (
         <div className="text-left">
-          <h4 className="font-semibold text-slate-900 dark:text-slate-100 leading-snug">{row.name}</h4>
+          <h4 className="font-semibold text-slate-900 dark:text-white dark:text-slate-100 leading-snug">{row.name}</h4>
           <span className="text-xs text-slate-400 font-semibold">{row.companyName}</span>
         </div>
       ),
@@ -167,7 +168,7 @@ export const CompanyAdminDashboard: React.FC = () => {
                 <mod.icon size={20} />
               </div>
               <div>
-                <h3 className="font-semibold text-sm text-slate-900 dark:text-slate-100">{mod.name}</h3>
+                <h3 className="font-semibold text-sm text-slate-900 dark:text-white dark:text-slate-100">{mod.name}</h3>
                 <p className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">{mod.desc}</p>
               </div>
             </CardContent>
@@ -186,7 +187,7 @@ export const CompanyAdminDashboard: React.FC = () => {
                   {stat.title}
                 </span>
                 <div className="flex items-center justify-between">
-                  <span className="text-2xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">{stat.value}</span>
+                  <span className="text-2xl font-extrabold text-slate-900 dark:text-white dark:text-slate-100 tracking-tight">{stat.value}</span>
                   <div className={`p-2 rounded-lg border ${stat.color} flex items-center justify-center flex-shrink-0`}>
                     <Icon size={16} />
                   </div>
@@ -203,6 +204,15 @@ export const CompanyAdminDashboard: React.FC = () => {
         
         {/* Deal allocation by Sales Rep Chart */}
         <div className="lg:col-span-2">
+          <Card className="h-full flex flex-col">
+            <CardHeader>
+              <CardTitle className="text-left">Activity Heatmap (Peak Call Volume)</CardTitle>
+            </CardHeader>
+            <CardContent className="flex-1 flex items-center justify-center pt-0">
+               <ActivityHeatmap />
+            </CardContent>
+          </Card>
+          
           <Card className="h-full">
             <CardHeader>
               <CardTitle className="text-left">Representative Lead Distribution</CardTitle>
@@ -221,16 +231,16 @@ export const CompanyAdminDashboard: React.FC = () => {
               ) : (
                 <div className="w-full h-full pr-4">
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={chartData} margin={{ top: 20, right: 10, left: -20, bottom: 0 }}>
+                    <BarChart data={chartData} margin={{ top: 20, right: 10, left: 10, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" className="stroke-slate-200" />
                       <XAxis dataKey="name" className="text-[11px] fill-slate-500 font-medium" />
-                      <YAxis className="text-[11px] fill-slate-500 font-medium" />
+                      <YAxis className="text-[11px] fill-slate-500 font-medium" width={45} tickFormatter={(v: number) => `$${v >= 1000 ? (v / 1000).toFixed(0) + 'k' : v}`} />
                       <Tooltip
                         contentStyle={{
-                          backgroundColor: '#fff',
-                          borderColor: '#e2e8f0',
+                          backgroundColor: 'var(--chart-tooltip-bg)',
+                          borderColor: 'var(--chart-tooltip-border)',
                           borderRadius: '8px',
-                          color: '#1e293b',
+                          color: 'var(--chart-tooltip-text)',
                           fontSize: '12px',
                         }}
                       />
@@ -267,7 +277,7 @@ export const CompanyAdminDashboard: React.FC = () => {
                       className="flex items-center justify-between p-3.5 border border-slate-200 dark:border-slate-800 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-all cursor-pointer text-left"
                     >
                       <div>
-                        <h4 className="text-sm font-bold text-slate-900 dark:text-slate-100 leading-snug">{lead.name}</h4>
+                        <h4 className="text-sm font-bold text-slate-900 dark:text-white dark:text-slate-100 leading-snug">{lead.name}</h4>
                         <span className="text-xs text-slate-400">{lead.companyName}</span>
                       </div>
                       <Badge variant={lead.status === 'Converted' ? 'success' : 'secondary'} className="px-2 font-bold text-[10px]">
@@ -324,7 +334,7 @@ export const CompanyAdminDashboard: React.FC = () => {
                       <activity.icon size={14} />
                     </div>
                     <div>
-                      <h4 className="text-xs font-bold text-slate-900 dark:text-slate-100">{activity.text}</h4>
+                      <h4 className="text-xs font-bold text-slate-900 dark:text-white dark:text-slate-100">{activity.text}</h4>
                       <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">{activity.detail}</p>
                       <span className="text-[9px] text-slate-400 font-bold uppercase tracking-wider block mt-1.5">{activity.time}</span>
                     </div>

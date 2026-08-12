@@ -27,7 +27,7 @@ export const DashboardLayout: React.FC = () => {
   const workspaceUrl = user?.workspaceName ? `${user.workspaceName}.twincord.com` : 'workspace.twincord.com'
 
   return (
-    <div className="flex h-screen w-full overflow-hidden text-slate-800 font-sans">
+    <div className="flex h-screen w-full overflow-hidden text-slate-800 dark:text-slate-200 font-sans">
       {/* Sidebar Navigation */}
       <Sidebar />
 

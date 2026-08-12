@@ -2,6 +2,7 @@ import React, { Component, ReactNode } from 'react'
 import { useAuthStore } from '../store/authStore'
 import { CompanyAdminDashboard } from '../views/company-admin/Dashboard'
 import { SalesUserDashboard } from '../views/sales-user/Dashboard'
+import { SalesLeaderDashboard } from '../views/sales-leader/Dashboard'
 
 class ErrorBoundary extends Component<{children: ReactNode}, {hasError: boolean, error: Error | null}> {
   public state = { hasError: false, error: null as Error | null };
@@ -24,6 +25,9 @@ const DashboardContent: React.FC = () => {
 
   if (user?.role === 'COMPANY_ADMIN') {
     return <CompanyAdminDashboard />
+  }
+  if (user?.role === 'SALES_LEADER') {
+    return <SalesLeaderDashboard />
   }
 
   return <SalesUserDashboard />

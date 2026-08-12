@@ -169,7 +169,7 @@ export const SettingsView: React.FC = () => {
               'px-4 py-2.5 text-sm font-semibold border-b-2 transition-all cursor-pointer flex items-center gap-2',
               activeTab === 'profile'
                 ? 'border-primary text-primary'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+                : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-100'
             )}
           >
             <User size={16} /> Personal Profile
@@ -180,7 +180,7 @@ export const SettingsView: React.FC = () => {
               'px-4 py-2.5 text-sm font-semibold border-b-2 transition-all cursor-pointer flex items-center gap-2',
               activeTab === 'company'
                 ? 'border-primary text-primary'
-                : 'border-transparent text-slate-500 hover:text-slate-800'
+                : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-100'
             )}
           >
             <Building size={16} /> Company Settings

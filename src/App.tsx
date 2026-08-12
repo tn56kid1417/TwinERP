@@ -24,12 +24,14 @@ import Placeholder from './pages/Placeholder';
 import Settings from './pages/Settings';
 import DashboardDispatcher from './twin-crm/router/DashboardDispatcher';
 import LeadsDispatcher from './twin-crm/router/LeadsDispatcher';
+import UploadLeads from './twin-crm/views/marketing/UploadLeads';
 import Customers from './twin-crm/views/company-admin/Customers';
 import CustomerDetails from './twin-crm/views/company-admin/CustomerDetails';
 import Reports from './twin-crm/views/company-admin/Reports';
 import SalesUsers from './twin-crm/views/company-admin/SalesUsers';
 import CRMSettings from './twin-crm/views/shared/Settings';
 import CRMCalls from './twin-crm/views/shared/Calls';
+import CRMPayments from './twin-crm/views/shared/Payments';
 
 import HRMUserAnalytics from './pages/HRMUserAnalytics';
 import ProjectsList from './pages/projects/ProjectsList';
@@ -80,11 +82,13 @@ export default function App() {
             <Route path="/crm">
               <Route index element={<div className="p-6"><DashboardDispatcher /></div>} />
               <Route path="leads" element={<div className="p-6"><LeadsDispatcher /></div>} />
+              <Route path="upload-leads" element={<div className="p-6"><UploadLeads /></div>} />
               <Route path="customers" element={<div className="p-6"><Customers /></div>} />
               <Route path="customers/:id" element={<div className="p-6"><CustomerDetails /></div>} />
               <Route path="reports" element={<div className="p-6"><Reports /></div>} />
               <Route path="sales" element={<div className="p-6"><SalesUsers /></div>} />
               <Route path="calls" element={<div className="p-6"><CRMCalls /></div>} />
+              <Route path="payments" element={<div className="p-6"><CRMPayments /></div>} />
 
               <Route path="settings" element={<div className="p-6"><CRMSettings /></div>} />
             </Route>

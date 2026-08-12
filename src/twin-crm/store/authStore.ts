@@ -18,14 +18,20 @@ export const useAuthStore = (): AuthState => {
   
   const mappedUser = useMemo<User | null>(() => {
     if (!mainUser) return null;
+    let mappedRole: any = 'SALES_USER';
+    if (mainUser.department === "Marketing") mappedRole = 'MARKETING';
+    else if (mainUser.role === "Manager" || mainUser.role === "Team Leader" || mainUser.role === "Sales Team Leader") mappedRole = 'SALES_LEADER';
+    else if (mainUser.role === "CEO" || mainUser.role === "Admin" || mainUser.department === "HR") mappedRole = 'COMPANY_ADMIN';
+
     return {
-      id: (mainUser.department === "Marketing" || mainUser.role === "CEO" || mainUser.role === "Admin" || mainUser.department === "HR") ? mainUser.id : "user-sales-john",
+      id: mainUser.id,
       name: `${mainUser.firstName} ${mainUser.lastName}`,
       email: mainUser.email,
-      role: (mainUser.department === "Marketing" || mainUser.role === "CEO" || mainUser.role === "Admin" || mainUser.department === "HR") ? "COMPANY_ADMIN" : "SALES_USER",
-      designation: mainUser.role,
+      role: mappedRole,
+      designation: mainUser.designation || mainUser.role,
       workspaceName: "acme",
-      companyId: "company-1"
+      companyId: "company-1",
+      teamId: mainUser.teamId
     };
   }, [mainUser]);
 

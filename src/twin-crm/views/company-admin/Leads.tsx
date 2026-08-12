@@ -152,7 +152,7 @@ export const Leads: React.FC = () => {
       header: 'Prospect Contact',
       accessor: (row) => (
         <div className="text-left">
-          <h4 className="font-semibold text-slate-800 leading-snug">{row.name}</h4>
+          <h4 className="font-semibold text-slate-800 dark:text-slate-100 leading-snug">{row.name}</h4>
           <span className="text-xs text-slate-400 font-semibold">{row.companyName}</span>
         </div>
       ),
@@ -230,7 +230,7 @@ export const Leads: React.FC = () => {
               'px-4 py-2.5 text-sm font-semibold border-b-2 whitespace-nowrap transition-all duration-200 cursor-pointer flex items-center gap-2',
               activeTab === tab.value
                 ? 'border-primary text-primary bg-primary/5'
-                : 'border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-100/50'
+                : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-100 hover:bg-slate-100/50'
             )}
           >
             {tab.label}
