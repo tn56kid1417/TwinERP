@@ -23,9 +23,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     const storedToken = localStorage.getItem('token');
-    if (storedUser && storedToken) {
-      setUser(JSON.parse(storedUser));
-      setToken(storedToken);
+    if (storedUser) {
+      try {
+        const parsedUser = JSON.parse(storedUser) as Employee;
+        if (storedToken) {
+          setUser(parsedUser);
+          setToken(storedToken);
+        } else {
+          localStorage.removeItem('user');
+        }
+      } catch (error) {
+        console.error('Failed to parse stored user session. Clearing invalid local session.', error);
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+      }
     }
   }, []);
 

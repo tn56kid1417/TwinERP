@@ -50,7 +50,7 @@ export const Sidebar: React.FC = () => {
       </button>
 
       {/* Nav List */}
-      <nav className="flex-1 p-4 space-y-1.5 overflow-y-auto">
+      <nav className="flex-1 min-h-0 p-4 pb-36 space-y-1.5 overflow-y-auto">
         {filteredNav.map((item) => {
           const isActive = location.pathname === item.href || location.pathname.startsWith(item.href + '/')
           const Icon = item.icon
@@ -81,7 +81,7 @@ export const Sidebar: React.FC = () => {
       </nav>
 
       {/* Profile Section & Logout */}
-      <div className="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 space-y-3 transition-colors">
+      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/95 dark:bg-slate-900/95 backdrop-blur-md space-y-3 transition-colors">
         <div className={cn('flex items-center gap-3', isCollapsed ? 'justify-center' : 'justify-start')}>
           {/* Avatar Icon */}
           <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-sm flex-shrink-0 uppercase border border-primary/20">

@@ -105,7 +105,7 @@ const Sidebar = () => {
   const navItems = getActiveNavItems();
 
   return (
-    <div className="w-64 bg-slate-50 dark:bg-[#11141B]/60 backdrop-blur-md border-r border-slate-200/80 dark:border-slate-800/50 flex flex-col min-h-screen">
+    <div className="relative w-64 bg-slate-50 dark:bg-[#11141B]/60 backdrop-blur-md border-r border-slate-200/80 dark:border-slate-800/50 flex flex-col h-screen sticky top-0 overflow-hidden">
       <div className="p-6 flex items-center gap-3">
         <img src="/logo.png" alt="TwinERP Logo" className="h-8 object-contain invert dark:invert-0" />
       </div>
@@ -133,7 +133,7 @@ const Sidebar = () => {
         </div>
       </div>
       
-      <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
+      <nav className="flex-1 min-h-0 px-4 pb-28 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
           const isExactMatch = location.pathname === item.path;
           const isSubRouteMatch = item.path !== '/' && item.path !== '/crm' && item.path !== '/projects' && location.pathname.startsWith(item.path);
@@ -158,7 +158,7 @@ const Sidebar = () => {
         })}
       </nav>
       
-      <div className="p-4 border-t border-slate-200/80 dark:border-slate-800/50">
+      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-200/80 dark:border-slate-800/50 bg-slate-50 dark:bg-[#11141B]/95">
         <div className="flex items-center gap-3 p-2 rounded-lg bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800">
           <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex-shrink-0 border border-slate-300 dark:border-slate-600 flex items-center justify-center text-xs font-bold text-slate-900 dark:text-white">
             {user?.firstName?.[0]}{user?.lastName?.[0]}
