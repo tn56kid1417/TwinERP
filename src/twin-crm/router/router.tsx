@@ -16,6 +16,7 @@ import Login from '../views/auth/Login'
 import DashboardDispatcher from './DashboardDispatcher'
 import LeadsDispatcher from './LeadsDispatcher'
 import UploadLeads from '../views/marketing/UploadLeads'
+import DistributeLeads from '../views/sales-leader/DistributeLeads'
 
 // Protected Workspace Views
 import SalesUsers from '../views/company-admin/SalesUsers'
@@ -44,6 +45,7 @@ export const AppRouter: React.FC = () => {
             {/* Common routes for both admin & sales reps */}
             <Route path="/dashboard" element={<DashboardDispatcher />} />
             <Route path="/leads" element={<LeadsDispatcher />} />
+            <Route path="/distribute-leads" element={<DistributeLeads />} />
             <Route path="/upload-leads" element={<UploadLeads />} />
             <Route path="/customers" element={<Customers />} />
             <Route path="/customers/:id" element={<CustomerDetails />} />

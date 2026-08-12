@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, Target, Users2, FileText, Settings, UploadCloud } from 'lucide-react'
+import { LayoutDashboard, Users, Target, Users2, FileText, Settings, UploadCloud, Shuffle } from 'lucide-react'
 
 export interface NavItem {
   name: string
@@ -23,6 +23,12 @@ export const SIDEBAR_NAV: NavItem[] = [
     name: 'Leads Board',
     href: '/leads',
     icon: Target,
+  },
+  {
+    name: 'Distribute Leads',
+    href: '/distribute-leads',
+    icon: Shuffle,
+    allowedRoles: ['SALES_LEADER'],
   },
   {
     name: 'Upload Leads',

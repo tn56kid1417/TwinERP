@@ -32,6 +32,7 @@ import SalesUsers from './twin-crm/views/company-admin/SalesUsers';
 import CRMSettings from './twin-crm/views/shared/Settings';
 import CRMCalls from './twin-crm/views/shared/Calls';
 import CRMPayments from './twin-crm/views/shared/Payments';
+import DistributeLeads from './twin-crm/views/sales-leader/DistributeLeads';
 
 import HRMUserAnalytics from './pages/HRMUserAnalytics';
 import ProjectsList from './pages/projects/ProjectsList';
@@ -89,6 +90,7 @@ export default function App() {
               <Route path="sales" element={<div className="p-6"><SalesUsers /></div>} />
               <Route path="calls" element={<div className="p-6"><CRMCalls /></div>} />
               <Route path="payments" element={<div className="p-6"><CRMPayments /></div>} />
+              <Route path="distribute-leads" element={<div className="p-6"><DistributeLeads /></div>} />
 
               <Route path="settings" element={<div className="p-6"><CRMSettings /></div>} />
             </Route>

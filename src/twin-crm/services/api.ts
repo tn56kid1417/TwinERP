@@ -334,6 +334,33 @@ api.defaults.adapter = async function mockAdapter(config: AxiosRequestConfig): P
       return createMockResponse(config, 201, newLeads)
     }
 
+    // === ROUTE: /leads/assign-bulk ===
+    if (cleanPath === '/leads/assign-bulk' && method === 'post') {
+      // body: { assignments: { leadId: string, userId: string }[] }
+      const assignments: { leadId: string; userId: string }[] = body.assignments || []
+      let leads = db.getLeads()
+      const users = db.getUsers()
+      const updated: Lead[] = []
+
+      for (const { leadId, userId } of assignments) {
+        const idx = leads.findIndex((l) => l.id === leadId)
+        if (idx === -1) continue
+        const foundUser = users.find((u) => u.id === userId)
+        const updatedLead: Lead = {
+          ...leads[idx],
+          assignedUserId: userId,
+          assignedUserName: foundUser?.name || leads[idx].assignedUserName,
+          status: leads[idx].status === 'New' ? 'Contacted' : leads[idx].status,
+          updatedDate: new Date().toISOString(),
+        }
+        leads[idx] = updatedLead
+        updated.push(updatedLead)
+      }
+
+      db.saveLeads(leads)
+      return createMockResponse(config, 200, { updated })
+    }
+
     // === ROUTE: /leads/:id ===
     if (cleanPath.startsWith('/leads/') && cleanPath.split('/').length === 3) {
       const leadId = cleanPath.split('/')[2]
