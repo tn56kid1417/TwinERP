@@ -3,43 +3,52 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
-import Dashboard from './pages/Dashboard';
-import EmployeeList from './pages/EmployeeList';
-import LeaveRequests from './pages/LeaveRequests';
-import LeaveBalance from './pages/LeaveBalance';
-import Attendance from './pages/Attendance';
-import Payslips from './pages/Payslips';
-import Resignations from './pages/Resignations';
-import Terminations from './pages/Terminations';
-import Holidays from './pages/Holidays';
-import Awards from './pages/Awards';
-import Announcements from './pages/Announcements';
-import Events from './pages/Events';
-import LetterGenerator from './pages/LetterGenerator';
 import Login from './pages/Login';
-import Placeholder from './pages/Placeholder';
-import Settings from './pages/Settings';
-import DashboardDispatcher from './twin-crm/router/DashboardDispatcher';
-import LeadsDispatcher from './twin-crm/router/LeadsDispatcher';
-import UploadLeads from './twin-crm/views/marketing/UploadLeads';
-import Customers from './twin-crm/views/company-admin/Customers';
-import CustomerDetails from './twin-crm/views/company-admin/CustomerDetails';
-import Reports from './twin-crm/views/company-admin/Reports';
-import SalesUsers from './twin-crm/views/company-admin/SalesUsers';
-import CRMSettings from './twin-crm/views/shared/Settings';
-import CRMCalls from './twin-crm/views/shared/Calls';
-import CRMPayments from './twin-crm/views/shared/Payments';
-import DistributeLeads from './twin-crm/views/sales-leader/DistributeLeads';
-
-import HRMUserAnalytics from './pages/HRMUserAnalytics';
-import ProjectsList from './pages/projects/ProjectsList';
-import ProjectKanban from './pages/projects/ProjectKanban';
-import ProjectsDashboard from './pages/projects/ProjectsDashboard';
-import ClientsList from './pages/projects/ClientsList';
 import { useAuth } from './context/AuthContext';
+
+// Lazy-load all pages — each is only downloaded when navigated to
+const Dashboard        = lazy(() => import('./pages/Dashboard'));
+const EmployeeList     = lazy(() => import('./pages/EmployeeList'));
+const LeaveRequests    = lazy(() => import('./pages/LeaveRequests'));
+const LeaveBalance     = lazy(() => import('./pages/LeaveBalance'));
+const Attendance       = lazy(() => import('./pages/Attendance'));
+const Payslips         = lazy(() => import('./pages/Payslips'));
+const Resignations     = lazy(() => import('./pages/Resignations'));
+const Terminations     = lazy(() => import('./pages/Terminations'));
+const Holidays         = lazy(() => import('./pages/Holidays'));
+const Awards           = lazy(() => import('./pages/Awards'));
+const Announcements    = lazy(() => import('./pages/Announcements'));
+const Events           = lazy(() => import('./pages/Events'));
+const LetterGenerator  = lazy(() => import('./pages/LetterGenerator'));
+const Settings         = lazy(() => import('./pages/Settings'));
+const HRMUserAnalytics = lazy(() => import('./pages/HRMUserAnalytics'));
+const ProjectsDashboard= lazy(() => import('./pages/projects/ProjectsDashboard'));
+const ProjectsList     = lazy(() => import('./pages/projects/ProjectsList'));
+const ProjectKanban    = lazy(() => import('./pages/projects/ProjectKanban'));
+const ClientsList      = lazy(() => import('./pages/projects/ClientsList'));
+
+// CRM module — lazy loaded as a group
+const DashboardDispatcher = lazy(() => import('./twin-crm/router/DashboardDispatcher'));
+const LeadsDispatcher     = lazy(() => import('./twin-crm/router/LeadsDispatcher'));
+const UploadLeads         = lazy(() => import('./twin-crm/views/marketing/UploadLeads'));
+const Customers           = lazy(() => import('./twin-crm/views/company-admin/Customers'));
+const CustomerDetails     = lazy(() => import('./twin-crm/views/company-admin/CustomerDetails'));
+const Reports             = lazy(() => import('./twin-crm/views/company-admin/Reports'));
+const SalesUsers          = lazy(() => import('./twin-crm/views/company-admin/SalesUsers'));
+const CRMSettings         = lazy(() => import('./twin-crm/views/shared/Settings'));
+const CRMCalls            = lazy(() => import('./twin-crm/views/shared/Calls'));
+const CRMPayments         = lazy(() => import('./twin-crm/views/shared/Payments'));
+const DistributeLeads     = lazy(() => import('./twin-crm/views/sales-leader/DistributeLeads'));
+
+const PageLoader = () => (
+  <div className="flex-1 flex items-center justify-center min-h-[60vh]">
+    <div className="w-8 h-8 border-2 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin" />
+  </div>
+);
 
 export default function App() {
   const { user } = useAuth();
@@ -62,48 +71,50 @@ export default function App() {
         <main className="flex-1 overflow-auto z-10 relative flex flex-col">
           <Header />
           <div className="flex-1 overflow-auto">
-            <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/employees" element={<EmployeeList />} />
-            <Route path="/attendance" element={<Attendance />} />
-            <Route path="/leaves" element={<LeaveRequests />} />
-            <Route path="/leave-balance" element={<LeaveBalance />} />
-            <Route path="/payslips" element={<Payslips />} />
-            <Route path="/resignations" element={<Resignations />} />
-            <Route path="/terminations" element={<Terminations />} />
-            <Route path="/holidays" element={<Holidays />} />
-            <Route path="/awards" element={<Awards />} />
-            <Route path="/announcements" element={<Announcements />} />
-            <Route path="/events" element={<Events />} />
-            <Route path="/letters" element={<LetterGenerator />} />
-            <Route path="/analytics" element={<HRMUserAnalytics />} />
-            <Route path="/settings" element={<Settings />} />
-            
-            {/* CRM Module Routes */}
-            <Route path="/crm">
-              <Route index element={<div className="p-6"><DashboardDispatcher /></div>} />
-              <Route path="leads" element={<div className="p-6"><LeadsDispatcher /></div>} />
-              <Route path="upload-leads" element={<div className="p-6"><UploadLeads /></div>} />
-              <Route path="customers" element={<div className="p-6"><Customers /></div>} />
-              <Route path="customers/:id" element={<div className="p-6"><CustomerDetails /></div>} />
-              <Route path="reports" element={<div className="p-6"><Reports /></div>} />
-              <Route path="sales" element={<div className="p-6"><SalesUsers /></div>} />
-              <Route path="calls" element={<div className="p-6"><CRMCalls /></div>} />
-              <Route path="payments" element={<div className="p-6"><CRMPayments /></div>} />
-              <Route path="distribute-leads" element={<div className="p-6"><DistributeLeads /></div>} />
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/employees" element={<EmployeeList />} />
+              <Route path="/attendance" element={<Attendance />} />
+              <Route path="/leaves" element={<LeaveRequests />} />
+              <Route path="/leave-balance" element={<LeaveBalance />} />
+              <Route path="/payslips" element={<Payslips />} />
+              <Route path="/resignations" element={<Resignations />} />
+              <Route path="/terminations" element={<Terminations />} />
+              <Route path="/holidays" element={<Holidays />} />
+              <Route path="/awards" element={<Awards />} />
+              <Route path="/announcements" element={<Announcements />} />
+              <Route path="/events" element={<Events />} />
+              <Route path="/letters" element={<LetterGenerator />} />
+              <Route path="/analytics" element={<HRMUserAnalytics />} />
+              <Route path="/settings" element={<Settings />} />
 
-              <Route path="settings" element={<div className="p-6"><CRMSettings /></div>} />
-            </Route>
+              {/* CRM Module Routes */}
+              <Route path="/crm">
+                <Route index element={<div className="p-6"><DashboardDispatcher /></div>} />
+                <Route path="leads" element={<div className="p-6"><LeadsDispatcher /></div>} />
+                <Route path="upload-leads" element={<div className="p-6"><UploadLeads /></div>} />
+                <Route path="customers" element={<div className="p-6"><Customers /></div>} />
+                <Route path="customers/:id" element={<div className="p-6"><CustomerDetails /></div>} />
+                <Route path="reports" element={<div className="p-6"><Reports /></div>} />
+                <Route path="sales" element={<div className="p-6"><SalesUsers /></div>} />
+                <Route path="calls" element={<div className="p-6"><CRMCalls /></div>} />
+                <Route path="payments" element={<div className="p-6"><CRMPayments /></div>} />
+                <Route path="distribute-leads" element={<div className="p-6"><DistributeLeads /></div>} />
+                <Route path="settings" element={<div className="p-6"><CRMSettings /></div>} />
+              </Route>
 
-            {/* Projects Module Routes */}
-            <Route path="/projects" element={<ProjectsDashboard />} />
-            <Route path="/projects/all" element={<ProjectsList />} />
-            <Route path="/projects/:id/board" element={<ProjectKanban />} />
-            <Route path="/projects/clients" element={<ClientsList />} />
+              {/* Projects Module Routes */}
+              <Route path="/projects" element={<ProjectsDashboard />} />
+              <Route path="/projects/all" element={<ProjectsList />} />
+              <Route path="/projects/:id/board" element={<ProjectKanban />} />
+              <Route path="/projects/clients" element={<ClientsList />} />
 
-            <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
+              <Route path="*" element={<Navigate to="/" replace />} />
+              </Routes>
+            </Suspense>
           </div>
+
         </main>
       </div>
     </Router>
