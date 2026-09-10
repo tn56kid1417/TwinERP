@@ -101,9 +101,8 @@ let projectActivities: any[] = [
   { id: 'a3', taskId: 't1', projectId: 'p1', type: 'StatusChange', description: 'Task "Design Mockups" moved to In Progress', timestamp: new Date(Date.now() - 3600000 * 5).toISOString() },
 ];
 
-async function startServer() {
+export function createApp() {
   const app = express();
-  const PORT = 3000;
 
   app.use(express.json());
   app.use((req, res, next) => { console.log(req.method, req.url); next(); });
@@ -532,6 +531,13 @@ async function startServer() {
     app.use(express.static(path.join(process.cwd(), 'public')));
   }
 
+  return app;
+}
+
+async function startServer() {
+  const app = createApp();
+  const PORT = process.env.PORT ? parseInt(process.env.PORT) : 3000;
+
   // --- Vite Middleware for Development ---
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
@@ -552,4 +558,7 @@ async function startServer() {
   });
 }
 
-startServer();
+// Only start the local server when this file is run directly (not imported by api/index.ts)
+if (process.env.VERCEL !== '1') {
+  startServer();
+}
