@@ -135,42 +135,46 @@ export default function ClientsList() {
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="bg-white dark:bg-[#1A1D23] border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl w-full max-w-md overflow-hidden"
+              className="relative bg-[#0C1017]/95 border border-slate-700/60 dark:border-slate-700/50 rounded-2xl shadow-2xl shadow-black/80 ring-1 ring-white/10 w-full max-w-md overflow-hidden"
             >
-              <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800">
-                <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Add New Client</h2>
-                <button onClick={() => setIsAddModalOpen(false)} className="text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:text-slate-200">
-                  <X size={20} />
+              <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-indigo-500/80 to-transparent pointer-events-none" />
+              <div className="flex items-center justify-between px-6 py-4.5 border-b border-slate-800/80 bg-slate-900/50 backdrop-blur-md">
+                <h2 className="text-base font-bold text-white tracking-tight">Add New Client</h2>
+                <button 
+                  onClick={() => setIsAddModalOpen(false)} 
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/70 transition-colors cursor-pointer"
+                >
+                  <X size={18} />
                 </button>
               </div>
               <form onSubmit={handleAddSubmit} className="p-6 space-y-4">
                 <div>
-                  <label className="block text-xs font-medium text-slate-500 dark:text-slate-500 dark:text-slate-400 mb-2">Company Name</label>
-                  <input required type="text" value={newClient.name} onChange={e => setNewClient({...newClient, name: e.target.value})} className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500" />
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Company Name</label>
+                  <input required type="text" value={newClient.name} onChange={e => setNewClient({...newClient, name: e.target.value})} className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner" placeholder="e.g. Acme Corp" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-slate-500 dark:text-slate-500 dark:text-slate-400 mb-2">Contact Person</label>
-                    <input required type="text" value={newClient.contactPerson} onChange={e => setNewClient({...newClient, contactPerson: e.target.value})} className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500" />
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Contact Person</label>
+                    <input required type="text" value={newClient.contactPerson} onChange={e => setNewClient({...newClient, contactPerson: e.target.value})} className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner" placeholder="John Doe" />
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-slate-500 dark:text-slate-500 dark:text-slate-400 mb-2">Industry</label>
-                    <input type="text" value={newClient.industry} onChange={e => setNewClient({...newClient, industry: e.target.value})} className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500" />
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Industry</label>
+                    <input type="text" value={newClient.industry} onChange={e => setNewClient({...newClient, industry: e.target.value})} className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner" placeholder="Technology" />
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-500 dark:text-slate-500 dark:text-slate-400 mb-2">Email</label>
-                  <input required type="email" value={newClient.email} onChange={e => setNewClient({...newClient, email: e.target.value})} className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500" />
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Email</label>
+                  <input required type="email" value={newClient.email} onChange={e => setNewClient({...newClient, email: e.target.value})} className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner" placeholder="contact@acme.com" />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-500 dark:text-slate-500 dark:text-slate-400 mb-2">Phone</label>
-                  <input type="text" value={newClient.phone} onChange={e => setNewClient({...newClient, phone: e.target.value})} className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500" />
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Phone</label>
+                  <input type="text" value={newClient.phone} onChange={e => setNewClient({...newClient, phone: e.target.value})} className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner" placeholder="+1 (555) 012-3456" />
                 </div>
-                <div className="flex justify-end gap-3 mt-6">
-                  <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:text-white transition-colors">
+                <div className="flex justify-end items-center gap-3 pt-4 border-t border-slate-800/80">
+                  <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 rounded-xl transition-colors border border-slate-700/50 cursor-pointer">
                     Cancel
                   </button>
-                  <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-slate-900 dark:text-white text-sm font-medium rounded-lg transition-colors shadow-lg shadow-indigo-500/20">
+                  <button type="submit" className="px-5 py-2.5 bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 text-white text-xs font-semibold uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-indigo-500/25 active:scale-[0.98] cursor-pointer">
                     Save Client
                   </button>
                 </div>

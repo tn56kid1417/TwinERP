@@ -54,20 +54,28 @@ export const Modal: React.FC<ModalProps> = ({
       {/* Modal Container */}
       <div
         className={cn(
-          'relative w-full bg-card text-card-foreground border border-border rounded-xl shadow-xl overflow-hidden z-10 animate-slide-up',
+          'relative w-full bg-[#0C1017]/95 dark:bg-[#0C1017]/95 backdrop-blur-2xl text-slate-100 border border-slate-700/60 dark:border-slate-700/50 rounded-2xl shadow-2xl shadow-black/80 ring-1 ring-white/10 overflow-hidden z-10 animate-slide-up',
           sizeClasses[size]
         )}
       >
+        {/* Subtle top accent gradient */}
+        <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-indigo-500/80 to-transparent pointer-events-none" />
+
         {/* Modal Header */}
-        <div className="flex items-center justify-between p-5 border-b border-border bg-secondary/5">
-          <h3 className="text-lg font-bold text-foreground tracking-tight">{title}</h3>
-          <Button variant="ghost" size="sm" onClick={onClose} className="p-1 rounded-full text-foreground/55 hover:text-foreground">
+        <div className="flex items-center justify-between px-6 py-4.5 border-b border-slate-800/80 bg-slate-900/50 backdrop-blur-md">
+          <h3 className="text-base font-bold text-white tracking-tight">{title}</h3>
+          <button
+            type="button"
+            onClick={onClose}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/70 transition-colors cursor-pointer outline-none focus:ring-2 focus:ring-indigo-500/50"
+            aria-label="Close modal"
+          >
             <X size={18} />
-          </Button>
+          </button>
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 max-h-[75vh] overflow-y-auto">
+        <div className="p-6 max-h-[78vh] overflow-y-auto">
           {children}
         </div>
       </div>

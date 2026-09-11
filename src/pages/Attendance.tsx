@@ -84,48 +84,48 @@ const Attendance = () => {
       <div className="flex-1 flex flex-col min-h-0 bg-white dark:bg-[#1A1D23] rounded-xl border border-slate-200 dark:border-slate-800">
         
         {/* Filters Top Bar */}
-        <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex flex-wrap gap-4 items-end">
+        <div className="p-4 border-b border-slate-800/80 bg-slate-900/40 flex flex-wrap gap-4 items-end">
           <div className="flex-1 min-w-[200px]">
-             <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-1">Employee</label>
+             <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Employee</label>
              <select 
-               className="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-indigo-500/50"
+               className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner cursor-pointer"
                value={selectedEmp}
                onChange={e => setSelectedEmp(e.target.value)}
              >
-               <option value="all">All Employees</option>
+               <option value="all" className="bg-[#0C1017] text-slate-100">All Employees</option>
                {employees.map(e => (
-                 <option key={e.id} value={e.id}>{e.firstName} {e.lastName}</option>
+                 <option key={e.id} value={e.id} className="bg-[#0C1017] text-slate-100">{e.firstName} {e.lastName}</option>
                ))}
              </select>
           </div>
           
           <div className="w-48">
-             <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-1">Month</label>
+             <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Month</label>
              <select 
-               className="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-indigo-500/50"
+               className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner cursor-pointer"
                value={selectedMonth}
                onChange={e => setSelectedMonth(Number(e.target.value))}
              >
                {MONTHS.map((m, i) => (
-                 <option key={i+1} value={i+1}>{m}</option>
+                 <option key={i+1} value={i+1} className="bg-[#0C1017] text-slate-100">{m}</option>
                ))}
              </select>
           </div>
 
           <div className="w-32">
-             <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-1">Year</label>
+             <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Year</label>
              <select 
-               className="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-indigo-500/50"
+               className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner cursor-pointer"
                value={selectedYear}
                onChange={e => setSelectedYear(Number(e.target.value))}
              >
                {[2024, 2025, 2026, 2027].map(y => (
-                 <option key={y} value={y}>{y}</option>
+                 <option key={y} value={y} className="bg-[#0C1017] text-slate-100">{y}</option>
                ))}
              </select>
           </div>
 
-          <button className="bg-indigo-600 hover:bg-indigo-500 text-slate-900 dark:text-white px-6 py-2 rounded text-xs font-bold uppercase tracking-widest transition-colors h-[38px] flex items-center justify-center gap-2">
+          <button className="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 text-white px-6 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all shadow-lg shadow-indigo-500/25 h-[38px] flex items-center justify-center gap-2 cursor-pointer">
             <Search size={14} /> Apply
           </button>
         </div>

@@ -226,9 +226,9 @@ export const CustomerDetails: React.FC = () => {
                       value={noteText}
                       onChange={(e) => setNoteText(e.target.value)}
                       placeholder="Add follow-up details or notes..."
-                      className="flex-1 text-sm py-2.5 px-4 bg-white border border-slate-200 text-slate-700 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 placeholder:text-slate-400"
+                      className="flex-1 text-sm py-2.5 px-4 bg-[#07090E]/90 border border-slate-700/60 text-slate-100 placeholder:text-slate-500 rounded-xl outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 shadow-inner"
                     />
-                    <Button type="submit" isLoading={addingNote} className="cursor-pointer">
+                    <Button type="submit" isLoading={addingNote} variant="primary">
                       Save Note
                     </Button>
                   </form>
@@ -247,21 +247,19 @@ export const CustomerDetails: React.FC = () => {
                             className={cn(
                               'p-4 border rounded-xl text-left space-y-1',
                               isSystem
-                                ? 'bg-slate-50 border-slate-200 text-slate-500'
-                                : 'bg-white border-slate-200 shadow-sm'
+                                ? 'bg-slate-900/40 border-slate-800 text-slate-400'
+                                : 'bg-[#0F131C]/60 border-slate-800/80 text-slate-200 shadow-sm'
                             )}
                           >
                             <div className="flex items-center justify-between">
-                              <span className={cn('text-xs font-bold', isSystem ? 'text-primary' : 'text-slate-700')}>
+                              <span className={cn('text-xs font-bold', isSystem ? 'text-indigo-400' : 'text-slate-200')}>
                                 {note.authorName}
                               </span>
                               <span className="text-[10px] text-slate-400 flex items-center gap-1">
                                 <History size={10} /> {formatRelativeTime(note.timestamp)}
                               </span>
                             </div>
-                            <p className="text-sm text-slate-650 leading-relaxed pt-1">
-                              {note.text}
-                            </p>
+                            <p className="text-xs text-slate-300 leading-relaxed font-normal">{note.text}</p>
                           </div>
                         )
                       })
@@ -275,21 +273,21 @@ export const CustomerDetails: React.FC = () => {
                 <div className="space-y-4">
                   {purchases.length === 0 ? (
                     <div className="text-center py-12 text-slate-400 text-sm">
-                      No purchase history recorded. Click "Log Purchase" above to add.
+                      No purchase records yet.
                     </div>
                   ) : (
                     purchases.map((purchase) => (
-                      <div key={purchase.id} className="flex items-center justify-between p-4 border border-slate-200 bg-white rounded-xl text-left hover:bg-slate-50 transition-all">
+                      <div key={purchase.id} className="flex items-center justify-between p-4 border border-slate-800/80 bg-[#0F131C]/60 rounded-xl text-left hover:bg-slate-800/40 transition-all">
                         <div className="flex items-center gap-3">
-                          <div className="p-2.5 bg-success/15 text-success rounded-lg flex items-center justify-center">
+                          <div className="p-2.5 bg-emerald-500/15 text-emerald-400 rounded-lg flex items-center justify-center">
                             <ShoppingBag size={18} />
                           </div>
                           <div>
-                            <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 leading-snug">{purchase.product}</h4>
+                            <h4 className="text-sm font-bold text-slate-100 leading-snug">{purchase.product}</h4>
                             <span className="text-xs text-slate-400">{formatDate(purchase.date)}</span>
                           </div>
                         </div>
-                        <span className="text-base font-extrabold text-slate-800 dark:text-slate-100">{formatUSD(purchase.amount)}</span>
+                        <span className="text-base font-extrabold text-slate-100">{formatUSD(purchase.amount)}</span>
                       </div>
                     ))
                   )}
@@ -309,7 +307,6 @@ export const CustomerDetails: React.FC = () => {
       >
         <form onSubmit={handleAddPurchase} className="space-y-4 text-left">
           <Input
-            type="text"
             label="Product Name"
             placeholder="Enterprise Suite License (1-Year)"
             required
@@ -327,19 +324,18 @@ export const CustomerDetails: React.FC = () => {
             onChange={(e) => setPurchaseAmount(e.target.value)}
           />
 
-          <div className="flex items-center justify-end gap-3 mt-6">
+          <div className="flex items-center justify-end gap-3 mt-8 pt-4 border-t border-slate-800/80">
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               onClick={() => setIsPurchaseModalOpen(false)}
-              className="cursor-pointer"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               isLoading={loggingPurchase}
-              className="cursor-pointer"
+              variant="primary"
             >
               Log Purchase
             </Button>

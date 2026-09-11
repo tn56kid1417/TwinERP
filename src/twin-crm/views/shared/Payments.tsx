@@ -540,18 +540,18 @@ export const Payments: React.FC = () => {
       >
         <form onSubmit={handleSavePayment} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold uppercase tracking-wider text-foreground/75">Customer</label>
+            <div className="flex flex-col gap-1.5 text-left">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Customer</label>
               <select
-                className="w-full text-sm py-2 px-3.5 bg-card border border-border text-foreground rounded-lg transition-all duration-200 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 appearance-none"
+                className="w-full text-sm py-2.5 px-3.5 bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl transition-all duration-200 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 appearance-none cursor-pointer shadow-inner"
                 value={newPayment.leadId}
                 onChange={(e) => setNewPayment({ ...newPayment, leadId: e.target.value })}
                 required
-                style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1em' }}
+                style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.85rem center', backgroundSize: '1.1em' }}
               >
-                <option value="" disabled>Select a customer</option>
+                <option value="" disabled className="bg-[#0C1017] text-slate-400">Select a customer</option>
                 {selectableLeads.map((lead) => (
-                  <option key={lead.id} value={lead.id}>
+                  <option key={lead.id} value={lead.id} className="bg-[#0C1017] text-slate-100">
                     {lead.name}
                   </option>
                 ))}
@@ -589,32 +589,32 @@ export const Payments: React.FC = () => {
               onChange={(e) => setNewPayment({ ...newPayment, soldPrice: e.target.value })}
             />
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold uppercase tracking-wider text-foreground/75">Type</label>
+            <div className="flex flex-col gap-1.5 text-left">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Type</label>
               <select
-                className="w-full text-sm py-2 px-3.5 bg-card border border-border text-foreground rounded-lg transition-all duration-200 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 appearance-none"
+                className="w-full text-sm py-2.5 px-3.5 bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl transition-all duration-200 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 appearance-none cursor-pointer shadow-inner"
                 value={newPayment.paymentType}
                 onChange={(e) => setNewPayment({ ...newPayment, paymentType: e.target.value as 'Full' | 'Partial' })}
                 required
-                style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1em' }}
+                style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.85rem center', backgroundSize: '1.1em' }}
               >
-                <option value="Full">Full</option>
-                <option value="Partial">Partial</option>
+                <option value="Full" className="bg-[#0C1017] text-slate-100">Full</option>
+                <option value="Partial" className="bg-[#0C1017] text-slate-100">Partial</option>
               </select>
             </div>
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold uppercase tracking-wider text-foreground/75">Status</label>
+            <div className="flex flex-col gap-1.5 text-left">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Status</label>
               <select
-                className="w-full text-sm py-2 px-3.5 bg-card border border-border text-foreground rounded-lg transition-all duration-200 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 appearance-none"
+                className="w-full text-sm py-2.5 px-3.5 bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl transition-all duration-200 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 appearance-none cursor-pointer shadow-inner"
                 value={newPayment.paymentStatus}
                 onChange={(e) => setNewPayment({ ...newPayment, paymentStatus: e.target.value as 'Pending' | 'Paid' | 'expired' })}
                 required
-                style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.75rem center', backgroundSize: '1em' }}
+                style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.85rem center', backgroundSize: '1.1em' }}
               >
-                <option value="Pending">Pending</option>
-                <option value="Paid">Paid</option>
-                <option value="expired">Expired</option>
+                <option value="Pending" className="bg-[#0C1017] text-slate-100">Pending</option>
+                <option value="Paid" className="bg-[#0C1017] text-slate-100">Paid</option>
+                <option value="expired" className="bg-[#0C1017] text-slate-100">Expired</option>
               </select>
             </div>
 
@@ -640,11 +640,11 @@ export const Payments: React.FC = () => {
             />
           </div>
 
-          <div className="flex justify-end gap-3 mt-6 pt-2">
-            <Button variant="ghost" type="button" onClick={() => setIsModalOpen(false)}>
+          <div className="flex justify-end items-center gap-3 mt-8 pt-4 border-t border-slate-800/80">
+            <Button variant="outline" type="button" onClick={() => setIsModalOpen(false)}>
               Cancel
             </Button>
-            <Button type="submit" isLoading={isSubmitting} className="bg-primary hover:bg-primary/90 text-primary-foreground">
+            <Button type="submit" isLoading={isSubmitting} variant="primary">
               {editingPaymentId ? "Update Payment" : "Create Payment"}
             </Button>
           </div>

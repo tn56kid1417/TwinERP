@@ -95,29 +95,30 @@ const EmployeeList = () => {
       </div>
 
       {canEdit && isAdding && (
-        <div className="bg-white dark:bg-[#1A1D23] rounded-xl border border-slate-200 dark:border-slate-800 p-6 mb-8">
-          <h2 className="text-sm font-semibold text-slate-900 dark:text-white mb-4">Add New Employee</h2>
+        <div className="bg-[#0C1017]/90 backdrop-blur-xl border border-slate-800/80 rounded-2xl p-6 mb-8 shadow-xl shadow-black/40 relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-indigo-500/80 to-transparent" />
+          <h2 className="text-sm font-semibold text-slate-100 mb-4 tracking-tight">Add New Employee</h2>
           <form onSubmit={handleAdd} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <input required type="text" placeholder="First Name" className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:border-indigo-500/50"
+            <input required type="text" placeholder="First Name" className="bg-[#07090E]/90 border border-slate-700/60 text-slate-100 placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 shadow-inner transition-all"
               value={formData.firstName} onChange={e => setFormData({...formData, firstName: e.target.value})} />
-            <input required type="text" placeholder="Last Name" className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:border-indigo-500/50"
+            <input required type="text" placeholder="Last Name" className="bg-[#07090E]/90 border border-slate-700/60 text-slate-100 placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 shadow-inner transition-all"
               value={formData.lastName} onChange={e => setFormData({...formData, lastName: e.target.value})} />
-            <input required type="email" placeholder="Email Address" className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:border-indigo-500/50"
+            <input required type="email" placeholder="Email Address" className="bg-[#07090E]/90 border border-slate-700/60 text-slate-100 placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 shadow-inner transition-all"
               value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
-            <input required type="text" placeholder="Department" className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:border-indigo-500/50"
+            <input required type="text" placeholder="Department" className="bg-[#07090E]/90 border border-slate-700/60 text-slate-100 placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 shadow-inner transition-all"
               value={formData.department} onChange={e => setFormData({...formData, department: e.target.value})} />
-            <input required type="text" placeholder="Role" className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:border-indigo-500/50"
+            <input required type="text" placeholder="Role" className="bg-[#07090E]/90 border border-slate-700/60 text-slate-100 placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 shadow-inner transition-all"
               value={formData.role} onChange={e => setFormData({...formData, role: e.target.value})} />
-            <input required type="date" className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:border-indigo-500/50"
+            <input required type="date" className="bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 shadow-inner transition-all [color-scheme:dark]"
               value={formData.hireDate} onChange={e => setFormData({...formData, hireDate: e.target.value})} />
-            <select required className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-lg px-4 py-2 focus:outline-none focus:border-indigo-500/50"
+            <select required className="bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 shadow-inner transition-all [color-scheme:dark]"
               value={formData.shift} onChange={e => setFormData({...formData, shift: e.target.value})}>
-                <option value="Morning">Morning Shift</option>
-                <option value="Evening">Evening Shift</option>
-                <option value="Night">Night Shift</option>
+                <option value="Morning" className="bg-[#0C1017]">Morning Shift</option>
+                <option value="Evening" className="bg-[#0C1017]">Evening Shift</option>
+                <option value="Night" className="bg-[#0C1017]">Night Shift</option>
             </select>
             <div className="lg:col-span-2 flex justify-end items-center">
-              <button type="submit" className="bg-indigo-600 hover:bg-indigo-500 text-slate-900 dark:text-white px-6 py-2 rounded text-[10px] uppercase font-bold tracking-widest transition-colors">Save Employee</button>
+              <button type="submit" className="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white px-6 py-2.5 rounded-xl text-xs uppercase font-bold tracking-widest transition-all shadow-lg shadow-indigo-500/25 cursor-pointer">Save Employee</button>
             </div>
           </form>
         </div>

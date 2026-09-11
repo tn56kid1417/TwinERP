@@ -134,9 +134,10 @@ export const RegisterCompany: React.FC = () => {
           </span>
         </div>
 
-        <Card className="border border-border shadow-lg bg-card">
-          <CardHeader className="pb-3">
-            <CardTitle className="text-center text-xl font-extrabold text-slate-800 dark:text-slate-100">
+        <Card className="bg-[#0C1017]/95 border-slate-700/60 shadow-2xl shadow-black/80 ring-1 ring-white/10 relative overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-indigo-500/80 to-transparent" />
+          <CardHeader className="pb-3 border-b border-slate-800/80">
+            <CardTitle className="text-center text-xl font-extrabold text-slate-100">
               {step === 1 && 'Company Profile'}
               {step === 2 && 'Workspace Configuration'}
               {step === 3 && 'Administrative Profile'}
@@ -145,9 +146,9 @@ export const RegisterCompany: React.FC = () => {
             
             {/* Progress Bar */}
             {step < 4 && (
-              <div className="w-full bg-slate-100 h-1.5 rounded-full mt-4 relative overflow-hidden">
+              <div className="w-full bg-slate-800 h-1.5 rounded-full mt-4 relative overflow-hidden">
                 <div
-                  className="bg-primary h-full transition-all duration-300 rounded-full"
+                  className="bg-indigo-500 h-full transition-all duration-300 rounded-full"
                   style={{ width: `${(step / 3) * 100}%` }}
                 />
               </div>
@@ -269,14 +270,14 @@ export const RegisterCompany: React.FC = () => {
                     Company Size
                   </label>
                   <select
-                    className="w-full text-sm py-2 px-3.5 bg-card border border-border text-slate-800 dark:text-slate-100 rounded-xl outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 cursor-pointer"
+                    className="w-full text-sm py-2.5 px-3.5 bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 cursor-pointer shadow-inner [color-scheme:dark]"
                     {...register('companySize')}
                   >
-                    <option value="1–10 Employees">1–10 Employees</option>
-                    <option value="11–50 Employees">11–50 Employees</option>
-                    <option value="51–100 Employees">51–100 Employees</option>
-                    <option value="101–500 Employees">101–500 Employees</option>
-                    <option value="500+ Employees">500+ Employees</option>
+                    <option value="1–10 Employees" className="bg-[#0C1017]">1–10 Employees</option>
+                    <option value="11–50 Employees" className="bg-[#0C1017]">11–50 Employees</option>
+                    <option value="51–100 Employees" className="bg-[#0C1017]">51–100 Employees</option>
+                    <option value="101–500 Employees" className="bg-[#0C1017]">101–500 Employees</option>
+                    <option value="500+ Employees" className="bg-[#0C1017]">500+ Employees</option>
                   </select>
                 </div>
 

@@ -121,9 +121,10 @@ export const UploadLeads: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-white dark:bg-[#1A1D23] border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-sm max-w-3xl">
+      <div className="bg-[#0C1017]/90 backdrop-blur-xl border border-slate-800/80 rounded-2xl p-6 shadow-xl shadow-black/40 max-w-3xl relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-indigo-500/80 to-transparent" />
         {message && (
-          <div className={`mb-6 p-4 rounded-lg flex items-start gap-3 border ${message.type === 'success' ? 'bg-green-50 border-green-200 text-green-700 dark:bg-green-500/10 dark:border-green-500/20 dark:text-green-400' : 'bg-red-50 border-red-200 text-red-700 dark:bg-red-500/10 dark:border-red-500/20 dark:text-red-400'}`}>
+          <div className={`mb-6 p-4 rounded-xl flex items-start gap-3 border ${message.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-rose-500/10 border-rose-500/30 text-rose-400'}`}>
             {message.type === 'success' ? <CheckCircle size={20} className="mt-0.5 flex-shrink-0" /> : <AlertCircle size={20} className="mt-0.5 flex-shrink-0" />}
             <div>
               <h3 className="text-sm font-semibold">{message.type === 'success' ? 'Success' : 'Error'}</h3>
@@ -132,22 +133,22 @@ export const UploadLeads: React.FC = () => {
           </div>
         )}
 
-        <div className="space-y-4">
+        <div className="space-y-5">
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
               Upload Excel or CSV (Columns: Name, Company, Email, Phone, Value)
             </label>
-            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 dark:border-slate-700 border-dashed rounded-xl relative hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-700/80 border-dashed rounded-xl relative bg-[#07090E]/60 hover:bg-[#07090E]/90 hover:border-indigo-500/60 transition-all">
               <div className="space-y-1 text-center">
                 <File className="mx-auto h-12 w-12 text-slate-400" />
-                <div className="flex text-sm text-slate-600 dark:text-slate-400 justify-center">
-                  <label htmlFor="file-upload" className="relative cursor-pointer bg-transparent rounded-md font-medium text-primary hover:text-primary/80 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-primary">
+                <div className="flex text-sm text-slate-400 justify-center">
+                  <label htmlFor="file-upload" className="relative cursor-pointer bg-transparent rounded-md font-semibold text-indigo-400 hover:text-indigo-300 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500">
                     <span>Upload a file</span>
                     <input id="file-upload" name="file-upload" type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" className="sr-only" onChange={handleFileChange} />
                   </label>
                   <p className="pl-1">or drag and drop</p>
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-xs text-slate-500">
                   {selectedFile ? selectedFile.name : 'XLSX, XLS, CSV up to 10MB'}
                 </p>
               </div>
@@ -155,17 +156,17 @@ export const UploadLeads: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
               Assign to Sales Team Leader
             </label>
             <select
               value={selectedLeader}
               onChange={(e) => setSelectedLeader(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-white text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none transition-all"
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-700/60 bg-[#07090E]/90 text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/25 focus:border-indigo-500 outline-none transition-all shadow-inner [color-scheme:dark]"
             >
-              <option value="">-- Select Leader --</option>
+              <option value="" className="bg-[#0C1017] text-slate-400">-- Select Leader --</option>
               {leaders.map(l => (
-                <option key={l.id} value={l.id}>{l.name} ({l.email})</option>
+                <option key={l.id} value={l.id} className="bg-[#0C1017] text-slate-100">{l.name} ({l.email})</option>
               ))}
             </select>
           </div>
@@ -175,7 +176,7 @@ export const UploadLeads: React.FC = () => {
               onClick={handleUpload}
               isLoading={isUploading}
               disabled={!selectedFile || !selectedLeader}
-              className="flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-6"
+              className="flex items-center gap-2 px-6 shadow-lg shadow-indigo-500/25"
             >
               <UploadCloud size={18} />
               Upload and Assign

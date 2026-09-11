@@ -21,11 +21,11 @@ export const Button: React.FC<ButtonProps> = ({
   const baseStyles = 'inline-flex items-center justify-center font-medium transition-all duration-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none cursor-pointer'
   
   const variants = {
-    primary: 'bg-primary text-primary-foreground hover:bg-primary/90 focus:ring-primary shadow-sm hover:shadow active:scale-98',
-    secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80 focus:ring-secondary/50',
-    outline: 'border border-border bg-transparent text-foreground hover:bg-secondary hover:text-secondary-foreground focus:ring-primary/50',
-    danger: 'bg-danger text-danger-foreground hover:bg-danger/90 focus:ring-danger shadow-sm active:scale-98',
-    ghost: 'bg-transparent text-foreground hover:bg-secondary/80 focus:ring-secondary/50',
+    primary: 'bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white shadow-lg shadow-indigo-500/25 active:scale-[0.98] focus:ring-indigo-500/50',
+    secondary: 'bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 border border-slate-700/60 active:scale-[0.98]',
+    outline: 'border border-slate-700/60 bg-transparent text-slate-300 hover:bg-slate-800/60 hover:text-white active:scale-[0.98]',
+    danger: 'bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-500/25 active:scale-[0.98]',
+    ghost: 'bg-transparent text-slate-400 hover:text-slate-100 hover:bg-slate-800/60',
   }
 
   const sizes = {

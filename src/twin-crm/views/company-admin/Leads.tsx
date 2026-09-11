@@ -306,54 +306,53 @@ export const Leads: React.FC = () => {
             />
 
             {/* Custom Select for Lead Status */}
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+            <div className="flex flex-col gap-1.5 text-left">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
                 Lead Status
               </label>
               <select
-                className="w-full text-sm py-2 px-3.5 bg-white border border-slate-200 text-slate-700 rounded-lg transition-all duration-200 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 cursor-pointer"
+                className="w-full text-sm py-2.5 px-3.5 bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl transition-all duration-200 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 cursor-pointer shadow-inner"
                 {...register('status')}
               >
-                <option value="New">New</option>
-                <option value="Contacted">Contacted</option>
-                <option value="Follow-up">Follow-up</option>
-                <option value="Converted">Converted</option>
-                <option value="Closed">Closed</option>
+                <option value="New" className="bg-[#0C1017] text-slate-100">New</option>
+                <option value="Contacted" className="bg-[#0C1017] text-slate-100">Contacted</option>
+                <option value="Follow-up" className="bg-[#0C1017] text-slate-100">Follow-up</option>
+                <option value="Converted" className="bg-[#0C1017] text-slate-100">Converted</option>
+                <option value="Closed" className="bg-[#0C1017] text-slate-100">Closed</option>
               </select>
             </div>
           </div>
 
           {/* Allocation select box */}
-          <div className="flex flex-col gap-1.5 border-t border-slate-200 pt-4 mt-2">
-            <label className="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
-              <Users size={16} /> Allocate Assigned Sales Representative
+          <div className="flex flex-col gap-1.5 border-t border-slate-800/80 pt-4 mt-2 text-left">
+            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+              <Users size={15} className="text-indigo-400" /> Allocate Assigned Sales Representative
             </label>
             <select
-              className="w-full text-sm py-2 px-3.5 bg-white border border-slate-200 text-slate-700 rounded-lg transition-all duration-200 outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 cursor-pointer"
+              className="w-full text-sm py-2.5 px-3.5 bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl transition-all duration-200 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 cursor-pointer shadow-inner"
               {...register('assignedUserId')}
             >
-              <option value="">-- Leave Unassigned --</option>
+              <option value="" className="bg-[#0C1017] text-slate-400">-- Leave Unassigned --</option>
               {salesReps.map((rep) => (
-                <option key={rep.id} value={rep.id}>
+                <option key={rep.id} value={rep.id} className="bg-[#0C1017] text-slate-100">
                   {rep.name} ({rep.email})
                 </option>
               ))}
             </select>
           </div>
 
-          <div className="flex items-center justify-end gap-3 mt-6">
+          <div className="flex items-center justify-end gap-3 mt-8 pt-4 border-t border-slate-800/80">
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               onClick={() => setIsModalOpen(false)}
-              className="cursor-pointer"
             >
               Cancel
             </Button>
             <Button
               type="submit"
               isLoading={submitting}
-              className="cursor-pointer"
+              variant="primary"
             >
               {selectedLead ? 'Save Changes' : 'Enroll Lead'}
             </Button>

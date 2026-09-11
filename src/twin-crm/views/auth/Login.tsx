@@ -84,9 +84,10 @@ export const Login: React.FC = () => {
   }
 
   return (
-    <Card className="w-full bg-white border border-slate-200 shadow-lg">
+    <Card className="w-full bg-[#0C1017]/95 border-slate-700/60 shadow-2xl shadow-black/80 ring-1 ring-white/10 relative overflow-hidden">
+      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-indigo-500/80 to-transparent" />
       <CardHeader className="text-center pb-2">
-        <CardTitle className="text-xl font-bold flex items-center justify-center gap-2 text-slate-800 dark:text-slate-100">
+        <CardTitle className="text-xl font-bold flex items-center justify-center gap-2 text-slate-100">
           Workspace Login
         </CardTitle>
       </CardHeader>
@@ -121,15 +122,15 @@ export const Login: React.FC = () => {
             {...register('password')}
           />
 
-          <Button type="submit" fullWidth isLoading={isLoading} className="mt-2 cursor-pointer shadow-sm">
+          <Button type="submit" fullWidth isLoading={isLoading} className="mt-2 cursor-pointer shadow-lg shadow-indigo-500/25">
             Sign In
           </Button>
         </form>
 
         {/* Quick Demo Pre-fill Links */}
-        <div className="border-t border-slate-100 pt-4 text-left">
+        <div className="border-t border-slate-800/80 pt-4 text-left">
           <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1 mb-2.5 uppercase tracking-wider">
-            <ShieldCheck size={12} /> Pre-fill testing credentials
+            <ShieldCheck size={12} className="text-indigo-400" /> Pre-fill testing credentials
           </span>
           <div className="grid grid-cols-2 gap-2">
             <Button
@@ -137,7 +138,7 @@ export const Login: React.FC = () => {
               variant="outline"
               size="sm"
               onClick={() => handleQuickLogin('admin')}
-              className="text-[10px] px-1 font-bold h-8 cursor-pointer border-slate-200"
+              className="text-[10px] px-1 font-bold h-8 cursor-pointer bg-[#07090E]/80 border-slate-800 hover:border-slate-700 text-slate-300"
             >
               Acme Admin
             </Button>
@@ -146,7 +147,7 @@ export const Login: React.FC = () => {
               variant="outline"
               size="sm"
               onClick={() => handleQuickLogin('sales')}
-              className="text-[10px] px-1 font-bold h-8 cursor-pointer border-slate-200"
+              className="text-[10px] px-1 font-bold h-8 cursor-pointer bg-[#07090E]/80 border-slate-800 hover:border-slate-700 text-slate-300"
             >
               Acme Sales
             </Button>
@@ -155,7 +156,7 @@ export const Login: React.FC = () => {
               variant="outline"
               size="sm"
               onClick={() => handleQuickLogin('leader1')}
-              className="text-[10px] px-1 font-bold h-8 cursor-pointer border-slate-200"
+              className="text-[10px] px-1 font-bold h-8 cursor-pointer bg-[#07090E]/80 border-slate-800 hover:border-slate-700 text-slate-300"
             >
               Acme Leader 1
             </Button>
@@ -164,7 +165,7 @@ export const Login: React.FC = () => {
               variant="outline"
               size="sm"
               onClick={() => handleQuickLogin('leader2')}
-              className="text-[10px] px-1 font-bold h-8 cursor-pointer border-slate-200"
+              className="text-[10px] px-1 font-bold h-8 cursor-pointer bg-[#07090E]/80 border-slate-800 hover:border-slate-700 text-slate-300"
             >
               Acme Leader 2
             </Button>

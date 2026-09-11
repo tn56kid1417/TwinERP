@@ -176,7 +176,7 @@ const LetterGenerator = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Upload Section */}
-        <div className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-6 relative overflow-hidden flex flex-col items-center justify-center min-h-[300px]">
+        <div className="relative bg-[#0C1017]/90 backdrop-blur-xl border border-slate-700/60 dark:border-slate-700/50 rounded-2xl p-6 overflow-hidden flex flex-col items-center justify-center min-h-[300px] shadow-2xl shadow-black/40 ring-1 ring-white/5">
           <input
             type="file"
             accept=".docx"
@@ -188,7 +188,7 @@ const LetterGenerator = () => {
           {file && (
             <button
               onClick={handleRemoveTemplate}
-              className="absolute top-4 right-4 z-20 p-2 bg-red-500/10 text-red-400 rounded-lg hover:bg-red-500/20 transition-colors pointer-events-auto"
+              className="absolute top-4 right-4 z-20 p-2 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-xl hover:bg-rose-500/20 transition-colors pointer-events-auto"
               title="Remove Template"
             >
               <Trash2 size={18} />
@@ -198,23 +198,23 @@ const LetterGenerator = () => {
           <div className="flex flex-col items-center justify-center text-center space-y-4 pointer-events-none z-0">
             {file ? (
               <>
-                <div className="w-16 h-16 bg-indigo-500/20 text-indigo-400 rounded-full flex items-center justify-center border border-indigo-500/30">
+                <div className="w-16 h-16 bg-indigo-500/20 text-indigo-400 rounded-full flex items-center justify-center border border-indigo-500/30 shadow-lg shadow-indigo-500/20">
                   <FileText size={32} />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-slate-900 dark:text-white">{file.name}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">{(file.size / 1024).toFixed(2)} KB</p>
+                  <p className="text-sm font-semibold text-white">{file.name}</p>
+                  <p className="text-xs text-slate-400 mt-1">{(file.size / 1024).toFixed(2)} KB</p>
                 </div>
                 <div className="text-indigo-400 text-sm font-medium">Click or drag to replace template</div>
               </>
             ) : (
               <>
-                <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-500 dark:text-slate-400 rounded-full flex items-center justify-center border border-slate-300 dark:border-slate-700 transition-colors group-hover:bg-slate-200 dark:hover:bg-slate-700">
+                <div className="w-16 h-16 bg-slate-800/60 text-slate-400 rounded-full flex items-center justify-center border border-slate-700/60 transition-colors">
                   <UploadCloud size={32} />
                 </div>
                 <div>
-                  <p className="text-sm font-medium text-slate-900 dark:text-white">Upload Template</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">Select a .docx file to use as a template</p>
+                  <p className="text-sm font-semibold text-white">Upload Template</p>
+                  <p className="text-xs text-slate-400 mt-1">Select a .docx file to use as a template</p>
                 </div>
               </>
             )}
@@ -222,10 +222,11 @@ const LetterGenerator = () => {
         </div>
 
         {/* Form Section */}
-        <div className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-xl p-6 shadow-xl">
+        <div className="relative bg-[#0C1017]/90 backdrop-blur-xl border border-slate-700/60 dark:border-slate-700/50 rounded-2xl p-6 shadow-2xl shadow-black/40 overflow-hidden ring-1 ring-white/5">
+          <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-indigo-500/80 to-transparent pointer-events-none" />
           <form onSubmit={handleGenerate} className="space-y-5">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+              <label htmlFor="name" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
                 Candidate Name
               </label>
               <input
@@ -234,13 +235,13 @@ const LetterGenerator = () => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Jane Doe"
-                className="w-full bg-slate-800/50 border border-slate-300 dark:border-slate-700 rounded-lg px-4 py-2.5 text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
+                className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner"
                 required
               />
             </div>
             
             <div>
-              <label htmlFor="role" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+              <label htmlFor="role" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
                 Role / Position
               </label>
               <input
@@ -249,29 +250,29 @@ const LetterGenerator = () => {
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
                 placeholder="e.g. Senior Software Engineer"
-                className="w-full bg-slate-800/50 border border-slate-300 dark:border-slate-700 rounded-lg px-4 py-2.5 text-slate-900 dark:text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition-all"
+                className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner"
                 required
               />
             </div>
 
             {error && (
-              <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-red-300">{error}</p>
+              <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-rose-400 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-rose-300">{error}</p>
               </div>
             )}
 
             {success && (
-              <div className="p-3 rounded-lg bg-green-500/10 border border-green-500/20 flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-green-300">Letter generated and downloaded successfully!</p>
+              <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-start gap-3">
+                <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-emerald-300">Letter generated and downloaded successfully!</p>
               </div>
             )}
 
             <button
               type="submit"
               disabled={isGenerating || !file || !name || !role}
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-slate-900 dark:text-white font-medium py-3 rounded-lg flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed mt-4"
+              className="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-indigo-500/25 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed mt-4 cursor-pointer text-xs uppercase tracking-wider"
             >
               {isGenerating ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

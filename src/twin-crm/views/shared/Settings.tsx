@@ -162,14 +162,14 @@ export const SettingsView: React.FC = () => {
 
       {/* Settings Navigation Tabs */}
       {isCompanyAdmin && (
-        <div className="flex border-b border-slate-200 gap-2 pb-1 text-left">
+        <div className="flex border-b border-slate-800/80 gap-2 pb-1 text-left">
           <button
             onClick={() => setActiveTab('profile')}
             className={cn(
               'px-4 py-2.5 text-sm font-semibold border-b-2 transition-all cursor-pointer flex items-center gap-2',
               activeTab === 'profile'
-                ? 'border-primary text-primary'
-                : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-100'
+                ? 'border-indigo-500 text-indigo-400'
+                : 'border-transparent text-slate-400 hover:text-slate-200'
             )}
           >
             <User size={16} /> Personal Profile
@@ -179,8 +179,8 @@ export const SettingsView: React.FC = () => {
             className={cn(
               'px-4 py-2.5 text-sm font-semibold border-b-2 transition-all cursor-pointer flex items-center gap-2',
               activeTab === 'company'
-                ? 'border-primary text-primary'
-                : 'border-transparent text-slate-500 hover:text-slate-800 dark:text-slate-100'
+                ? 'border-indigo-500 text-indigo-400'
+                : 'border-transparent text-slate-400 hover:text-slate-200'
             )}
           >
             <Building size={16} /> Company Settings
@@ -199,16 +199,16 @@ export const SettingsView: React.FC = () => {
               <form onSubmit={handleSubmitProfile(onProfileSubmit)} className="space-y-4">
                 
                 {/* Mock photo upload */}
-                <div className="flex items-center gap-4 p-4 border border-slate-200 rounded-xl bg-slate-50/50">
-                  <div className="w-14 h-14 bg-primary text-primary-foreground flex items-center justify-center rounded-xl font-bold text-lg uppercase shadow-sm">
+                <div className="flex items-center gap-4 p-4 border border-slate-800/80 rounded-xl bg-[#07090E]/60">
+                  <div className="w-14 h-14 bg-indigo-600 text-white flex items-center justify-center rounded-xl font-bold text-lg uppercase shadow-lg shadow-indigo-500/20">
                     {user?.name.charAt(0)}
                   </div>
                   <div className="space-y-1">
-                    <span className="text-xs font-bold text-slate-700 block">Profile Avatar Image</span>
+                    <span className="text-xs font-bold text-slate-300 block">Profile Avatar Image</span>
                     <button
                       type="button"
                       onClick={() => alert('Demo: Choose a local image to update profile avatar.')}
-                      className="px-3 py-1 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-50 flex items-center gap-1.5 cursor-pointer shadow-sm"
+                      className="px-3 py-1 bg-slate-800/80 border border-slate-700/80 rounded-lg text-xs font-semibold text-slate-200 hover:bg-slate-700/80 flex items-center gap-1.5 cursor-pointer transition-colors"
                     >
                       <Upload size={12} /> Upload Photo
                     </button>
@@ -240,7 +240,7 @@ export const SettingsView: React.FC = () => {
                   {...registerProfile('email')}
                 />
 
-                <div className="border-t border-slate-200 pt-4 mt-6 space-y-4">
+                <div className="border-t border-slate-800/80 pt-4 mt-6 space-y-4">
                   <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
                     Change Password
                   </h3>
@@ -282,16 +282,16 @@ export const SettingsView: React.FC = () => {
               <form onSubmit={handleSubmitCompany(onCompanySubmit)} className="space-y-4">
                 
                 {/* Corporate Logo mock */}
-                <div className="flex items-center gap-4 p-4 border border-slate-200 rounded-xl bg-slate-50/50">
-                  <div className="w-14 h-14 bg-primary/10 text-primary flex items-center justify-center rounded-xl font-extrabold shadow-sm border border-primary/20">
+                <div className="flex items-center gap-4 p-4 border border-slate-800/80 rounded-xl bg-[#07090E]/60">
+                  <div className="w-14 h-14 bg-indigo-500/15 text-indigo-400 flex items-center justify-center rounded-xl font-extrabold shadow-sm border border-indigo-500/30">
                     <Building size={24} />
                   </div>
                   <div className="space-y-1">
-                    <span className="text-xs font-bold text-slate-700 block">Corporate Logo</span>
+                    <span className="text-xs font-bold text-slate-300 block">Corporate Logo</span>
                     <button
                       type="button"
                       onClick={() => alert('Demo: Choose a png/jpg company logo asset.')}
-                      className="px-3 py-1 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-50 flex items-center gap-1.5 cursor-pointer shadow-sm"
+                      className="px-3 py-1 bg-slate-800/80 border border-slate-700/80 rounded-lg text-xs font-semibold text-slate-200 hover:bg-slate-700/80 flex items-center gap-1.5 cursor-pointer transition-colors"
                     >
                       <Upload size={12} /> Upload Logo
                     </button>

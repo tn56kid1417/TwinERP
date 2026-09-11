@@ -290,34 +290,34 @@ export const Calls: React.FC = () => {
                     <span className="text-sm font-bold font-mono text-slate-900 dark:text-white dark:text-white">{formatDuration(callDuration)}</span>
                   </div>
                   <div>
-                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">
+                    <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 block">
                       Call Status
                     </label>
                     <select
-                      className="w-full text-sm py-2 px-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg outline-none focus:border-primary text-slate-700 dark:text-slate-200"
+                      className="w-full text-sm py-2.5 px-3.5 bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 shadow-inner"
                       value={callStatus}
                       onChange={(e) => setCallStatus(e.target.value as CallStatus)}
                     >
-                      <option value="Answered">Answered</option>
-                      <option value="Not Connected 1">Not Connected 1</option>
-                      <option value="Not Connected 2">Not Connected 2</option>
-                      <option value="Not Connected 3">Not Connected 3</option>
-                      <option value="Not Connected 4">Not Connected 4</option>
-                      <option value="Not Connected 5">Not Connected 5</option>
-                      <option value="Busy">Busy</option>
-                      <option value="Voicemail">Voicemail</option>
-                      <option value="Wrong Number">Wrong Number</option>
-                      <option value="Follow Up">Follow Up</option>
+                      <option value="Answered" className="bg-[#0C1017] text-slate-100">Answered</option>
+                      <option value="Not Connected 1" className="bg-[#0C1017] text-slate-100">Not Connected 1</option>
+                      <option value="Not Connected 2" className="bg-[#0C1017] text-slate-100">Not Connected 2</option>
+                      <option value="Not Connected 3" className="bg-[#0C1017] text-slate-100">Not Connected 3</option>
+                      <option value="Not Connected 4" className="bg-[#0C1017] text-slate-100">Not Connected 4</option>
+                      <option value="Not Connected 5" className="bg-[#0C1017] text-slate-100">Not Connected 5</option>
+                      <option value="Busy" className="bg-[#0C1017] text-slate-100">Busy</option>
+                      <option value="Voicemail" className="bg-[#0C1017] text-slate-100">Voicemail</option>
+                      <option value="Wrong Number" className="bg-[#0C1017] text-slate-100">Wrong Number</option>
+                      <option value="Follow Up" className="bg-[#0C1017] text-slate-100">Follow Up</option>
                     </select>
                   </div>
                   {callStatus === 'Follow Up' && (
                     <div className="animate-in fade-in duration-300">
-                      <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">
+                      <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 block">
                         Follow Up Time
                       </label>
                       <input
                         type="datetime-local"
-                        className="w-full text-sm py-2 px-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg outline-none focus:border-primary text-slate-700 dark:text-slate-200"
+                        className="w-full text-sm py-2.5 px-3.5 bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 shadow-inner [color-scheme:dark]"
                         value={followUpTime}
                         onChange={(e) => setFollowUpTime(e.target.value)}
                       />
@@ -332,15 +332,15 @@ export const Calls: React.FC = () => {
                     if (recentCalls.length === 0) return null
                     
                     return (
-                      <div className="p-3 bg-slate-50 dark:bg-slate-900/50 rounded-lg border border-slate-100 dark:border-slate-800 mt-2">
-                        <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">
+                      <div className="p-3.5 bg-slate-900/50 rounded-xl border border-slate-800 mt-2">
+                        <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 block">
                           Recent Activity
                         </label>
                         <div className="space-y-2">
                           {recentCalls.map(c => (
                             <div key={c.id} className="flex justify-between items-center text-xs">
-                              <span className="text-slate-500">{formatDate(c.startTime)} {new Date(c.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                              <span className="font-medium text-slate-700 dark:text-slate-300">{c.status}</span>
+                              <span className="text-slate-400">{formatDate(c.startTime)} {new Date(c.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                              <span className="font-medium text-slate-200">{c.status}</span>
                             </div>
                           ))}
                         </div>
@@ -349,17 +349,17 @@ export const Calls: React.FC = () => {
                   })()}
 
                   <div>
-                    <label className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2 block">
+                    <label className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2 block">
                       Call Notes
                     </label>
                     <textarea
-                      className="w-full text-sm py-2 px-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg outline-none focus:border-primary text-slate-700 dark:text-slate-200 min-h-[100px]"
+                      className="w-full text-sm py-2.5 px-3.5 bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 shadow-inner min-h-[100px] placeholder:text-slate-500"
                       placeholder="Add discussion notes..."
                       value={callNotes}
                       onChange={(e) => setCallNotes(e.target.value)}
                     />
                   </div>
-                  <Button className="w-full" onClick={saveCallLog}>
+                  <Button variant="primary" className="w-full" onClick={saveCallLog}>
                     <CheckCircle className="mr-2" size={16} /> Save Call Log
                   </Button>
                 </div>

@@ -92,14 +92,15 @@ const Resignations = () => {
 
       <div className={`grid grid-cols-1 gap-8 flex-1 min-h-0 ${showForm ? 'lg:grid-cols-3' : 'lg:grid-cols-1'}`}>
         {showForm && (<div className="lg:col-span-1">
-          <div className="bg-white dark:bg-[#1A1D23] rounded-xl border border-slate-200 dark:border-slate-800 p-6">
-            <h2 className="text-sm font-semibold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
-              <UserMinus size={16} className="text-indigo-400" />
+          <div className="relative bg-[#0C1017]/90 backdrop-blur-xl rounded-2xl border border-slate-700/60 dark:border-slate-700/50 p-6 shadow-2xl shadow-black/40 overflow-hidden ring-1 ring-white/5">
+            <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-indigo-500/80 to-transparent pointer-events-none" />
+            <h2 className="text-base font-bold text-white mb-6 flex items-center gap-2">
+              <UserMinus size={18} className="text-indigo-400" />
               New Resignation
             </h2>
             
             {error && (
-              <div className="bg-red-500/10 text-red-400 border border-red-500/20 p-3 rounded text-xs mb-4">
+              <div className="bg-rose-500/10 text-rose-400 border border-rose-500/20 p-3 rounded-xl text-xs mb-4">
                 {error}
               </div>
             )}
@@ -107,39 +108,39 @@ const Resignations = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               {canEdit && (
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-1">Employee</label>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Employee</label>
                   <select 
-                    className="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded px-4 py-2 text-sm focus:outline-none focus:border-indigo-500/50"
+                    className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner cursor-pointer"
                     value={formData.employeeId}
                     onChange={e => setFormData({...formData, employeeId: e.target.value})}
                     required
                   >
-                    <option value="">Select Employee</option>
+                    <option value="" className="bg-[#0C1017] text-slate-400">Select Employee</option>
                     {employees.map(emp => (
-                      <option key={emp.id} value={emp.id}>{emp.firstName} {emp.lastName}</option>
+                      <option key={emp.id} value={emp.id} className="bg-[#0C1017] text-slate-100">{emp.firstName} {emp.lastName}</option>
                     ))}
                   </select>
                 </div>
               )}
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-1">Last Working Date</label>
-                <input type="date" required className="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded px-4 py-2 text-sm focus:outline-none focus:border-indigo-500/50"
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Last Working Date</label>
+                <input type="date" required className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner [color-scheme:dark]"
                   value={formData.lastWorkingDate} onChange={e => setFormData({...formData, lastWorkingDate: e.target.value})} />
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-1">Reason</label>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Reason</label>
                 <textarea 
                   required 
-                  className="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded px-4 py-2 text-sm focus:outline-none focus:border-indigo-500/50 h-24 resize-none"
+                  className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all h-24 resize-none shadow-inner"
                   value={formData.reason} 
                   onChange={e => setFormData({...formData, reason: e.target.value})}
                   placeholder="State the reason for resignation..."
                 ></textarea>
               </div>
 
-              <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-slate-900 dark:text-white py-2 rounded text-[10px] font-bold uppercase tracking-widest transition-colors mt-4">
+              <button type="submit" className="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 text-white font-semibold py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all shadow-lg shadow-indigo-500/25 active:scale-[0.98] cursor-pointer mt-6">
                 Submit Resignation
               </button>
             </form>

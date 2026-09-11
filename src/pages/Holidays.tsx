@@ -98,57 +98,58 @@ const Holidays = () => {
       <div className={`grid grid-cols-1 gap-8 flex-1 min-h-0 ${canEdit ? 'lg:grid-cols-3' : 'lg:grid-cols-1'}`}>
         {canEdit && (
           <div className="lg:col-span-1">
-            <div className="bg-white dark:bg-[#1A1D23] rounded-xl border border-slate-200 dark:border-slate-800 p-6">
-              <h2 className="text-sm font-semibold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
-                <Plus size={16} className="text-indigo-400" />
+            <div className="relative bg-[#0C1017]/90 backdrop-blur-xl rounded-2xl border border-slate-700/60 dark:border-slate-700/50 p-6 shadow-2xl shadow-black/40 overflow-hidden ring-1 ring-white/5">
+              <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-indigo-500/80 to-transparent pointer-events-none" />
+              <h2 className="text-base font-bold text-white mb-6 flex items-center gap-2">
+                <Plus size={18} className="text-indigo-400" />
                 New Holiday
               </h2>
               
               {error && (
-                <div className="bg-red-500/10 text-red-400 border border-red-500/20 p-3 rounded text-xs mb-4">
+                <div className="bg-rose-500/10 text-rose-400 border border-rose-500/20 p-3 rounded-xl text-xs mb-4">
                   {error}
                 </div>
               )}
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-1">Holiday Name</label>
-                  <input type="text" required className="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded px-4 py-2 text-sm focus:outline-none focus:border-indigo-500/50"
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Holiday Name</label>
+                  <input type="text" required className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner"
                     value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} placeholder="e.g. New Year's Day" />
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-1">Start Date</label>
-                  <input type="date" required className="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded px-4 py-2 text-sm focus:outline-none focus:border-indigo-500/50"
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Start Date</label>
+                  <input type="date" required className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner [color-scheme:dark]"
                     value={formData.startDate} onChange={e => setFormData({...formData, startDate: e.target.value})} />
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-1">End Date</label>
-                  <input type="date" required className="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded px-4 py-2 text-sm focus:outline-none focus:border-indigo-500/50"
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">End Date</label>
+                  <input type="date" required className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner [color-scheme:dark]"
                     value={formData.endDate} onChange={e => setFormData({...formData, endDate: e.target.value})} />
                 </div>
 
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest mb-1">Holiday Type</label>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Holiday Type</label>
                   <select 
-                    className="w-full bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded px-4 py-2 text-sm focus:outline-none focus:border-indigo-500/50"
+                    className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner cursor-pointer"
                     value={formData.type}
                     onChange={e => setFormData({...formData, type: e.target.value})}
                   >
-                    <option value="Public Holiday">Public Holiday</option>
-                    <option value="Company Holiday">Company Holiday</option>
-                    <option value="Optional Holiday">Optional Holiday</option>
+                    <option value="Public Holiday" className="bg-[#0C1017] text-slate-100">Public Holiday</option>
+                    <option value="Company Holiday" className="bg-[#0C1017] text-slate-100">Company Holiday</option>
+                    <option value="Optional Holiday" className="bg-[#0C1017] text-slate-100">Optional Holiday</option>
                   </select>
                 </div>
 
                 <div className="flex items-center gap-2 mt-4">
-                  <input type="checkbox" id="isPaid" className="rounded bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-indigo-500 focus:ring-indigo-500/50"
+                  <input type="checkbox" id="isPaid" className="accent-indigo-500 w-4 h-4 rounded cursor-pointer"
                     checked={formData.isPaid} onChange={e => setFormData({...formData, isPaid: e.target.checked})} />
-                  <label htmlFor="isPaid" className="text-xs text-slate-700 dark:text-slate-300">Paid Holiday</label>
+                  <label htmlFor="isPaid" className="text-xs text-slate-300 cursor-pointer">Paid Holiday</label>
                 </div>
 
-                <button type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-slate-900 dark:text-white py-2 rounded text-[10px] font-bold uppercase tracking-widest transition-colors mt-6">
+                <button type="submit" className="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 text-white font-semibold py-2.5 rounded-xl text-xs uppercase tracking-wider transition-all shadow-lg shadow-indigo-500/25 active:scale-[0.98] cursor-pointer mt-6">
                   Create Holiday
                 </button>
               </form>

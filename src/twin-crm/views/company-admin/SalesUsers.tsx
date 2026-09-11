@@ -411,16 +411,15 @@ export const SalesUsers: React.FC = () => {
             />
           </div>
 
-          <div className="flex items-center justify-end gap-3 mt-6">
+          <div className="flex items-center justify-end gap-3 mt-8 pt-4 border-t border-slate-800/80">
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               onClick={() => setIsAddEditModalOpen(false)}
-              className="cursor-pointer"
             >
               Cancel
             </Button>
-            <Button type="submit" isLoading={submitting} className="cursor-pointer">
+            <Button type="submit" isLoading={submitting} variant="primary">
               {selectedRep ? 'Save Configuration' : 'Enroll Representative'}
             </Button>
           </div>
@@ -435,30 +434,28 @@ export const SalesUsers: React.FC = () => {
         size="sm"
       >
         <div className="space-y-4 text-left">
-          <div className="flex items-start gap-3 p-3 bg-danger/10 text-danger rounded-xl">
-            <ShieldAlert size={20} className="flex-shrink-0 mt-0.5" />
+          <div className="flex items-start gap-3 p-3.5 bg-rose-500/10 border border-rose-500/20 text-rose-300 rounded-xl">
+            <ShieldAlert size={20} className="flex-shrink-0 mt-0.5 text-rose-400" />
             <p className="text-xs leading-normal">
               Warning: Revoking access removes this representative from the active roster. Any prospects assigned to them will require manual reallocation.
             </p>
           </div>
-          <p className="text-sm text-slate-600">
-            Are you sure you want to remove <strong>{selectedRep?.name}</strong> from the sales workspace?
+          <p className="text-sm text-slate-300">
+            Are you sure you want to remove <strong className="text-white">{selectedRep?.name}</strong> from the sales workspace?
           </p>
 
-          <div className="flex items-center justify-end gap-3 mt-6">
+          <div className="flex items-center justify-end gap-3 mt-8 pt-4 border-t border-slate-800/80">
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               onClick={() => setIsDeleteModalOpen(false)}
-              className="cursor-pointer"
             >
               Cancel
             </Button>
             <Button
-              variant="outline"
+              variant="danger"
               onClick={handleDelete}
               isLoading={submitting}
-              className="border-danger hover:bg-danger/10 text-danger cursor-pointer"
             >
               Confirm Revocation
             </Button>
