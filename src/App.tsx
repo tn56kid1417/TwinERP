@@ -62,17 +62,30 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, Error
   render() {
     if (this.state.hasError) {
       return (
-        <div className="flex-1 flex flex-col items-center justify-center min-h-[60vh] gap-4 p-8">
-          <div className="text-center">
+        <div className="min-h-screen bg-[#0A0C10] flex flex-col items-center justify-center gap-4 p-8 text-slate-200">
+          <div className="bg-[#1A1D23] border border-slate-800 rounded-2xl p-8 max-w-md w-full text-center shadow-2xl">
             <div className="text-4xl mb-3">⚠️</div>
-            <h2 className="text-lg font-semibold text-slate-800 dark:text-white mb-2">Something went wrong</h2>
-            <p className="text-sm text-slate-500 mb-6">{this.state.error?.message || 'An unexpected error occurred'}</p>
-            <button
-              onClick={() => { this.setState({ hasError: false, error: null }); window.location.reload(); }}
-              className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-lg transition-colors"
-            >
-              Reload Page
-            </button>
+            <h2 className="text-lg font-semibold text-white mb-2">Something went wrong</h2>
+            <p className="text-sm text-slate-400 mb-6 font-mono text-left bg-slate-900/80 p-3 rounded-lg overflow-x-auto max-h-40 border border-slate-800">
+              {this.state.error?.message || 'An unexpected error occurred'}
+            </p>
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={() => { this.setState({ hasError: false, error: null }); window.location.reload(); }}
+                className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"
+              >
+                Reload Page
+              </button>
+              <button
+                onClick={() => {
+                  localStorage.clear();
+                  window.location.href = '/';
+                }}
+                className="px-4 py-2.5 bg-rose-600/20 hover:bg-rose-600/30 text-rose-400 border border-rose-500/30 text-xs font-bold uppercase tracking-wider rounded-lg transition-colors"
+              >
+                Clear Cache & Logout
+              </button>
+            </div>
           </div>
         </div>
       );
@@ -84,72 +97,71 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, Error
 export default function App() {
   const { user } = useAuth();
 
-  if (!user) {
-    return <Login />;
-  }
-
   return (
-    <Router>
-      <div className="flex min-h-screen bg-slate-50 dark:bg-[#0A0C10] text-slate-700 dark:text-slate-300 font-sans relative overflow-hidden z-0">
-        <div className="bg-live-mesh">
-          <div className="blob blob-1"></div>
-          <div className="blob blob-2"></div>
-          <div className="blob blob-3"></div>
-          <div className="grid-bg"></div>
-        </div>
-        
-        <Sidebar />
-        <main className="flex-1 overflow-auto z-10 relative flex flex-col">
-          <Header />
-          <div className="flex-1 overflow-auto">
-            <ErrorBoundary>
-              <Suspense fallback={<PageLoader />}>
-              <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/employees" element={<EmployeeList />} />
-              <Route path="/attendance" element={<Attendance />} />
-              <Route path="/leaves" element={<LeaveRequests />} />
-              <Route path="/leave-balance" element={<LeaveBalance />} />
-              <Route path="/payslips" element={<Payslips />} />
-              <Route path="/resignations" element={<Resignations />} />
-              <Route path="/terminations" element={<Terminations />} />
-              <Route path="/holidays" element={<Holidays />} />
-              <Route path="/awards" element={<Awards />} />
-              <Route path="/announcements" element={<Announcements />} />
-              <Route path="/events" element={<Events />} />
-              <Route path="/letters" element={<LetterGenerator />} />
-              <Route path="/analytics" element={<HRMUserAnalytics />} />
-              <Route path="/settings" element={<Settings />} />
+    <ErrorBoundary>
+      {!user ? (
+        <Login />
+      ) : (
+        <Router>
+          <div className="flex min-h-screen bg-slate-50 dark:bg-[#0A0C10] text-slate-700 dark:text-slate-300 font-sans relative overflow-hidden z-0">
+            <div className="bg-live-mesh">
+              <div className="blob blob-1"></div>
+              <div className="blob blob-2"></div>
+              <div className="blob blob-3"></div>
+              <div className="grid-bg"></div>
+            </div>
+            
+            <Sidebar />
+            <main className="flex-1 overflow-auto z-10 relative flex flex-col">
+              <Header />
+              <div className="flex-1 overflow-auto">
+                <Suspense fallback={<PageLoader />}>
+                  <Routes>
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/employees" element={<EmployeeList />} />
+                    <Route path="/attendance" element={<Attendance />} />
+                    <Route path="/leaves" element={<LeaveRequests />} />
+                    <Route path="/leave-balance" element={<LeaveBalance />} />
+                    <Route path="/payslips" element={<Payslips />} />
+                    <Route path="/resignations" element={<Resignations />} />
+                    <Route path="/terminations" element={<Terminations />} />
+                    <Route path="/holidays" element={<Holidays />} />
+                    <Route path="/awards" element={<Awards />} />
+                    <Route path="/announcements" element={<Announcements />} />
+                    <Route path="/events" element={<Events />} />
+                    <Route path="/letters" element={<LetterGenerator />} />
+                    <Route path="/analytics" element={<HRMUserAnalytics />} />
+                    <Route path="/settings" element={<Settings />} />
 
-              {/* CRM Module Routes */}
-              <Route path="/crm">
-                <Route index element={<div className="p-6"><DashboardDispatcher /></div>} />
-                <Route path="leads" element={<div className="p-6"><LeadsDispatcher /></div>} />
-                <Route path="upload-leads" element={<div className="p-6"><UploadLeads /></div>} />
-                <Route path="customers" element={<div className="p-6"><Customers /></div>} />
-                <Route path="customers/:id" element={<div className="p-6"><CustomerDetails /></div>} />
-                <Route path="reports" element={<div className="p-6"><Reports /></div>} />
-                <Route path="sales" element={<div className="p-6"><SalesUsers /></div>} />
-                <Route path="calls" element={<div className="p-6"><CRMCalls /></div>} />
-                <Route path="payments" element={<div className="p-6"><CRMPayments /></div>} />
-                <Route path="distribute-leads" element={<div className="p-6"><DistributeLeads /></div>} />
-                <Route path="settings" element={<div className="p-6"><CRMSettings /></div>} />
-              </Route>
+                    {/* CRM Module Routes */}
+                    <Route path="/crm">
+                      <Route index element={<div className="p-6"><DashboardDispatcher /></div>} />
+                      <Route path="leads" element={<div className="p-6"><LeadsDispatcher /></div>} />
+                      <Route path="upload-leads" element={<div className="p-6"><UploadLeads /></div>} />
+                      <Route path="customers" element={<div className="p-6"><Customers /></div>} />
+                      <Route path="customers/:id" element={<div className="p-6"><CustomerDetails /></div>} />
+                      <Route path="reports" element={<div className="p-6"><Reports /></div>} />
+                      <Route path="sales" element={<div className="p-6"><SalesUsers /></div>} />
+                      <Route path="calls" element={<div className="p-6"><CRMCalls /></div>} />
+                      <Route path="payments" element={<div className="p-6"><CRMPayments /></div>} />
+                      <Route path="distribute-leads" element={<div className="p-6"><DistributeLeads /></div>} />
+                      <Route path="settings" element={<div className="p-6"><CRMSettings /></div>} />
+                    </Route>
 
-              {/* Projects Module Routes */}
-              <Route path="/projects" element={<ProjectsDashboard />} />
-              <Route path="/projects/all" element={<ProjectsList />} />
-              <Route path="/projects/:id/board" element={<ProjectKanban />} />
-              <Route path="/projects/clients" element={<ClientsList />} />
+                    {/* Projects Module Routes */}
+                    <Route path="/projects" element={<ProjectsDashboard />} />
+                    <Route path="/projects/all" element={<ProjectsList />} />
+                    <Route path="/projects/:id/board" element={<ProjectKanban />} />
+                    <Route path="/projects/clients" element={<ClientsList />} />
 
-              <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-              </Suspense>
-            </ErrorBoundary>
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                  </Routes>
+                </Suspense>
+              </div>
+            </main>
           </div>
-
-        </main>
-      </div>
-    </Router>
+        </Router>
+      )}
+    </ErrorBoundary>
   );
 }
