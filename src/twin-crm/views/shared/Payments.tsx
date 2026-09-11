@@ -22,6 +22,7 @@ export const Payments: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingPaymentId, setEditingPaymentId] = useState<string | null>(null)
   const [newPayment, setNewPayment] = useState<{
+    customerName: string;
     leadId: string;
     product: string;
     amount: string;
@@ -32,6 +33,7 @@ export const Payments: React.FC = () => {
     approver: string;
     expires: string;
   }>({
+    customerName: '',
     leadId: '',
     product: '',
     amount: '',
@@ -73,7 +75,7 @@ export const Payments: React.FC = () => {
       const lowerQuery = searchQuery.toLowerCase();
       result = result.filter(p => {
         const lead = leads.find(l => l.id === p.leadId);
-        const leadName = lead ? lead.name.toLowerCase() : '';
+        const leadName = lead ? lead.name.toLowerCase() : (p.leadId || '').toLowerCase();
         const createdBy = (p.createdBy || '').toLowerCase();
         return leadName.includes(lowerQuery) || createdBy.includes(lowerQuery);
       });
@@ -89,13 +91,20 @@ export const Payments: React.FC = () => {
 
   const handleSavePayment = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!newPayment.leadId || !newPayment.product || !newPayment.amount) return
+    const customerInput = (newPayment.customerName || newPayment.leadId).trim()
+    if (!customerInput || !newPayment.product || !newPayment.amount) return
+
+    const matchedLead = leads.find(l => 
+      l.name.toLowerCase() === customerInput.toLowerCase() || 
+      l.id === customerInput
+    )
+    const targetLeadId = matchedLead ? matchedLead.id : customerInput
 
     setIsSubmitting(true)
     try {
       if (editingPaymentId) {
         await updatePurchase(editingPaymentId, {
-          leadId: newPayment.leadId,
+          leadId: targetLeadId,
           product: newPayment.product,
           amount: Number(newPayment.amount),
           paymentStatus: newPayment.paymentStatus,
@@ -107,7 +116,7 @@ export const Payments: React.FC = () => {
         })
       } else {
         await addPurchase({
-          leadId: newPayment.leadId,
+          leadId: targetLeadId,
           product: newPayment.product,
           amount: Number(newPayment.amount),
           paymentStatus: newPayment.paymentStatus,
@@ -122,6 +131,7 @@ export const Payments: React.FC = () => {
       setIsModalOpen(false)
       setEditingPaymentId(null)
       setNewPayment({ 
+        customerName: '',
         leadId: '', 
         product: '', 
         amount: '',
@@ -141,7 +151,9 @@ export const Payments: React.FC = () => {
 
   const handleEditPayment = (payment: Purchase) => {
     setEditingPaymentId(payment.id)
+    const existingLeadName = getLeadName(payment.leadId)
     setNewPayment({
+      customerName: existingLeadName,
       leadId: payment.leadId,
       product: payment.product,
       amount: String(payment.amount),
@@ -158,6 +170,7 @@ export const Payments: React.FC = () => {
   const handleOpenCreateModal = () => {
     setEditingPaymentId(null)
     setNewPayment({ 
+      customerName: '',
       leadId: '', 
       product: '', 
       amount: '',
@@ -540,22 +553,29 @@ export const Payments: React.FC = () => {
       >
         <form onSubmit={handleSavePayment} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div className="flex flex-col gap-1.5 text-left">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Customer</label>
-              <select
-                className="w-full text-sm py-2.5 px-3.5 bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl transition-all duration-200 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 appearance-none cursor-pointer shadow-inner"
-                value={newPayment.leadId}
-                onChange={(e) => setNewPayment({ ...newPayment, leadId: e.target.value })}
+            <div>
+              <Input
+                label="Customer"
+                placeholder="Type customer name..."
+                value={newPayment.customerName}
+                onChange={(e) => {
+                  const val = e.target.value
+                  const matched = leads.find(l => l.name.toLowerCase() === val.trim().toLowerCase())
+                  setNewPayment({
+                    ...newPayment,
+                    customerName: val,
+                    leadId: matched ? matched.id : val
+                  })
+                }}
+                leftIcon={<User size={16} />}
+                list="customer-suggestions"
                 required
-                style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.85rem center', backgroundSize: '1.1em' }}
-              >
-                <option value="" disabled className="bg-[#0C1017] text-slate-400">Select a customer</option>
+              />
+              <datalist id="customer-suggestions">
                 {selectableLeads.map((lead) => (
-                  <option key={lead.id} value={lead.id} className="bg-[#0C1017] text-slate-100">
-                    {lead.name}
-                  </option>
+                  <option key={lead.id} value={lead.name} />
                 ))}
-              </select>
+              </datalist>
             </div>
             
             <Input
