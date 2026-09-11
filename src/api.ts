@@ -16,10 +16,10 @@ export const updateEmployee = (id: string, emp: Partial<Employee>) => api.put<Em
 export const deleteEmployee = (id: string) => api.delete(`/employees/${id}`);
 
 // Attendance APIs
-export const clockIn = (employeeId: string) => api.post<Attendance>('/attendance/clock-in', { employeeId }).then(res => res.data);
-export const clockOut = (employeeId: string) => api.post<Attendance>('/attendance/clock-out', { employeeId }).then(res => res.data);
-export const breakIn = (employeeId: string) => api.post<Attendance>('/attendance/break-in', { employeeId }).then(res => res.data);
-export const breakOut = (employeeId: string) => api.post<Attendance>('/attendance/break-out', { employeeId }).then(res => res.data);
+export const clockIn = (employeeId: string, clockInTime?: string) => api.post<Attendance>('/attendance/clock-in', { employeeId, clockInTime }).then(res => res.data);
+export const clockOut = (employeeId: string, clockInTime?: string) => api.post<Attendance>('/attendance/clock-out', { employeeId, clockInTime }).then(res => res.data);
+export const breakIn = (employeeId: string, clockInTime?: string) => api.post<Attendance>('/attendance/break-in', { employeeId, clockInTime }).then(res => res.data);
+export const breakOut = (employeeId: string, clockInTime?: string, breakInTime?: string) => api.post<Attendance>('/attendance/break-out', { employeeId, clockInTime, breakInTime }).then(res => res.data);
 export const getAttendance = (employeeId: string) => api.get<Attendance[]>(`/attendance/${employeeId}`).then(res => res.data);
 export const getAllAttendance = () => api.get<Attendance[]>('/attendance').then(res => res.data);
 

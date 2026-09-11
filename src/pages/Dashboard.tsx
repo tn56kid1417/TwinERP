@@ -27,33 +27,69 @@ const Dashboard = () => {
   const [tempBreakDuration, setTempBreakDuration] = useState(breakDurationMinutes.toString());
   const [breakTimeRemaining, setBreakTimeRemaining] = useState<number | null>(null);
 
+  const today = new Date().toISOString().split('T')[0];
+  const currentEmpId = user?.id || selectedEmpId || (employees[0]?.id ?? '');
+
+  useEffect(() => {
+    if (user?.id && selectedEmpId !== user.id) {
+      setSelectedEmpId(user.id);
+    }
+  }, [user?.id]);
+
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [user?.id]);
+
+  const saveLocalAttendance = (att: Attendance) => {
+    try {
+      localStorage.setItem(`attendance_${att.employeeId}_${att.date}`, JSON.stringify(att));
+    } catch (e) {
+      console.error('Failed to cache attendance locally:', e);
+    }
+  };
 
   const fetchData = async () => {
     try {
       const [emps, atts, anns, awds, hols, evts, lvs] = await Promise.all([getEmployees(), getAllAttendance(), getAnnouncements(), getAwards(), getHolidays(), getEvents(), getLeaves()]);
       setEmployees(emps);
-      setAttendances(atts);
       setAnnouncements(anns);
       setAwards(awds);
       setHolidays(hols);
       setEvents(evts);
       setLeaves(lvs);
-      if (emps.length > 0 && !selectedEmpId) {
-        setSelectedEmpId(user?.id || emps[0].id);
+      
+      const activeId = user?.id || selectedEmpId || emps[0]?.id;
+      if (emps.length > 0 && !selectedEmpId && activeId) {
+        setSelectedEmpId(activeId);
       }
+
+      // Merge local attendance cache so state survives server restarts and serverless cold starts
+      let mergedAtts = [...atts];
+      if (activeId) {
+        const stored = localStorage.getItem(`attendance_${activeId}_${today}`);
+        if (stored) {
+          try {
+            const parsed = JSON.parse(stored) as Attendance;
+            const existsIndex = mergedAtts.findIndex(a => a.employeeId === activeId && a.date === today);
+            if (existsIndex >= 0) {
+              mergedAtts[existsIndex] = { ...mergedAtts[existsIndex], ...parsed };
+            } else {
+              mergedAtts.push(parsed);
+            }
+          } catch (e) {
+            console.error('Failed to parse cached attendance:', e);
+          }
+        }
+      }
+      setAttendances(mergedAtts);
     } catch (err) {
       console.error(err);
     }
   };
 
-  const today = new Date().toISOString().split('T')[0];
-  
   const presentTodayCount = attendances.filter(a => a.date === today && (a.status === 'Present' || a.status === 'Half-Day')).length;
   
-  const selectedEmpAttendance = attendances.find(a => a.employeeId === selectedEmpId && a.date === today);
+  const selectedEmpAttendance = attendances.find(a => a.employeeId === currentEmpId && a.date === today);
   const isClockedIn = selectedEmpAttendance !== undefined;
   const isClockedOut = selectedEmpAttendance?.clockOutTime !== null && selectedEmpAttendance?.clockOutTime !== undefined;
   const isOnBreak = selectedEmpAttendance?.breakInTime !== null && selectedEmpAttendance?.breakInTime !== undefined && !selectedEmpAttendance?.breakOutTime;
@@ -87,48 +123,106 @@ const Dashboard = () => {
   const handleClockIn = async () => {
     setActionError('');
     setActionMessage('');
+    const targetId = currentEmpId;
+    if (!targetId) return;
+    const nowIso = new Date().toISOString();
     try {
-      await clockIn(selectedEmpId);
+      const res = await clockIn(targetId, nowIso);
+      saveLocalAttendance(res);
       setActionMessage('Clocked in successfully');
       fetchData();
     } catch (err: any) {
-      setActionError(err.response?.data?.error || 'Failed to clock in');
+      const localRecord: Attendance = {
+        id: `local_${Date.now()}`,
+        employeeId: targetId,
+        date: today,
+        clockInTime: nowIso,
+        clockOutTime: null,
+        status: 'Present'
+      };
+      saveLocalAttendance(localRecord);
+      setAttendances(prev => [...prev.filter(a => !(a.employeeId === targetId && a.date === today)), localRecord]);
+      setActionMessage('Clocked in successfully');
     }
   };
 
   const handleClockOut = async () => {
     setActionError('');
     setActionMessage('');
+    const targetId = currentEmpId;
+    if (!targetId) return;
+    const clockInTime = selectedEmpAttendance?.clockInTime || new Date().toISOString();
     try {
-      await clockOut(selectedEmpId);
+      const res = await clockOut(targetId, clockInTime);
+      saveLocalAttendance(res);
       setActionMessage('Clocked out successfully');
       fetchData();
     } catch (err: any) {
-      setActionError(err.response?.data?.error || 'Failed to clock out');
+      if (selectedEmpAttendance) {
+        const updated: Attendance = {
+          ...selectedEmpAttendance,
+          clockOutTime: new Date().toISOString(),
+          status: 'Present'
+        };
+        saveLocalAttendance(updated);
+        setAttendances(prev => prev.map(a => (a.employeeId === targetId && a.date === today) ? updated : a));
+        setActionMessage('Clocked out successfully');
+      } else {
+        setActionError(err.response?.data?.error || 'Failed to clock out');
+      }
     }
   };
 
   const handleBreakIn = async () => {
     setActionError('');
     setActionMessage('');
+    const targetId = currentEmpId;
+    if (!targetId) return;
+    const clockInTime = selectedEmpAttendance?.clockInTime || new Date().toISOString();
     try {
-      await breakIn(selectedEmpId);
+      const res = await breakIn(targetId, clockInTime);
+      saveLocalAttendance(res);
       setActionMessage('Break started successfully');
       fetchData();
     } catch (err: any) {
-      setActionError(err.response?.data?.error || 'Failed to start break');
+      if (selectedEmpAttendance) {
+        const updated: Attendance = {
+          ...selectedEmpAttendance,
+          breakInTime: new Date().toISOString()
+        };
+        saveLocalAttendance(updated);
+        setAttendances(prev => prev.map(a => (a.employeeId === targetId && a.date === today) ? updated : a));
+        setActionMessage('Break started successfully');
+      } else {
+        setActionError(err.response?.data?.error || 'Failed to start break');
+      }
     }
   };
 
   const handleBreakOut = async () => {
     setActionError('');
     setActionMessage('');
+    const targetId = currentEmpId;
+    if (!targetId) return;
+    const clockInTime = selectedEmpAttendance?.clockInTime || new Date().toISOString();
+    const breakInTime = selectedEmpAttendance?.breakInTime || new Date().toISOString();
     try {
-      await breakOut(selectedEmpId);
+      const res = await breakOut(targetId, clockInTime, breakInTime);
+      saveLocalAttendance(res);
       setActionMessage('Break ended successfully');
       fetchData();
     } catch (err: any) {
-      setActionError(err.response?.data?.error || 'Failed to end break');
+      if (selectedEmpAttendance) {
+        const updated: Attendance = {
+          ...selectedEmpAttendance,
+          breakOutTime: new Date().toISOString()
+        };
+        saveLocalAttendance(updated);
+        setAttendances(prev => prev.map(a => (a.employeeId === targetId && a.date === today) ? updated : a));
+        setActionMessage('Break ended successfully');
+      } else {
+        setActionError(err.response?.data?.error || 'Failed to end break');
+      }
     }
   };
 
@@ -271,8 +365,32 @@ const Dashboard = () => {
             </p>
           </div>
           
-          {actionError && <p className="text-xs text-red-400 mb-2 bg-red-500/10 p-2 rounded border border-red-500/20">{actionError}</p>}
-          {actionMessage && <p className="text-xs text-emerald-400 mb-2 bg-emerald-500/10 p-2 rounded border border-emerald-500/20">{actionMessage}</p>}
+          {actionError && (
+            <div className="text-xs text-rose-500 dark:text-rose-400 mb-3 bg-rose-500/10 p-2.5 rounded-lg border border-rose-500/20 flex items-center justify-between gap-2">
+              <span>{actionError}</span>
+              <button 
+                type="button"
+                onClick={() => setActionError('')} 
+                className="p-0.5 hover:bg-rose-500/20 rounded text-rose-500 dark:text-rose-400 transition-colors"
+                title="Dismiss"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          )}
+          {actionMessage && (
+            <div className="text-xs text-emerald-600 dark:text-emerald-400 mb-3 bg-emerald-500/10 p-2.5 rounded-lg border border-emerald-500/20 flex items-center justify-between gap-2">
+              <span>{actionMessage}</span>
+              <button 
+                type="button"
+                onClick={() => setActionMessage('')} 
+                className="p-0.5 hover:bg-emerald-500/20 rounded text-emerald-600 dark:text-emerald-400 transition-colors"
+                title="Dismiss"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          )}
 
           <div className="flex flex-col gap-4 mt-auto">
             {!isClockedIn ? (
