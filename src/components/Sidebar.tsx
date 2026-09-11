@@ -108,12 +108,12 @@ const Sidebar = () => {
   const navItems = getActiveNavItems();
 
   return (
-    <div className="relative w-64 bg-white/70 dark:bg-[#11141B]/60 backdrop-blur-xl border-r border-slate-200/80 dark:border-slate-800/50 flex flex-col h-screen sticky top-0 overflow-hidden shadow-sm dark:shadow-none">
-      <div className="p-6 flex items-center gap-3">
+    <aside className="relative w-64 bg-white/80 dark:bg-[#0C1017]/90 backdrop-blur-2xl border-r border-slate-200/80 dark:border-slate-800/80 flex flex-col h-full shrink-0 overflow-hidden shadow-sm dark:shadow-none z-20">
+      <div className="p-6 flex items-center gap-3 shrink-0">
         <img src="/logo.png" alt="TwinERP Logo" className="h-8 object-contain invert dark:invert-0" />
       </div>
 
-      <div className="px-4 mb-4">
+      <div className="px-4 mb-4 shrink-0">
         <div className="bg-slate-100/80 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-800 rounded-xl p-1 flex">
           {(['HRM', 'CRM', 'Projects'] as Module[]).map((mod) => (
             <button
@@ -136,7 +136,7 @@ const Sidebar = () => {
         </div>
       </div>
       
-      <nav className="flex-1 min-h-0 px-4 py-1 pb-24 space-y-1 overflow-y-auto">
+      <nav className="flex-1 min-h-0 px-4 py-1 pb-28 space-y-1 overflow-y-auto scrollbar-thin">
         {navItems.map((item) => {
           const isExactMatch = location.pathname === item.path;
           const isSubRouteMatch = item.path !== '/' && item.path !== '/crm' && item.path !== '/projects' && location.pathname.startsWith(item.path);
@@ -206,7 +206,7 @@ const Sidebar = () => {
         </motion.div>,
         document.body
       )}
-    </div>
+    </aside>
   );
 };
 

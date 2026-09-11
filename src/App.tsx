@@ -103,8 +103,8 @@ export default function App() {
         <Login />
       ) : (
         <Router>
-          <div className="flex min-h-screen bg-slate-50 dark:bg-[#0A0C10] text-slate-700 dark:text-slate-300 font-sans relative overflow-hidden z-0">
-            <div className="bg-live-mesh">
+          <div className="flex h-screen w-screen overflow-hidden bg-slate-50 dark:bg-[#0A0C10] text-slate-700 dark:text-slate-300 font-sans relative z-0">
+            <div className="bg-live-mesh fixed inset-0 pointer-events-none">
               <div className="blob blob-1"></div>
               <div className="blob blob-2"></div>
               <div className="blob blob-3"></div>
@@ -112,9 +112,9 @@ export default function App() {
             </div>
             
             <Sidebar />
-            <main className="flex-1 overflow-auto z-10 relative flex flex-col">
+            <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden z-10 relative">
               <Header />
-              <div className="flex-1 overflow-auto">
+              <main className="flex-1 overflow-y-auto overflow-x-hidden">
                 <Suspense fallback={<PageLoader />}>
                   <Routes>
                     <Route path="/" element={<Dashboard />} />
@@ -157,8 +157,8 @@ export default function App() {
                     <Route path="*" element={<Navigate to="/" replace />} />
                   </Routes>
                 </Suspense>
-              </div>
-            </main>
+              </main>
+            </div>
           </div>
         </Router>
       )}
