@@ -77,15 +77,15 @@ const LeaveRequests = () => {
 
       <div className={`grid grid-cols-1 gap-8 flex-1 min-h-0 ${showForm ? 'lg:grid-cols-3' : 'lg:grid-cols-1'}`}>
         {showForm && (<div className="lg:col-span-1">
-          <div className="relative bg-[#0C1017]/90 backdrop-blur-xl rounded-2xl border border-slate-700/60 dark:border-slate-700/50 p-6 shadow-2xl shadow-black/40 overflow-hidden ring-1 ring-white/5">
+          <div className="relative bg-white/85 dark:bg-[#0C1017]/90 backdrop-blur-xl rounded-2xl border border-slate-200/80 dark:border-slate-700/50 p-6 shadow-lg shadow-slate-200/50 dark:shadow-black/40 overflow-hidden ring-1 ring-slate-900/5 dark:ring-white/5">
             <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-indigo-500/80 to-transparent pointer-events-none" />
-            <h2 className="text-base font-bold text-white mb-6 flex items-center gap-2">
-              <CalendarIcon size={18} className="text-indigo-400" />
+            <h2 className="text-base font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+              <CalendarIcon size={18} className="text-indigo-500" />
               New Request
             </h2>
             
             {error && (
-              <div className="bg-rose-500/10 text-rose-400 border border-rose-500/20 p-3 rounded-xl text-xs mb-4">
+              <div className="bg-rose-500/10 text-rose-500 dark:text-rose-400 border border-rose-500/20 p-3 rounded-xl text-xs mb-4">
                 {error}
               </div>
             )}
@@ -93,43 +93,43 @@ const LeaveRequests = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               {canViewAll && (
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Employee</label>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Employee</label>
                   <select 
-                    className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner cursor-pointer"
+                    className="w-full bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-sm dark:shadow-inner cursor-pointer"
                     value={formData.employeeId}
                     onChange={e => setFormData({...formData, employeeId: e.target.value})}
                     required
                   >
-                    <option value="" className="bg-[#0C1017] text-slate-400">Select Employee</option>
+                    <option value="" className="bg-white dark:bg-[#0C1017] text-slate-400">Select Employee</option>
                     {employees.map(emp => (
-                      <option key={emp.id} value={emp.id} className="bg-[#0C1017] text-slate-100">{emp.firstName} {emp.lastName}</option>
+                      <option key={emp.id} value={emp.id} className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">{emp.firstName} {emp.lastName}</option>
                     ))}
                   </select>
                 </div>
               )}
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Leave Type</label>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Leave Type</label>
                 <select 
-                  className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner cursor-pointer"
+                  className="w-full bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-sm dark:shadow-inner cursor-pointer"
                   value={formData.leaveType}
                   onChange={e => setFormData({...formData, leaveType: e.target.value})}
                 >
-                  <option value="Sick" className="bg-[#0C1017] text-slate-100">Sick Leave</option>
-                  <option value="Casual" className="bg-[#0C1017] text-slate-100">Casual Leave</option>
-                  <option value="Earned" className="bg-[#0C1017] text-slate-100">Earned Leave</option>
+                  <option value="Sick" className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">Sick Leave</option>
+                  <option value="Casual" className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">Casual Leave</option>
+                  <option value="Earned" className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">Earned Leave</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Start Date</label>
-                <input required type="date" className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner [color-scheme:dark]"
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Start Date</label>
+                <input required type="date" className="w-full bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-sm dark:shadow-inner"
                   value={formData.startDate} onChange={e => setFormData({...formData, startDate: e.target.value})} />
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">End Date</label>
-                <input required type="date" className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner [color-scheme:dark]"
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">End Date</label>
+                <input required type="date" className="w-full bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-sm dark:shadow-inner"
                   value={formData.endDate} onChange={e => setFormData({...formData, endDate: e.target.value})} />
               </div>
 

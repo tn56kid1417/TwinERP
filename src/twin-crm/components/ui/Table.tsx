@@ -23,16 +23,16 @@ export function Table<T extends { id: string | number }>({
   rowClick,
 }: TableProps<T>) {
   return (
-    <div className="w-full overflow-hidden border border-slate-200 dark:border-slate-800 rounded-xl bg-white dark:bg-[#1A1D23]/60 backdrop-blur-md shadow-sm transition-colors">
+    <div className="w-full overflow-hidden border border-slate-200/80 dark:border-slate-800 rounded-2xl bg-white/90 dark:bg-[#1A1D23]/60 backdrop-blur-xl shadow-sm transition-all">
       <div className="w-full overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="border-b border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50 transition-colors">
+            <tr className="border-b border-slate-100 dark:border-slate-800 bg-slate-50/80 dark:bg-slate-900/50 transition-colors">
               {columns.map((col, idx) => (
                 <th
                   key={idx}
                   className={cn(
-                    'p-4 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400',
+                    'p-4 text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400',
                     col.className
                   )}
                 >
@@ -41,7 +41,7 @@ export function Table<T extends { id: string | number }>({
               ))}
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+          <tbody className="divide-y divide-slate-100 dark:divide-slate-800/80">
             {isLoading ? (
               <tr>
                 <td colSpan={columns.length} className="p-8 text-center">
@@ -82,7 +82,7 @@ export function Table<T extends { id: string | number }>({
                   key={row.id}
                   onClick={() => rowClick && rowClick(row)}
                   className={cn(
-                    'transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/50',
+                    'transition-colors hover:bg-indigo-50/40 dark:hover:bg-slate-800/50',
                     rowClick && 'cursor-pointer'
                   )}
                 >

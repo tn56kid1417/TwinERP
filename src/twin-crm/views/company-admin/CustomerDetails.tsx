@@ -226,7 +226,7 @@ export const CustomerDetails: React.FC = () => {
                       value={noteText}
                       onChange={(e) => setNoteText(e.target.value)}
                       placeholder="Add follow-up details or notes..."
-                      className="flex-1 text-sm py-2.5 px-4 bg-[#07090E]/90 border border-slate-700/60 text-slate-100 placeholder:text-slate-500 rounded-xl outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 shadow-inner"
+                      className="flex-1 text-sm py-2.5 px-4 bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 shadow-sm dark:shadow-inner"
                     />
                     <Button type="submit" isLoading={addingNote} variant="primary">
                       Save Note
@@ -247,19 +247,19 @@ export const CustomerDetails: React.FC = () => {
                             className={cn(
                               'p-4 border rounded-xl text-left space-y-1',
                               isSystem
-                                ? 'bg-slate-900/40 border-slate-800 text-slate-400'
-                                : 'bg-[#0F131C]/60 border-slate-800/80 text-slate-200 shadow-sm'
+                                ? 'bg-slate-50 dark:bg-slate-900/40 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400'
+                                : 'bg-white/90 dark:bg-[#0F131C]/60 border-slate-200 dark:border-slate-800/80 text-slate-700 dark:text-slate-200 shadow-sm'
                             )}
                           >
                             <div className="flex items-center justify-between">
-                              <span className={cn('text-xs font-bold', isSystem ? 'text-indigo-400' : 'text-slate-200')}>
+                              <span className={cn('text-xs font-bold', isSystem ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-800 dark:text-slate-200')}>
                                 {note.authorName}
                               </span>
-                              <span className="text-[10px] text-slate-400 flex items-center gap-1">
+                              <span className="text-[10px] text-slate-500 dark:text-slate-400 flex items-center gap-1">
                                 <History size={10} /> {formatRelativeTime(note.timestamp)}
                               </span>
                             </div>
-                            <p className="text-xs text-slate-300 leading-relaxed font-normal">{note.text}</p>
+                            <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed font-normal">{note.text}</p>
                           </div>
                         )
                       })

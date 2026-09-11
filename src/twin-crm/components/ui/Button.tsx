@@ -22,10 +22,10 @@ export const Button: React.FC<ButtonProps> = ({
   
   const variants = {
     primary: 'bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white shadow-lg shadow-indigo-500/25 active:scale-[0.98] focus:ring-indigo-500/50',
-    secondary: 'bg-slate-800/80 hover:bg-slate-700/80 text-slate-200 border border-slate-700/60 active:scale-[0.98]',
-    outline: 'border border-slate-700/60 bg-transparent text-slate-300 hover:bg-slate-800/60 hover:text-white active:scale-[0.98]',
+    secondary: 'bg-slate-100 hover:bg-slate-200/80 dark:bg-slate-800/80 dark:hover:bg-slate-700/80 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700/60 active:scale-[0.98] shadow-sm',
+    outline: 'border border-slate-200 dark:border-slate-700/60 bg-white/80 dark:bg-transparent text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/60 hover:text-slate-900 dark:hover:text-white hover:border-slate-300 dark:hover:border-slate-600 active:scale-[0.98] shadow-sm',
     danger: 'bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-500/25 active:scale-[0.98]',
-    ghost: 'bg-transparent text-slate-400 hover:text-slate-100 hover:bg-slate-800/60',
+    ghost: 'bg-transparent text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800/60',
   }
 
   const sizes = {

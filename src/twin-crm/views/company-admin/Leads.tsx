@@ -307,41 +307,41 @@ export const Leads: React.FC = () => {
 
             {/* Custom Select for Lead Status */}
             <div className="flex flex-col gap-1.5 text-left">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
                 Lead Status
               </label>
               <select
-                className="w-full text-sm py-2.5 px-3.5 bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl transition-all duration-200 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 cursor-pointer shadow-inner"
+                className="w-full text-sm py-2.5 px-3.5 bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 rounded-xl transition-all duration-200 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 cursor-pointer shadow-sm dark:shadow-inner"
                 {...register('status')}
               >
-                <option value="New" className="bg-[#0C1017] text-slate-100">New</option>
-                <option value="Contacted" className="bg-[#0C1017] text-slate-100">Contacted</option>
-                <option value="Follow-up" className="bg-[#0C1017] text-slate-100">Follow-up</option>
-                <option value="Converted" className="bg-[#0C1017] text-slate-100">Converted</option>
-                <option value="Closed" className="bg-[#0C1017] text-slate-100">Closed</option>
+                <option value="New" className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">New</option>
+                <option value="Contacted" className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">Contacted</option>
+                <option value="Follow-up" className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">Follow-up</option>
+                <option value="Converted" className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">Converted</option>
+                <option value="Closed" className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">Closed</option>
               </select>
             </div>
           </div>
 
           {/* Allocation select box */}
-          <div className="flex flex-col gap-1.5 border-t border-slate-800/80 pt-4 mt-2 text-left">
-            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
-              <Users size={15} className="text-indigo-400" /> Allocate Assigned Sales Representative
+          <div className="flex flex-col gap-1.5 border-t border-slate-100 dark:border-slate-800/80 pt-4 mt-2 text-left">
+            <label className="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
+              <Users size={15} className="text-indigo-600 dark:text-indigo-400" /> Allocate Assigned Sales Representative
             </label>
             <select
-              className="w-full text-sm py-2.5 px-3.5 bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl transition-all duration-200 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 cursor-pointer shadow-inner"
+              className="w-full text-sm py-2.5 px-3.5 bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 rounded-xl transition-all duration-200 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 cursor-pointer shadow-sm dark:shadow-inner"
               {...register('assignedUserId')}
             >
-              <option value="" className="bg-[#0C1017] text-slate-400">-- Leave Unassigned --</option>
+              <option value="" className="bg-white dark:bg-[#0C1017] text-slate-400">-- Leave Unassigned --</option>
               {salesReps.map((rep) => (
-                <option key={rep.id} value={rep.id} className="bg-[#0C1017] text-slate-100">
+                <option key={rep.id} value={rep.id} className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">
                   {rep.name} ({rep.email})
                 </option>
               ))}
             </select>
           </div>
 
-          <div className="flex items-center justify-end gap-3 mt-8 pt-4 border-t border-slate-800/80">
+          <div className="flex items-center justify-end gap-3 mt-8 pt-4 border-t border-slate-100 dark:border-slate-800/80">
             <Button
               type="button"
               variant="outline"

@@ -121,10 +121,10 @@ export const UploadLeads: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-[#0C1017]/90 backdrop-blur-xl border border-slate-800/80 rounded-2xl p-6 shadow-xl shadow-black/40 max-w-3xl relative overflow-hidden">
+      <div className="bg-white/85 dark:bg-[#0C1017]/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-2xl p-6 shadow-lg shadow-slate-200/50 dark:shadow-black/40 max-w-3xl relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-indigo-500/80 to-transparent" />
         {message && (
-          <div className={`mb-6 p-4 rounded-xl flex items-start gap-3 border ${message.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 'bg-rose-500/10 border-rose-500/30 text-rose-400'}`}>
+          <div className={`mb-6 p-4 rounded-xl flex items-start gap-3 border ${message.type === 'success' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-600 dark:text-emerald-400' : 'bg-rose-500/10 border-rose-500/30 text-rose-600 dark:text-rose-400'}`}>
             {message.type === 'success' ? <CheckCircle size={20} className="mt-0.5 flex-shrink-0" /> : <AlertCircle size={20} className="mt-0.5 flex-shrink-0" />}
             <div>
               <h3 className="text-sm font-semibold">{message.type === 'success' ? 'Success' : 'Error'}</h3>
@@ -135,14 +135,14 @@ export const UploadLeads: React.FC = () => {
 
         <div className="space-y-5">
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">
               Upload Excel or CSV (Columns: Name, Company, Email, Phone, Value)
             </label>
-            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-700/80 border-dashed rounded-xl relative bg-[#07090E]/60 hover:bg-[#07090E]/90 hover:border-indigo-500/60 transition-all">
+            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-slate-300 dark:border-slate-700/80 border-dashed rounded-xl relative bg-slate-50/70 dark:bg-[#07090E]/60 hover:bg-slate-100/70 dark:hover:bg-[#07090E]/90 hover:border-indigo-500/60 transition-all">
               <div className="space-y-1 text-center">
-                <File className="mx-auto h-12 w-12 text-slate-400" />
-                <div className="flex text-sm text-slate-400 justify-center">
-                  <label htmlFor="file-upload" className="relative cursor-pointer bg-transparent rounded-md font-semibold text-indigo-400 hover:text-indigo-300 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500">
+                <File className="mx-auto h-12 w-12 text-slate-400 dark:text-slate-500" />
+                <div className="flex text-sm text-slate-600 dark:text-slate-400 justify-center">
+                  <label htmlFor="file-upload" className="relative cursor-pointer bg-transparent rounded-md font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-indigo-500">
                     <span>Upload a file</span>
                     <input id="file-upload" name="file-upload" type="file" accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" className="sr-only" onChange={handleFileChange} />
                   </label>
@@ -156,17 +156,17 @@ export const UploadLeads: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+            <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">
               Assign to Sales Team Leader
             </label>
             <select
               value={selectedLeader}
               onChange={(e) => setSelectedLeader(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-xl border border-slate-700/60 bg-[#07090E]/90 text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/25 focus:border-indigo-500 outline-none transition-all shadow-inner [color-scheme:dark]"
+              className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/60 bg-white/90 dark:bg-[#07090E]/90 text-slate-800 dark:text-slate-100 text-sm focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm dark:shadow-inner cursor-pointer"
             >
-              <option value="" className="bg-[#0C1017] text-slate-400">-- Select Leader --</option>
+              <option value="" className="bg-white dark:bg-[#0C1017] text-slate-400">-- Select Leader --</option>
               {leaders.map(l => (
-                <option key={l.id} value={l.id} className="bg-[#0C1017] text-slate-100">{l.name} ({l.email})</option>
+                <option key={l.id} value={l.id} className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">{l.name} ({l.email})</option>
               ))}
             </select>
           </div>

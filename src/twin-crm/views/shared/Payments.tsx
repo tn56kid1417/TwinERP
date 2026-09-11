@@ -610,31 +610,31 @@ export const Payments: React.FC = () => {
             />
 
             <div className="flex flex-col gap-1.5 text-left">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Type</label>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">Type</label>
               <select
-                className="w-full text-sm py-2.5 px-3.5 bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl transition-all duration-200 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 appearance-none cursor-pointer shadow-inner"
+                className="w-full text-sm py-2.5 px-3.5 bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 rounded-xl transition-all duration-200 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 appearance-none cursor-pointer shadow-sm dark:shadow-inner"
                 value={newPayment.paymentType}
                 onChange={(e) => setNewPayment({ ...newPayment, paymentType: e.target.value as 'Full' | 'Partial' })}
                 required
                 style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.85rem center', backgroundSize: '1.1em' }}
               >
-                <option value="Full" className="bg-[#0C1017] text-slate-100">Full</option>
-                <option value="Partial" className="bg-[#0C1017] text-slate-100">Partial</option>
+                <option value="Full" className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">Full</option>
+                <option value="Partial" className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">Partial</option>
               </select>
             </div>
 
             <div className="flex flex-col gap-1.5 text-left">
-              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Status</label>
+              <label className="text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">Status</label>
               <select
-                className="w-full text-sm py-2.5 px-3.5 bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl transition-all duration-200 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 appearance-none cursor-pointer shadow-inner"
+                className="w-full text-sm py-2.5 px-3.5 bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 rounded-xl transition-all duration-200 outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 appearance-none cursor-pointer shadow-sm dark:shadow-inner"
                 value={newPayment.paymentStatus}
                 onChange={(e) => setNewPayment({ ...newPayment, paymentStatus: e.target.value as 'Pending' | 'Paid' | 'expired' })}
                 required
                 style={{ backgroundImage: `url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 0.85rem center', backgroundSize: '1.1em' }}
               >
-                <option value="Pending" className="bg-[#0C1017] text-slate-100">Pending</option>
-                <option value="Paid" className="bg-[#0C1017] text-slate-100">Paid</option>
-                <option value="expired" className="bg-[#0C1017] text-slate-100">Expired</option>
+                <option value="Pending" className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">Pending</option>
+                <option value="Paid" className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">Paid</option>
+                <option value="expired" className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">Expired</option>
               </select>
             </div>
 

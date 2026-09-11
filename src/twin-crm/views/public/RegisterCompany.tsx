@@ -134,10 +134,10 @@ export const RegisterCompany: React.FC = () => {
           </span>
         </div>
 
-        <Card className="bg-[#0C1017]/95 border-slate-700/60 shadow-2xl shadow-black/80 ring-1 ring-white/10 relative overflow-hidden">
+        <Card className="bg-white/90 dark:bg-[#0C1017]/95 border-slate-200/90 dark:border-slate-700/60 shadow-2xl shadow-slate-900/10 dark:shadow-black/80 ring-1 ring-black/5 dark:ring-white/10 relative overflow-hidden">
           <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-indigo-500/80 to-transparent" />
-          <CardHeader className="pb-3 border-b border-slate-800/80">
-            <CardTitle className="text-center text-xl font-extrabold text-slate-100">
+          <CardHeader className="pb-3 border-b border-slate-100 dark:border-slate-800/80">
+            <CardTitle className="text-center text-xl font-extrabold text-slate-900 dark:text-slate-100">
               {step === 1 && 'Company Profile'}
               {step === 2 && 'Workspace Configuration'}
               {step === 3 && 'Administrative Profile'}
@@ -146,7 +146,7 @@ export const RegisterCompany: React.FC = () => {
             
             {/* Progress Bar */}
             {step < 4 && (
-              <div className="w-full bg-slate-800 h-1.5 rounded-full mt-4 relative overflow-hidden">
+              <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full mt-4 relative overflow-hidden">
                 <div
                   className="bg-indigo-500 h-full transition-all duration-300 rounded-full"
                   style={{ width: `${(step / 3) * 100}%` }}
@@ -266,18 +266,18 @@ export const RegisterCompany: React.FC = () => {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">
+                  <label className="text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400">
                     Company Size
                   </label>
                   <select
-                    className="w-full text-sm py-2.5 px-3.5 bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 cursor-pointer shadow-inner [color-scheme:dark]"
+                    className="w-full text-sm py-2.5 px-3.5 bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 rounded-xl outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 cursor-pointer shadow-sm dark:shadow-inner [color-scheme:light] dark:[color-scheme:dark]"
                     {...register('companySize')}
                   >
-                    <option value="1–10 Employees" className="bg-[#0C1017]">1–10 Employees</option>
-                    <option value="11–50 Employees" className="bg-[#0C1017]">11–50 Employees</option>
-                    <option value="51–100 Employees" className="bg-[#0C1017]">51–100 Employees</option>
-                    <option value="101–500 Employees" className="bg-[#0C1017]">101–500 Employees</option>
-                    <option value="500+ Employees" className="bg-[#0C1017]">500+ Employees</option>
+                    <option value="1–10 Employees" className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">1–10 Employees</option>
+                    <option value="11–50 Employees" className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">11–50 Employees</option>
+                    <option value="51–100 Employees" className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">51–100 Employees</option>
+                    <option value="101–500 Employees" className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">101–500 Employees</option>
+                    <option value="500+ Employees" className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">500+ Employees</option>
                   </select>
                 </div>
 

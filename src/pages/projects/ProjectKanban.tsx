@@ -127,13 +127,13 @@ export default function ProjectKanban() {
           return (
             <div 
               key={status} 
-              className="flex-shrink-0 w-80 flex flex-col bg-white dark:bg-[#1A1D23] border border-slate-200 dark:border-slate-800 rounded-xl max-h-full"
+              className="flex-shrink-0 w-80 flex flex-col bg-white/85 dark:bg-[#1A1D23]/70 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800 rounded-2xl max-h-full shadow-lg shadow-slate-200/50 dark:shadow-none overflow-hidden"
               onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(e, status)}
             >
-              <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
+              <div className="p-4 border-b border-slate-200/80 dark:border-slate-800 flex justify-between items-center bg-slate-50/60 dark:bg-slate-900/30">
                 <h3 className="font-semibold text-slate-800 dark:text-slate-200">{status}</h3>
-                <span className="bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-500 dark:text-slate-400 text-xs px-2 py-0.5 rounded-full">
+                <span className="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 text-xs px-2.5 py-0.5 rounded-full font-medium">
                   {columnTasks.length}
                 </span>
               </div>
@@ -147,7 +147,7 @@ export default function ProjectKanban() {
                       key={task.id}
                       draggable={canManageTasks || task.assigneeId === user?.id}
                       onDragStart={(e: any) => handleDragStart(e, task.id)}
-                      className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 p-4 rounded-lg cursor-grab active:cursor-grabbing hover:border-slate-300 dark:border-slate-700 transition-colors flex flex-col gap-2"
+                      className="bg-white/90 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-800 p-4 rounded-xl cursor-grab active:cursor-grabbing hover:border-indigo-300 dark:hover:border-slate-700 transition-all flex flex-col gap-2 shadow-sm"
                     >
                       <div className="flex justify-between items-start gap-2">
                         <p className="font-medium text-slate-800 dark:text-slate-200 text-sm">{task.name}</p>
@@ -158,10 +158,10 @@ export default function ProjectKanban() {
                         )}
                       </div>
                       {task.description && (
-                        <p className="text-xs text-slate-500 dark:text-slate-500 whitespace-pre-wrap">{task.description}</p>
+                        <p className="text-xs text-slate-600 dark:text-slate-400 whitespace-pre-wrap">{task.description}</p>
                       )}
                       {assignee && (
-                        <div className="flex justify-between items-center text-xs text-slate-500 dark:text-slate-500 mt-1">
+                        <div className="flex justify-between items-center text-xs text-slate-500 dark:text-slate-400 mt-1">
                           <span className="flex items-center gap-1.5">
                             <User size={12} /> 
                             {assignee.firstName} {assignee.lastName}
@@ -172,49 +172,49 @@ export default function ProjectKanban() {
                   )
                 })}
                 {canManageTasks && isAddingTask === status && status === 'To Do' ? (
-                  <form onSubmit={(e) => handleAddTask(e, status)} className="bg-[#0C1017]/95 border border-indigo-500/40 p-3.5 rounded-xl shadow-xl shadow-black/50 backdrop-blur-xl">
+                  <form onSubmit={(e) => handleAddTask(e, status)} className="bg-white/95 dark:bg-[#0C1017]/95 border border-indigo-500/40 p-3.5 rounded-xl shadow-xl shadow-slate-900/10 dark:shadow-black/50 backdrop-blur-xl">
                     <input 
                       type="text" 
                       required
                       value={newTaskName}
                       onChange={e => setNewTaskName(e.target.value)}
                       placeholder="Task name"
-                      className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 placeholder:text-slate-500 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/25 mb-2 shadow-inner"
+                      className="w-full bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 mb-2 shadow-sm dark:shadow-inner"
                       autoFocus
                     />
                     <textarea
                       value={newTaskDescription}
                       onChange={e => setNewTaskDescription(e.target.value)}
                       placeholder="Description (optional)"
-                      className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 placeholder:text-slate-500 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/25 mb-2 resize-none shadow-inner"
+                      className="w-full bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 mb-2 resize-none shadow-sm dark:shadow-inner"
                       rows={2}
                     />
                     <select 
                       required
                       value={newTaskAssignee}
                       onChange={e => setNewTaskAssignee(e.target.value)}
-                      className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/25 mb-2 shadow-inner [color-scheme:dark]"
+                      className="w-full bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 mb-2 shadow-sm dark:shadow-inner cursor-pointer"
                     >
-                      <option value="" disabled className="bg-[#0C1017] text-slate-400">Assignee</option>
+                      <option value="" disabled className="bg-white dark:bg-[#0C1017] text-slate-400">Assignee</option>
                       {standardEmployees.map(emp => (
-                        <option key={emp.id} value={emp.id} className="bg-[#0C1017] text-slate-100">{emp.firstName} {emp.lastName}</option>
+                        <option key={emp.id} value={emp.id} className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">{emp.firstName} {emp.lastName}</option>
                       ))}
                     </select>
                     <select
                       required
                       value={newTaskPriority}
                       onChange={e => setNewTaskPriority(e.target.value as any)}
-                      className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/25 mb-3 shadow-inner [color-scheme:dark]"
+                      className="w-full bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/20 mb-3 shadow-sm dark:shadow-inner cursor-pointer"
                     >
-                      <option value="High" className="bg-[#0C1017] text-slate-100">High Priority</option>
-                      <option value="Medium" className="bg-[#0C1017] text-slate-100">Medium Priority</option>
-                      <option value="Low" className="bg-[#0C1017] text-slate-100">Low Priority</option>
+                      <option value="High" className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">High Priority</option>
+                      <option value="Medium" className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">Medium Priority</option>
+                      <option value="Low" className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">Low Priority</option>
                     </select>
                     <div className="flex gap-2">
                       <button type="submit" className="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white text-xs px-3.5 py-1.5 rounded-lg shadow-md shadow-indigo-500/20 font-medium transition-all cursor-pointer">
                         Add
                       </button>
-                      <button type="button" onClick={() => setIsAddingTask(null)} className="text-slate-400 text-xs px-2.5 py-1.5 hover:text-slate-200 transition-colors cursor-pointer">
+                      <button type="button" onClick={() => setIsAddingTask(null)} className="text-slate-600 dark:text-slate-400 text-xs px-2.5 py-1.5 hover:text-slate-900 dark:hover:text-slate-200 transition-colors cursor-pointer">
                         Cancel
                       </button>
                     </div>

@@ -108,13 +108,13 @@ const Sidebar = () => {
   const navItems = getActiveNavItems();
 
   return (
-    <div className="relative w-64 bg-slate-50 dark:bg-[#11141B]/60 backdrop-blur-md border-r border-slate-200/80 dark:border-slate-800/50 flex flex-col h-screen sticky top-0 overflow-hidden">
+    <div className="relative w-64 bg-white/70 dark:bg-[#11141B]/60 backdrop-blur-xl border-r border-slate-200/80 dark:border-slate-800/50 flex flex-col h-screen sticky top-0 overflow-hidden shadow-sm dark:shadow-none">
       <div className="p-6 flex items-center gap-3">
         <img src="/logo.png" alt="TwinERP Logo" className="h-8 object-contain invert dark:invert-0" />
       </div>
 
       <div className="px-4 mb-4">
-        <div className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-lg p-1 flex">
+        <div className="bg-slate-100/80 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-800 rounded-xl p-1 flex">
           {(['HRM', 'CRM', 'Projects'] as Module[]).map((mod) => (
             <button
               key={mod}
@@ -126,7 +126,7 @@ const Sidebar = () => {
               }}
               className={`flex-1 text-[10px] font-bold uppercase tracking-wider py-1.5 rounded-md transition-colors ${
                 activeModule === mod 
-                  ? 'bg-indigo-100 dark:bg-indigo-600/20 text-indigo-700 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-500/30 shadow-sm dark:shadow-none' 
+                  ? 'bg-white dark:bg-indigo-600/20 text-indigo-700 dark:text-indigo-400 border border-slate-200/80 dark:border-indigo-500/30 shadow-sm dark:shadow-none' 
                   : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-300'
               }`}
             >
@@ -170,7 +170,7 @@ const Sidebar = () => {
           whileTap={{ scale: 0.98 }}
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          className="fixed bottom-4 left-4 z-50 flex items-center gap-3 p-2.5 px-3.5 rounded-2xl bg-[#0C1017]/95 backdrop-blur-2xl border border-slate-700/60 shadow-2xl shadow-black/80 ring-1 ring-white/10 select-none cursor-grab active:cursor-grabbing w-[232px] group"
+          className="fixed bottom-4 left-4 z-50 flex items-center gap-3 p-2.5 px-3.5 rounded-2xl bg-white/90 dark:bg-[#0C1017]/95 backdrop-blur-2xl border border-slate-200/90 dark:border-slate-700/60 shadow-xl shadow-slate-900/10 dark:shadow-black/80 ring-1 ring-black/5 dark:ring-white/10 select-none cursor-grab active:cursor-grabbing w-[232px] group"
           title="Drag to reposition anywhere on the dashboard"
         >
           <div className="absolute top-0 left-3 right-3 h-[1px] bg-gradient-to-r from-transparent via-indigo-500/60 to-transparent pointer-events-none" />
@@ -178,10 +178,10 @@ const Sidebar = () => {
             {user?.firstName?.[0]}{user?.lastName?.[0]}
           </div>
           <div className="overflow-hidden flex-1 min-w-0">
-            <p className="text-xs font-bold text-slate-100 truncate tracking-tight leading-tight">
+            <p className="text-xs font-bold text-slate-800 dark:text-slate-100 truncate tracking-tight leading-tight">
               {user?.firstName} {user?.lastName}
             </p>
-            <p className="text-[10px] text-slate-400 uppercase font-semibold tracking-wider truncate leading-tight mt-0.5">
+            <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-semibold tracking-wider truncate leading-tight mt-0.5">
               {user?.role}
             </p>
           </div>
@@ -189,7 +189,7 @@ const Sidebar = () => {
             <button 
               type="button"
               onClick={(e) => { e.stopPropagation(); toggleTheme(); }} 
-              className="text-slate-400 hover:text-amber-300 p-1.5 rounded-lg hover:bg-white/5 transition-colors cursor-pointer" 
+              className="text-slate-400 hover:text-amber-500 dark:hover:text-amber-300 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer" 
               title="Toggle Theme"
             >
               {isDarkMode ? <Sun size={15} /> : <Moon size={15} />}
@@ -197,7 +197,7 @@ const Sidebar = () => {
             <button 
               type="button"
               onClick={(e) => { e.stopPropagation(); logout(); }} 
-              className="text-slate-400 hover:text-rose-400 p-1.5 rounded-lg hover:bg-white/5 transition-colors cursor-pointer" 
+              className="text-slate-400 hover:text-rose-500 dark:hover:text-rose-400 p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/5 transition-colors cursor-pointer" 
               title="Log out"
             >
               <LogOut size={15} />

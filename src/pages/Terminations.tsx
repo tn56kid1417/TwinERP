@@ -112,58 +112,58 @@ const Terminations = () => {
       <div className={`grid grid-cols-1 gap-8 flex-1 min-h-0 ${canEdit ? 'lg:grid-cols-3' : 'lg:grid-cols-1'}`}>
         {canEdit && (
           <div className="lg:col-span-1">
-            <div className="relative bg-[#0C1017]/90 backdrop-blur-xl rounded-2xl border border-rose-500/30 p-6 shadow-2xl shadow-black/40 overflow-hidden ring-1 ring-white/5">
+            <div className="relative bg-white/85 dark:bg-[#0C1017]/90 backdrop-blur-xl rounded-2xl border border-rose-500/20 dark:border-rose-500/30 p-6 shadow-lg shadow-slate-200/50 dark:shadow-black/40 overflow-hidden ring-1 ring-black/5 dark:ring-white/5">
               <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-rose-500/80 to-transparent pointer-events-none" />
-              <h2 className="text-base font-bold text-white mb-6 flex items-center gap-2">
-                <UserX size={18} className="text-rose-400" />
+              <h2 className="text-base font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
+                <UserX size={18} className="text-rose-500 dark:text-rose-400" />
                 New Termination
               </h2>
               
               {error && (
-                <div className="bg-rose-500/10 text-rose-400 border border-rose-500/20 p-3 rounded-xl text-xs mb-4">
+                <div className="bg-rose-500/10 text-rose-500 dark:text-rose-400 border border-rose-500/20 p-3 rounded-xl text-xs mb-4">
                   {error}
                 </div>
               )}
 
               <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Employee</label>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Employee</label>
                 <select 
-                  className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/25 transition-all shadow-inner cursor-pointer"
+                  className="w-full bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 transition-all shadow-sm dark:shadow-inner cursor-pointer"
                   value={formData.employeeId}
                   onChange={e => setFormData({...formData, employeeId: e.target.value})}
                   required
                 >
-                  <option value="" className="bg-[#0C1017] text-slate-400">Select Employee</option>
+                  <option value="" className="bg-white dark:bg-[#0C1017] text-slate-400">Select Employee</option>
                   {employees.map(emp => (
-                    <option key={emp.id} value={emp.id} className="bg-[#0C1017] text-slate-100">{emp.firstName} {emp.lastName}</option>
+                    <option key={emp.id} value={emp.id} className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">{emp.firstName} {emp.lastName}</option>
                   ))}
                 </select>
               </div>
               
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Termination Type</label>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Termination Type</label>
                 <select 
-                  className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/25 transition-all shadow-inner cursor-pointer"
+                  className="w-full bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 transition-all shadow-sm dark:shadow-inner cursor-pointer"
                   value={formData.terminationType}
                   onChange={e => setFormData({...formData, terminationType: e.target.value})}
                   required
                 >
-                  <option value="Voluntary" className="bg-[#0C1017] text-slate-100">Voluntary</option>
-                  <option value="Involuntary" className="bg-[#0C1017] text-slate-100">Involuntary</option>
-                  <option value="Mutual Agreement" className="bg-[#0C1017] text-slate-100">Mutual Agreement</option>
+                  <option value="Voluntary" className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">Voluntary</option>
+                  <option value="Involuntary" className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">Involuntary</option>
+                  <option value="Mutual Agreement" className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">Mutual Agreement</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Notice Date</label>
-                <input type="date" required className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/25 transition-all shadow-inner [color-scheme:dark]"
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Notice Date</label>
+                <input type="date" required className="w-full bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 transition-all shadow-sm dark:shadow-inner [color-scheme:light] dark:[color-scheme:dark]"
                   value={formData.noticeDate} onChange={e => setFormData({...formData, noticeDate: e.target.value})} />
               </div>
               
               <div>
-                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Termination Date</label>
-                <input type="date" required className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/25 transition-all shadow-inner [color-scheme:dark]"
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Termination Date</label>
+                <input type="date" required className="w-full bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-500/20 transition-all shadow-sm dark:shadow-inner [color-scheme:light] dark:[color-scheme:dark]"
                   value={formData.terminationDate} onChange={e => setFormData({...formData, terminationDate: e.target.value})} />
               </div>
 
@@ -176,7 +176,7 @@ const Terminations = () => {
         )}
 
         <div className={`${canEdit ? 'lg:col-span-2' : 'max-w-5xl'} flex flex-col min-h-0`}>
-          <div className="bg-white dark:bg-[#1A1D23] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden flex-1 flex flex-col">
+          <div className="bg-white/90 dark:bg-[#1A1D23]/70 backdrop-blur-xl rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-lg shadow-slate-200/50 dark:shadow-none overflow-hidden flex-1 flex flex-col">
             <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
               <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Terminations List</h2>
             </div>
@@ -184,7 +184,7 @@ const Terminations = () => {
             <div className="flex-1 overflow-auto">
               <table className="w-full text-left border-collapse min-w-max">
                 <thead>
-                  <tr className="bg-white/50 dark:bg-slate-900/50 text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-500 border-b border-slate-200/80 dark:border-slate-800/50">
+                  <tr className="bg-slate-50/80 dark:bg-slate-900/50 text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200/80 dark:border-slate-800/50">
                     <th className="px-6 py-3 font-semibold">Employee</th>
                     <th className="px-6 py-3 font-semibold">Type</th>
                     <th className="px-6 py-3 font-semibold">Notice Date</th>
@@ -212,11 +212,11 @@ const Terminations = () => {
                     </tr>
                   ) : (
                     terminations.map((res, idx) => (
-                      <motion.tr initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.2, delay: idx * 0.05 }} key={res.id} className="border-b border-slate-200/80 dark:border-slate-800/50 hover:bg-slate-800/30 transition-colors">
+                      <motion.tr initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.2, delay: idx * 0.05 }} key={res.id} className="border-b border-slate-200/80 dark:border-slate-800/50 hover:bg-indigo-50/40 dark:hover:bg-slate-800/30 transition-colors">
                         <td className="px-6 py-4 font-medium text-slate-800 dark:text-slate-200">{getEmpName(res.employeeId)}</td>
-                        <td className="px-6 py-4 text-slate-500 dark:text-slate-500 dark:text-slate-400">{res.terminationType}</td>
-                        <td className="px-6 py-4 text-slate-500 dark:text-slate-500 dark:text-slate-400">{res.noticeDate}</td>
-                        <td className="px-6 py-4 text-slate-500 dark:text-slate-500 dark:text-slate-400">{res.terminationDate}</td>
+                        <td className="px-6 py-4 text-slate-600 dark:text-slate-400">{res.terminationType}</td>
+                        <td className="px-6 py-4 text-slate-600 dark:text-slate-400">{res.noticeDate}</td>
+                        <td className="px-6 py-4 text-slate-600 dark:text-slate-400">{res.terminationDate}</td>
                         <td className="px-6 py-4">
                           {getStatusBadge(res.status)}
                         </td>

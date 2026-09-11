@@ -251,46 +251,46 @@ const ProjectsList = () => {
       {/* Assign Project to Team Leader Modal */}
       <AnimatePresence>
         {assignModalOpen && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="relative bg-[#0C1017]/95 border border-slate-700/60 dark:border-slate-700/50 rounded-2xl shadow-2xl shadow-black/80 ring-1 ring-white/10 w-full max-w-md overflow-hidden"
+              className="relative bg-white/95 dark:bg-[#0C1017]/95 backdrop-blur-2xl border border-slate-200/90 dark:border-slate-700/50 rounded-2xl shadow-2xl shadow-slate-900/15 dark:shadow-black/80 ring-1 ring-black/5 dark:ring-white/10 w-full max-w-md overflow-hidden"
             >
               <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-indigo-500/80 to-transparent pointer-events-none" />
-              <div className="flex items-center justify-between px-6 py-4.5 border-b border-slate-800/80 bg-slate-900/50 backdrop-blur-md">
-                <h2 className="text-base font-bold text-white tracking-tight">Assign Team Leader</h2>
+              <div className="flex items-center justify-between px-6 py-4.5 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/80 dark:bg-slate-900/50 backdrop-blur-md">
+                <h2 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">Assign Team Leader</h2>
                 <button 
                   onClick={() => setAssignModalOpen(false)}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/70 transition-colors cursor-pointer"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/70 transition-colors cursor-pointer"
                 >
                   <X size={18} />
                 </button>
               </div>
               <form onSubmit={handleAssignProjectSubmit} className="p-6">
                 <div className="mb-6">
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Select Team Leader</label>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-2">Select Team Leader</label>
                   <select 
                     value={selectedEmployeeId}
                     onChange={(e) => setSelectedEmployeeId(e.target.value)}
-                    className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner cursor-pointer"
+                    className="w-full bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-sm dark:shadow-inner cursor-pointer"
                     required
                   >
-                    <option value="" disabled className="bg-[#0C1017] text-slate-400">Select a team leader...</option>
+                    <option value="" disabled className="bg-white dark:bg-[#0C1017] text-slate-400">Select a team leader...</option>
                     {teamLeaders.map(emp => (
-                      <option key={emp.id} value={emp.id} className="bg-[#0C1017] text-slate-100">
+                      <option key={emp.id} value={emp.id} className="bg-white dark:bg-[#0C1017] text-slate-800 dark:text-slate-100">
                         {emp.firstName} {emp.lastName}
                       </option>
                     ))}
                   </select>
-                  <p className="text-xs text-slate-400 mt-2">Only employees with the 'Team Leader' role can be assigned as project owners.</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">Only employees with the 'Team Leader' role can be assigned as project owners.</p>
                 </div>
-                <div className="flex justify-end items-center gap-3 pt-4 border-t border-slate-800/80">
+                <div className="flex justify-end items-center gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
                   <button 
                     type="button"
                     onClick={() => setAssignModalOpen(false)}
-                    className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 rounded-xl transition-colors border border-slate-700/50 cursor-pointer"
+                    className="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 rounded-xl transition-colors border border-slate-200 dark:border-slate-700/50 cursor-pointer"
                   >
                     Cancel
                   </button>
@@ -311,19 +311,19 @@ const ProjectsList = () => {
       {/* New Project Modal */}
       <AnimatePresence>
         {newProjectModalOpen && (
-          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.95 }}
-              className="relative bg-[#0C1017]/95 border border-slate-700/60 dark:border-slate-700/50 rounded-2xl shadow-2xl shadow-black/80 ring-1 ring-white/10 w-full max-w-md overflow-hidden"
+              className="relative bg-white/95 dark:bg-[#0C1017]/95 backdrop-blur-2xl border border-slate-200/90 dark:border-slate-700/50 rounded-2xl shadow-2xl shadow-slate-900/15 dark:shadow-black/80 ring-1 ring-black/5 dark:ring-white/10 w-full max-w-md overflow-hidden"
             >
               <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-indigo-500/80 to-transparent pointer-events-none" />
-              <div className="flex items-center justify-between px-6 py-4.5 border-b border-slate-800/80 bg-slate-900/50 backdrop-blur-md">
-                <h2 className="text-base font-bold text-white tracking-tight">Create New Project</h2>
+              <div className="flex items-center justify-between px-6 py-4.5 border-b border-slate-100 dark:border-slate-800/80 bg-slate-50/80 dark:bg-slate-900/50 backdrop-blur-md">
+                <h2 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">Create New Project</h2>
                 <button 
                   onClick={() => setNewProjectModalOpen(false)}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800/70 transition-colors cursor-pointer"
+                  className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/70 transition-colors cursor-pointer"
                 >
                   <X size={18} />
                 </button>
@@ -331,65 +331,65 @@ const ProjectsList = () => {
               <form onSubmit={handleCreateProject} className="p-6">
                 <div className="space-y-4 mb-6">
                   <div>
-                    <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Project Name</label>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Project Name</label>
                     <input 
                       type="text"
                       value={newProjectName}
                       onChange={(e) => setNewProjectName(e.target.value)}
-                      className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner"
+                      className="w-full bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-sm dark:shadow-inner"
                       required
                       placeholder="e.g. Website Redesign"
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Client Name</label>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Client Name</label>
                     <input 
                       type="text"
                       value={newProjectClient}
                       onChange={(e) => setNewProjectClient(e.target.value)}
-                      className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner"
+                      className="w-full bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-sm dark:shadow-inner"
                       required
                       placeholder="e.g. Acme Corp"
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Start Date</label>
+                      <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Start Date</label>
                       <input 
                         type="date"
                         value={newProjectStartDate}
                         onChange={(e) => setNewProjectStartDate(e.target.value)}
-                        className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner [color-scheme:dark]"
+                        className="w-full bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-sm dark:shadow-inner [color-scheme:light] dark:[color-scheme:dark]"
                         required
                       />
                     </div>
                     <div>
-                      <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Deadline</label>
+                      <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Deadline</label>
                       <input 
                         type="date"
                         value={newProjectDeadline}
                         onChange={(e) => setNewProjectDeadline(e.target.value)}
-                        className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner [color-scheme:dark]"
+                        className="w-full bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-sm dark:shadow-inner [color-scheme:light] dark:[color-scheme:dark]"
                         required
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Description (Optional)</label>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Description (Optional)</label>
                     <textarea 
                       value={newProjectDescription}
                       onChange={(e) => setNewProjectDescription(e.target.value)}
-                      className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all resize-none shadow-inner"
+                      className="w-full bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all resize-none shadow-sm dark:shadow-inner"
                       rows={3}
                       placeholder="Project description or notes"
                     />
                   </div>
                 </div>
-                <div className="flex justify-end items-center gap-3 pt-4 border-t border-slate-800/80">
+                <div className="flex justify-end items-center gap-3 pt-4 border-t border-slate-100 dark:border-slate-800/80">
                   <button 
                     type="button"
                     onClick={() => setNewProjectModalOpen(false)}
-                    className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 rounded-xl transition-colors border border-slate-700/50 cursor-pointer"
+                    className="px-4 py-2 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/60 rounded-xl transition-colors border border-slate-200 dark:border-slate-700/50 cursor-pointer"
                   >
                     Cancel
                   </button>

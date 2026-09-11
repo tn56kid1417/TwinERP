@@ -199,16 +199,16 @@ export const SettingsView: React.FC = () => {
               <form onSubmit={handleSubmitProfile(onProfileSubmit)} className="space-y-4">
                 
                 {/* Mock photo upload */}
-                <div className="flex items-center gap-4 p-4 border border-slate-800/80 rounded-xl bg-[#07090E]/60">
+                <div className="flex items-center gap-4 p-4 border border-slate-200 dark:border-slate-800/80 rounded-xl bg-slate-50/70 dark:bg-[#07090E]/60">
                   <div className="w-14 h-14 bg-indigo-600 text-white flex items-center justify-center rounded-xl font-bold text-lg uppercase shadow-lg shadow-indigo-500/20">
                     {user?.name.charAt(0)}
                   </div>
                   <div className="space-y-1">
-                    <span className="text-xs font-bold text-slate-300 block">Profile Avatar Image</span>
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-300 block">Profile Avatar Image</span>
                     <button
                       type="button"
                       onClick={() => alert('Demo: Choose a local image to update profile avatar.')}
-                      className="px-3 py-1 bg-slate-800/80 border border-slate-700/80 rounded-lg text-xs font-semibold text-slate-200 hover:bg-slate-700/80 flex items-center gap-1.5 cursor-pointer transition-colors"
+                      className="px-3 py-1 bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/80 flex items-center gap-1.5 cursor-pointer transition-colors"
                     >
                       <Upload size={12} /> Upload Photo
                     </button>
@@ -240,8 +240,8 @@ export const SettingsView: React.FC = () => {
                   {...registerProfile('email')}
                 />
 
-                <div className="border-t border-slate-800/80 pt-4 mt-6 space-y-4">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                <div className="border-t border-slate-100 dark:border-slate-800/80 pt-4 mt-6 space-y-4">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
                     Change Password
                   </h3>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -282,16 +282,16 @@ export const SettingsView: React.FC = () => {
               <form onSubmit={handleSubmitCompany(onCompanySubmit)} className="space-y-4">
                 
                 {/* Corporate Logo mock */}
-                <div className="flex items-center gap-4 p-4 border border-slate-800/80 rounded-xl bg-[#07090E]/60">
-                  <div className="w-14 h-14 bg-indigo-500/15 text-indigo-400 flex items-center justify-center rounded-xl font-extrabold shadow-sm border border-indigo-500/30">
+                <div className="flex items-center gap-4 p-4 border border-slate-200 dark:border-slate-800/80 rounded-xl bg-slate-50/70 dark:bg-[#07090E]/60">
+                  <div className="w-14 h-14 bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 flex items-center justify-center rounded-xl font-extrabold shadow-sm border border-indigo-500/30">
                     <Building size={24} />
                   </div>
                   <div className="space-y-1">
-                    <span className="text-xs font-bold text-slate-300 block">Corporate Logo</span>
+                    <span className="text-xs font-bold text-slate-800 dark:text-slate-300 block">Corporate Logo</span>
                     <button
                       type="button"
                       onClick={() => alert('Demo: Choose a png/jpg company logo asset.')}
-                      className="px-3 py-1 bg-slate-800/80 border border-slate-700/80 rounded-lg text-xs font-semibold text-slate-200 hover:bg-slate-700/80 flex items-center gap-1.5 cursor-pointer transition-colors"
+                      className="px-3 py-1 bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700/80 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700/80 flex items-center gap-1.5 cursor-pointer transition-colors"
                     >
                       <Upload size={12} /> Upload Logo
                     </button>

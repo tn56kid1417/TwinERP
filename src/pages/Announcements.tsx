@@ -106,31 +106,31 @@ const Announcements = () => {
       <div className={`grid grid-cols-1 gap-8 flex-1 min-h-0 ${canEdit ? 'lg:grid-cols-3' : 'lg:grid-cols-1'}`}>
         {canEdit && (
           <div className="lg:col-span-1">
-            <div className="relative bg-[#0C1017]/90 backdrop-blur-xl rounded-2xl border border-slate-700/60 dark:border-slate-700/50 p-6 shadow-2xl shadow-black/40 overflow-hidden ring-1 ring-white/5">
+            <div className="relative bg-white/85 dark:bg-[#0C1017]/90 backdrop-blur-xl rounded-2xl border border-slate-200/80 dark:border-slate-700/50 p-6 shadow-lg shadow-slate-200/50 dark:shadow-black/40 overflow-hidden ring-1 ring-black/5 dark:ring-white/5">
               <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-indigo-500/80 to-transparent pointer-events-none" />
-              <h2 className="text-base font-bold text-white mb-6 flex items-center gap-2">
-                <Plus size={18} className="text-indigo-400" />
+              <h2 className="text-base font-bold text-slate-800 dark:text-white mb-6 flex items-center gap-2">
+                <Plus size={18} className="text-indigo-600 dark:text-indigo-400" />
                 New Announcement
               </h2>
               
               {error && (
-                <div className="bg-rose-500/10 text-rose-400 border border-rose-500/20 p-3 rounded-xl text-xs mb-4">
+                <div className="bg-rose-500/10 text-rose-500 dark:text-rose-400 border border-rose-500/20 p-3 rounded-xl text-xs mb-4">
                   {error}
                 </div>
               )}
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Title</label>
-                  <input type="text" required className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner"
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Title</label>
+                  <input type="text" required className="w-full bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-sm dark:shadow-inner"
                     value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} placeholder="Announcement Title" />
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Content</label>
+                  <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">Content</label>
                   <textarea 
                     required
-                    className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all h-32 resize-none shadow-inner"
+                    className="w-full bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all h-32 resize-none shadow-sm dark:shadow-inner"
                     value={formData.content} 
                     onChange={e => setFormData({...formData, content: e.target.value})}
                     placeholder="Write your announcement here..."
@@ -146,7 +146,7 @@ const Announcements = () => {
         )}
 
         <div className={`${canEdit ? 'lg:col-span-2' : 'max-w-4xl'} flex flex-col min-h-0`}>
-          <div className="bg-white dark:bg-[#1A1D23] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden flex-1 flex flex-col">
+          <div className="bg-white/90 dark:bg-[#1A1D23]/70 backdrop-blur-xl rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-lg shadow-slate-200/50 dark:shadow-none overflow-hidden flex-1 flex flex-col">
             <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
               <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Published Announcements</h2>
             </div>
@@ -164,12 +164,12 @@ const Announcements = () => {
                 </div>
               ) : (
                 announcements.map((announcement, idx) => (
-                  <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.2, delay: idx * 0.05 }} key={announcement.id} className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-lg p-5">
+                  <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.2, delay: idx * 0.05 }} key={announcement.id} className="bg-white/80 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-800 shadow-sm rounded-xl p-5">
                     {editingId === announcement.id && canEdit ? (
                       <div className="space-y-3">
-                        <input type="text" className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-indigo-500/50"
+                        <input type="text" className="w-full bg-white dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-indigo-500"
                           value={editData.title} onChange={e => setEditData({...editData, title: e.target.value})} />
-                        <textarea className="w-full bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 rounded px-3 py-2 text-sm focus:outline-none focus:border-indigo-500/50 h-24 resize-none"
+                        <textarea className="w-full bg-white dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-indigo-500 h-24 resize-none"
                           value={editData.content} onChange={e => setEditData({...editData, content: e.target.value})} />
                         <div className="flex justify-end gap-2">
                           <button onClick={cancelEditing} className="px-3 py-1.5 text-xs text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white transition-colors">Cancel</button>

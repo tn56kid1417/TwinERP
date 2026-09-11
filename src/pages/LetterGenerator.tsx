@@ -176,7 +176,7 @@ const LetterGenerator = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Upload Section */}
-        <div className="relative bg-[#0C1017]/90 backdrop-blur-xl border border-slate-700/60 dark:border-slate-700/50 rounded-2xl p-6 overflow-hidden flex flex-col items-center justify-center min-h-[300px] shadow-2xl shadow-black/40 ring-1 ring-white/5">
+        <div className="relative bg-white/85 dark:bg-[#0C1017]/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-700/50 rounded-2xl p-6 overflow-hidden flex flex-col items-center justify-center min-h-[300px] shadow-lg shadow-slate-200/50 dark:shadow-black/40 ring-1 ring-black/5 dark:ring-white/5">
           <input
             type="file"
             accept=".docx"
@@ -188,7 +188,7 @@ const LetterGenerator = () => {
           {file && (
             <button
               onClick={handleRemoveTemplate}
-              className="absolute top-4 right-4 z-20 p-2 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-xl hover:bg-rose-500/20 transition-colors pointer-events-auto"
+              className="absolute top-4 right-4 z-20 p-2 bg-rose-500/10 text-rose-500 dark:text-rose-400 border border-rose-500/20 rounded-xl hover:bg-rose-500/20 transition-colors pointer-events-auto"
               title="Remove Template"
             >
               <Trash2 size={18} />
@@ -198,23 +198,23 @@ const LetterGenerator = () => {
           <div className="flex flex-col items-center justify-center text-center space-y-4 pointer-events-none z-0">
             {file ? (
               <>
-                <div className="w-16 h-16 bg-indigo-500/20 text-indigo-400 rounded-full flex items-center justify-center border border-indigo-500/30 shadow-lg shadow-indigo-500/20">
+                <div className="w-16 h-16 bg-indigo-500/15 text-indigo-600 dark:text-indigo-400 rounded-full flex items-center justify-center border border-indigo-500/30 shadow-lg shadow-indigo-500/15">
                   <FileText size={32} />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-white">{file.name}</p>
-                  <p className="text-xs text-slate-400 mt-1">{(file.size / 1024).toFixed(2)} KB</p>
+                  <p className="text-sm font-semibold text-slate-800 dark:text-white">{file.name}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{(file.size / 1024).toFixed(2)} KB</p>
                 </div>
-                <div className="text-indigo-400 text-sm font-medium">Click or drag to replace template</div>
+                <div className="text-indigo-600 dark:text-indigo-400 text-sm font-medium">Click or drag to replace template</div>
               </>
             ) : (
               <>
-                <div className="w-16 h-16 bg-slate-800/60 text-slate-400 rounded-full flex items-center justify-center border border-slate-700/60 transition-colors">
+                <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800/60 text-slate-500 dark:text-slate-400 rounded-full flex items-center justify-center border border-slate-200 dark:border-slate-700/60 transition-colors">
                   <UploadCloud size={32} />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-white">Upload Template</p>
-                  <p className="text-xs text-slate-400 mt-1">Select a .docx file to use as a template</p>
+                  <p className="text-sm font-semibold text-slate-800 dark:text-white">Upload Template</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Select a .docx file to use as a template</p>
                 </div>
               </>
             )}
@@ -222,11 +222,11 @@ const LetterGenerator = () => {
         </div>
 
         {/* Form Section */}
-        <div className="relative bg-[#0C1017]/90 backdrop-blur-xl border border-slate-700/60 dark:border-slate-700/50 rounded-2xl p-6 shadow-2xl shadow-black/40 overflow-hidden ring-1 ring-white/5">
+        <div className="relative bg-white/85 dark:bg-[#0C1017]/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-700/50 rounded-2xl p-6 shadow-lg shadow-slate-200/50 dark:shadow-black/40 overflow-hidden ring-1 ring-black/5 dark:ring-white/5">
           <div className="absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-transparent via-indigo-500/80 to-transparent pointer-events-none" />
           <form onSubmit={handleGenerate} className="space-y-5">
             <div>
-              <label htmlFor="name" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+              <label htmlFor="name" className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">
                 Candidate Name
               </label>
               <input
@@ -235,13 +235,13 @@ const LetterGenerator = () => {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. Jane Doe"
-                className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner"
+                className="w-full bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-sm dark:shadow-inner"
                 required
               />
             </div>
             
             <div>
-              <label htmlFor="role" className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+              <label htmlFor="role" className="block text-[11px] font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">
                 Role / Position
               </label>
               <input
@@ -250,22 +250,22 @@ const LetterGenerator = () => {
                 value={role}
                 onChange={(e) => setRole(e.target.value)}
                 placeholder="e.g. Senior Software Engineer"
-                className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner"
+                className="w-full bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-sm dark:shadow-inner"
                 required
               />
             </div>
 
             {error && (
               <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-rose-400 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-rose-300">{error}</p>
+                <AlertCircle className="w-5 h-5 text-rose-500 dark:text-rose-400 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-rose-600 dark:text-rose-300">{error}</p>
               </div>
             )}
 
             {success && (
               <div className="p-3.5 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-emerald-300">Letter generated and downloaded successfully!</p>
+                <CheckCircle className="w-5 h-5 text-emerald-600 dark:text-emerald-400 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-emerald-700 dark:text-emerald-300">Letter generated and downloaded successfully!</p>
               </div>
             )}
 
