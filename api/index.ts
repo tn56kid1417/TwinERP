@@ -291,7 +291,7 @@ export function createApp() {
     if (record.clockOutTime) return res.status(400).json({ error: 'Already clocked out' });
     if (record.breakInTime) return res.status(400).json({ error: 'Already on break' });
 
-    record.breakInTime = new Date().toISOString();
+    record.breakInTime = req.body.breakInTime || new Date().toISOString();
     saveAttendances();
     res.json(record);
   });
