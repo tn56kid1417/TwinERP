@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { motion } from 'motion/react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Phone, Users, Clock, Calendar, FileText, LayoutDashboard, BarChart2, UserMinus, UserX, Award, Megaphone, LogOut, Mail, PartyPopper, Briefcase, Building, PieChart, Sun, Moon, UserPlus, Settings as SettingsIcon, CreditCard , UploadCloud, Shuffle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -134,7 +136,7 @@ const Sidebar = () => {
         </div>
       </div>
       
-      <nav className="flex-1 min-h-0 px-4 py-1 space-y-1 overflow-y-auto">
+      <nav className="flex-1 min-h-0 px-4 py-1 pb-24 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
           const isExactMatch = location.pathname === item.path;
           const isSubRouteMatch = item.path !== '/' && item.path !== '/crm' && item.path !== '/projects' && location.pathname.startsWith(item.path);
@@ -158,24 +160,52 @@ const Sidebar = () => {
           );
         })}
       </nav>
-      
-      <div className="p-4 border-t border-slate-200/80 dark:border-slate-800/50 bg-slate-50 dark:bg-[#11141B] shrink-0 z-10">
-        <div className="flex items-center gap-3 p-2 rounded-lg bg-white/70 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800">
-          <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex-shrink-0 border border-slate-300 dark:border-slate-600 flex items-center justify-center text-xs font-bold text-slate-900 dark:text-white">
+
+      {/* Floating User Profile Widget - Not fixed in a single place, floats in down-left corner and can be dragged freely */}
+      {typeof document !== 'undefined' && createPortal(
+        <motion.div 
+          drag
+          dragMomentum={false}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="fixed bottom-4 left-4 z-50 flex items-center gap-3 p-2.5 px-3.5 rounded-2xl bg-[#0C1017]/95 backdrop-blur-2xl border border-slate-700/60 shadow-2xl shadow-black/80 ring-1 ring-white/10 select-none cursor-grab active:cursor-grabbing w-[232px] group"
+          title="Drag to reposition anywhere on the dashboard"
+        >
+          <div className="absolute top-0 left-3 right-3 h-[1px] bg-gradient-to-r from-transparent via-indigo-500/60 to-transparent pointer-events-none" />
+          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-indigo-500 text-white flex-shrink-0 border border-white/20 flex items-center justify-center text-xs font-bold shadow-md shadow-indigo-500/30">
             {user?.firstName?.[0]}{user?.lastName?.[0]}
           </div>
-          <div className="overflow-hidden flex-1">
-            <p className="text-xs font-semibold text-slate-900 dark:text-white truncate">{user?.firstName} {user?.lastName}</p>
-            <p className="text-[10px] text-slate-500 dark:text-slate-500 uppercase font-medium">{user?.role}</p>
+          <div className="overflow-hidden flex-1 min-w-0">
+            <p className="text-xs font-bold text-slate-100 truncate tracking-tight leading-tight">
+              {user?.firstName} {user?.lastName}
+            </p>
+            <p className="text-[10px] text-slate-400 uppercase font-semibold tracking-wider truncate leading-tight mt-0.5">
+              {user?.role}
+            </p>
           </div>
-          <button onClick={toggleTheme} className="text-slate-500 dark:text-slate-500 hover:text-indigo-400 p-1 rounded-md transition-colors" title="Toggle Theme">
-            {isDarkMode ? <Sun size={16} /> : <Moon size={16} />}
-          </button>
-          <button onClick={logout} className="text-slate-500 dark:text-slate-500 hover:text-red-400 p-1 rounded-md transition-colors" title="Log out">
-            <LogOut size={16} />
-          </button>
-        </div>
-      </div>
+          <div className="flex items-center gap-0.5">
+            <button 
+              type="button"
+              onClick={(e) => { e.stopPropagation(); toggleTheme(); }} 
+              className="text-slate-400 hover:text-amber-300 p-1.5 rounded-lg hover:bg-white/5 transition-colors cursor-pointer" 
+              title="Toggle Theme"
+            >
+              {isDarkMode ? <Sun size={15} /> : <Moon size={15} />}
+            </button>
+            <button 
+              type="button"
+              onClick={(e) => { e.stopPropagation(); logout(); }} 
+              className="text-slate-400 hover:text-rose-400 p-1.5 rounded-lg hover:bg-white/5 transition-colors cursor-pointer" 
+              title="Log out"
+            >
+              <LogOut size={15} />
+            </button>
+          </div>
+        </motion.div>,
+        document.body
+      )}
     </div>
   );
 };
