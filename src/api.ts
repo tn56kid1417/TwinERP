@@ -90,7 +90,8 @@ export const updateClient = (id: string, data: Partial<import('./types').Client>
 export const deleteClient = (id: string) => api.delete(`/clients/${id}`);
 
 // Notifications & Overdue Break APIs
-export const getNotifications = () => api.get<AppNotification[]>('/notifications').then(res => res.data);
+export const getNotifications = (breakDurationMinutes?: number) => 
+  api.get<AppNotification[]>('/notifications', { params: breakDurationMinutes ? { breakDurationMinutes } : {} }).then(res => res.data);
 export const createNotification = (data: Partial<AppNotification>) => api.post<AppNotification>('/notifications', data).then(res => res.data);
 export const markNotificationRead = (id: string) => api.put<AppNotification>(`/notifications/${id}/read`).then(res => res.data);
 export const markAllNotificationsRead = () => api.post<{ success: boolean; count: number }>('/notifications/mark-all-read').then(res => res.data);

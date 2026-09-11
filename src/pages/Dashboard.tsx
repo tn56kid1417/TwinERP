@@ -109,11 +109,41 @@ const Dashboard = () => {
             if (!hasTriggeredAlertRef.current[emp.employeeId]) {
               hasTriggeredAlertRef.current[emp.employeeId] = true;
               toast.error(
-                `HR Alert: ${emp.employeeName} exceeded break limit (${breakDurationMinutes} mins) without breaking out!`,
+                `Manager Alert: ${emp.employeeName} exceeded break limit (${breakDurationMinutes} mins) without breaking out!`,
                 { duration: 8000, id: `break-alert-${emp.employeeId}`, icon: '⚠️' }
               );
             }
           });
+
+          // Sync to local storage manager_notifications for instant Header visibility
+          try {
+            const todayStr = new Date().toISOString().split('T')[0];
+            const stored = JSON.parse(localStorage.getItem('manager_notifications') || '[]');
+            const existingMap = new Map<string, any>(stored.map((n: any) => [n.id, n]));
+
+            res.overdueEmployees.forEach((emp: any) => {
+              const id = `notif_break_${emp.employeeId}_${todayStr}`;
+              if (!existingMap.has(id)) {
+                existingMap.set(id, {
+                  id,
+                  type: 'overdue_break',
+                  title: 'Manager Alert: Overdue Break',
+                  message: `${emp.employeeName} exceeded break limit (${breakDurationMinutes} mins) and has not broken out on time. Immediate manager review advised.`,
+                  time: 'Just now',
+                  timestamp: new Date().toISOString(),
+                  read: false,
+                  targetRole: 'Manager,HR',
+                  employeeId: emp.employeeId,
+                  employeeName: emp.employeeName,
+                  overdueMinutes: emp.overdueMinutes
+                });
+              }
+            });
+            localStorage.setItem('manager_notifications', JSON.stringify(Array.from(existingMap.values())));
+            window.dispatchEvent(new Event('manager_notifications_updated'));
+          } catch (e) {
+            console.error('Failed to sync manager notifications to localStorage:', e);
+          }
         }
       }
     } catch (err) {
@@ -276,6 +306,16 @@ const Dashboard = () => {
   const myAwards = awards.filter(a => a.employeeId === user?.id);
 
   const recentActivities = [
+    ...overdueEmployees.map(emp => ({
+      id: `overdue-${emp.employeeId}`,
+      type: 'overdue_break',
+      icon: <AlertTriangle size={16} className="text-rose-500 animate-pulse" />,
+      title: 'Manager Alert: Overdue Break',
+      description: `${emp.employeeName} has exceeded break limit (${breakDurationMinutes} mins) and is overdue by ${emp.overdueMinutes}m.`,
+      date: new Date(),
+      bgColor: 'bg-rose-500/10 dark:bg-rose-500/10',
+      borderColor: 'border-rose-500/30 dark:border-rose-500/30'
+    })),
     ...employees.map(emp => ({
       id: `emp-${emp.id}`,
       type: 'onboarding',
@@ -299,7 +339,7 @@ const Dashboard = () => {
         borderColor: 'border-blue-500/20 dark:border-blue-500/20'
       };
     })
-  ].sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 5);
+  ].sort((a, b) => b.date.getTime() - a.date.getTime()).slice(0, 6);
 
   const departmentData = React.useMemo(() => {
     const counts = employees.reduce((acc, emp) => {
@@ -379,7 +419,7 @@ const Dashboard = () => {
         </div>
       )}
 
-      {/* Overdue Break Alert Banner for HR Manager */}
+      {/* Overdue Break Alert Banner for Manager & HR */}
       {(isHR || isAdmin) && overdueEmployees.length > 0 && (
         <motion.div 
           initial={{ opacity: 0, y: -10 }} 
@@ -392,13 +432,13 @@ const Dashboard = () => {
             </div>
             <div>
               <h4 className="text-sm font-bold text-rose-600 dark:text-rose-400 flex items-center gap-2">
-                HR Alert: Overdue Break Detected
+                Manager Alert: Overdue Break Detected
                 <span className="text-[10px] uppercase font-extrabold px-2 py-0.5 rounded bg-rose-500/20 text-rose-600 dark:text-rose-400">
                   {overdueEmployees.length} Employee{overdueEmployees.length > 1 ? 's' : ''} Overdue
                 </span>
               </h4>
               <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
-                {overdueEmployees.map(e => `${e.employeeName} (+${e.overdueMinutes}m overdue)`).join(', ')} exceeded the {breakDurationMinutes} mins break limit without breaking out.
+                {overdueEmployees.map(e => `${e.employeeName} (+${e.overdueMinutes}m overdue)`).join(', ')} exceeded the {breakDurationMinutes} mins break limit without breaking out. Present in Manager Notifications panel.
               </p>
             </div>
           </div>

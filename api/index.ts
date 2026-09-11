@@ -331,13 +331,11 @@ export function createApp() {
     res.json(empAtt);
   });
 
-  // Check Overdue Breaks Endpoint (Alerts HR Manager)
-  router.post('/attendance/check-overdue-breaks', (req, res) => {
-    const { breakDurationMinutes = 45 } = req.body;
+  // Helper to detect overdue breaks and ensure manager notifications exist
+  const syncOverdueBreakNotifications = (breakDurationMinutes = 45) => {
     const today = new Date().toISOString().split('T')[0];
     const now = Date.now();
     const limitMs = Number(breakDurationMinutes) * 60 * 1000;
-
     const overdueList: any[] = [];
 
     attendances.forEach(att => {
@@ -367,12 +365,12 @@ export function createApp() {
             const newNotif = {
               id: `notif_break_${Date.now()}_${att.employeeId}`,
               type: 'overdue_break',
-              title: 'Overdue Break Alert',
-              message: `${empName} has exceeded the allocated break time (${breakDurationMinutes} mins) and has not broken out on time.`,
+              title: 'Manager Alert: Overdue Break',
+              message: `${empName} has exceeded the allocated break time (${breakDurationMinutes} mins) and has not broken out on time. Immediate manager review advised.`,
               time: 'Just now',
               timestamp: new Date().toISOString(),
               read: false,
-              targetRole: 'HR',
+              targetRole: 'Manager,HR',
               employeeId: att.employeeId,
               employeeName: empName,
               overdueMinutes: overdueMinutes > 0 ? overdueMinutes : 1
@@ -384,6 +382,14 @@ export function createApp() {
       }
     });
 
+    return overdueList;
+  };
+
+  // Check Overdue Breaks Endpoint (Alerts HR & Managers)
+  router.post('/attendance/check-overdue-breaks', (req, res) => {
+    const { breakDurationMinutes = 45 } = req.body;
+    const overdueList = syncOverdueBreakNotifications(breakDurationMinutes);
+
     res.json({
       overdueCount: overdueList.length,
       overdueEmployees: overdueList,
@@ -393,6 +399,8 @@ export function createApp() {
 
   // Notifications API
   router.get('/notifications', (req, res) => {
+    const duration = req.query.breakDurationMinutes ? Number(req.query.breakDurationMinutes) : 45;
+    syncOverdueBreakNotifications(duration);
     res.json(notifications);
   });
 
