@@ -184,9 +184,9 @@ const Dashboard = () => {
       initial={{ opacity: 0, y: 15 }} 
       animate={{ opacity: 1, y: 0 }} 
       transition={{ duration: 0.4 }}
-      className="p-8 max-w-7xl mx-auto h-full flex flex-col"
+      className="p-8 max-w-7xl mx-auto w-full min-h-full flex flex-col space-y-8 pb-16"
     >
-      <div className="mb-8 flex justify-between items-end">
+      <div className="flex justify-between items-end">
         <div>
           <h1 className="text-3xl font-medium text-slate-900 dark:text-white tracking-tight">Dashboard Overview</h1>
           <p className="text-slate-500 dark:text-slate-500 mt-1">Welcome back, {user?.firstName}. Here is what's happening today.</p>
@@ -413,19 +413,19 @@ const Dashboard = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-[300px]">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         {/* Conditional Panel: Recent Employees for HR, My Awards for Employees */}
         {canViewAll ? (
-          <div className="bg-white dark:bg-[#1A1D23]/60 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden flex flex-col group hover:border-slate-300 dark:border-slate-700 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300">
-            <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center group-hover:border-slate-300 dark:border-slate-700 transition-colors">
-              <h2 className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-indigo-300 transition-colors">Recent Employees</h2>
-              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="text-[10px] text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white uppercase font-bold tracking-widest transition-colors">View All</motion.button>
+          <div className="bg-white/85 dark:bg-[#0C1017]/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-xl overflow-hidden flex flex-col group hover:border-slate-300 dark:hover:border-slate-700 shadow-lg shadow-slate-200/40 dark:shadow-black/40 transition-all duration-300">
+            <div className="px-6 py-4 border-b border-slate-200/80 dark:border-slate-800/80 flex justify-between items-center group-hover:border-slate-300 dark:hover:border-slate-700 transition-colors">
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-white group-hover:text-indigo-400 dark:group-hover:text-indigo-300 transition-colors">Recent Employees</h2>
+              <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="text-[10px] text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white uppercase font-bold tracking-widest transition-colors">View All</motion.button>
             </div>
-            <div className="divide-y divide-slate-800/50 overflow-y-auto group-hover:divide-slate-700/50 transition-colors">
+            <div className="divide-y divide-slate-100 dark:divide-slate-800/60 overflow-y-auto">
               {employees.slice(0, 5).map(emp => (
-                <div key={emp.id} className="px-6 py-4 flex items-center justify-between hover:bg-slate-800/50 transition-all cursor-pointer">
+                <div key={emp.id} className="px-6 py-4 flex items-center justify-between hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-all cursor-pointer">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-semibold text-slate-700 dark:text-slate-300 group-hover:bg-slate-600 transition-colors">
+                    <div className="w-10 h-10 rounded bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-semibold text-slate-700 dark:text-slate-300 group-hover:bg-slate-300 dark:group-hover:bg-slate-600 transition-colors">
                       {emp.firstName.charAt(0)}{emp.lastName.charAt(0)}
                     </div>
                     <div>
@@ -434,7 +434,7 @@ const Dashboard = () => {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-slate-500 dark:text-slate-500 dark:text-slate-400">{emp.department}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">{emp.department}</p>
                     <p className="text-[10px] text-slate-500 dark:text-slate-500 tracking-tighter">{emp.role}</p>
                   </div>
                 </div>
@@ -447,8 +447,8 @@ const Dashboard = () => {
             </div>
           </div>
         ) : (
-          <div className="bg-white dark:bg-[#1A1D23]/60 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden flex flex-col group hover:border-amber-900/50 hover:shadow-xl hover:shadow-amber-500/5 transition-all duration-300">
-            <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center group-hover:border-slate-300 dark:border-slate-700 transition-colors">
+          <div className="bg-white/85 dark:bg-[#0C1017]/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-xl overflow-hidden flex flex-col group hover:border-amber-500/40 shadow-lg shadow-slate-200/40 dark:shadow-black/40 transition-all duration-300">
+            <div className="px-6 py-4 border-b border-slate-200/80 dark:border-slate-800/80 flex justify-between items-center transition-colors">
               <h2 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2 group-hover:text-amber-400 transition-colors">
                 <AwardIcon size={16} className="text-amber-400" /> My Awards
               </h2>
@@ -458,14 +458,14 @@ const Dashboard = () => {
                 <div className="text-center text-slate-500 dark:text-slate-500 py-4">No awards yet. Keep up the good work!</div>
               ) : (
                 myAwards.map(award => (
-                  <div key={award.id} className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-lg p-4 flex gap-4 items-center hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-amber-900/50 transition-all hover:-translate-y-0.5 cursor-default">
+                  <div key={award.id} className="bg-slate-50/80 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-800 rounded-lg p-4 flex gap-4 items-center hover:bg-slate-100 dark:hover:bg-slate-800 transition-all hover:-translate-y-0.5 cursor-default">
                     <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-500 flex-shrink-0">
                       <AwardIcon size={24} />
                     </div>
                     <div className="flex-1">
                       <h3 className="font-medium text-slate-800 dark:text-slate-200">{award.awardType}</h3>
                       <p className="text-xs text-amber-400 mt-1 font-semibold">{award.gift}</p>
-                      {award.description && <p className="text-xs text-slate-500 dark:text-slate-500 dark:text-slate-400 mt-1">{award.description}</p>}
+                      {award.description && <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{award.description}</p>}
                     </div>
                     <div className="text-[10px] text-slate-500 dark:text-slate-500 font-bold uppercase tracking-widest text-right">
                       {award.date}
@@ -479,23 +479,23 @@ const Dashboard = () => {
         
         <div className="flex flex-col gap-6">
           {/* Announcements Panel */}
-          <div className="bg-white dark:bg-[#1A1D23]/60 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden flex flex-col group hover:border-slate-300 dark:border-slate-700 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300 flex-1">
-            <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center group-hover:border-slate-300 dark:border-slate-700 transition-colors">
-              <h2 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2 group-hover:text-indigo-300 transition-colors">
+          <div className="bg-white/85 dark:bg-[#0C1017]/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-xl overflow-hidden flex flex-col group hover:border-slate-300 dark:hover:border-slate-700 shadow-lg shadow-slate-200/40 dark:shadow-black/40 transition-all duration-300">
+            <div className="px-6 py-4 border-b border-slate-200/80 dark:border-slate-800/80 flex justify-between items-center transition-colors">
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2 group-hover:text-indigo-400 dark:group-hover:text-indigo-300 transition-colors">
                 <Megaphone size={16} className="text-indigo-400" /> Announcements
               </h2>
             </div>
-            <div className="p-6 space-y-4 overflow-y-auto">
+            <div className="p-6 space-y-4 overflow-y-auto max-h-[300px]">
               {announcements.length === 0 ? (
                 <div className="text-center text-slate-500 dark:text-slate-500 py-4">No recent announcements.</div>
               ) : (
                 announcements.map(ann => (
-                  <div key={ann.id} className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-lg p-4 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-indigo-900/50 transition-all hover:-translate-y-0.5 cursor-default">
+                  <div key={ann.id} className="bg-slate-50/80 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-800 rounded-lg p-4 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all hover:-translate-y-0.5 cursor-default">
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="font-medium text-slate-800 dark:text-slate-200">{ann.title}</h3>
                       <span className="text-[10px] text-slate-500 dark:text-slate-500 font-bold uppercase tracking-widest">{ann.date}</span>
                     </div>
-                    <p className="text-sm text-slate-500 dark:text-slate-500 dark:text-slate-400 whitespace-pre-wrap">{ann.content}</p>
+                    <p className="text-sm text-slate-600 dark:text-slate-400 whitespace-pre-wrap">{ann.content}</p>
                     <div className="mt-3 text-[10px] text-slate-500 dark:text-slate-500 uppercase font-bold tracking-widest">
                       Posted by {ann.author}
                     </div>
@@ -506,20 +506,20 @@ const Dashboard = () => {
           </div>
 
           {/* Events Panel */}
-          <div className="bg-white dark:bg-[#1A1D23]/60 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden flex flex-col group hover:border-slate-300 dark:border-slate-700 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300 flex-1">
-            <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center group-hover:border-slate-300 dark:border-slate-700 transition-colors">
+          <div className="bg-white/85 dark:bg-[#0C1017]/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-xl overflow-hidden flex flex-col group hover:border-slate-300 dark:hover:border-slate-700 shadow-lg shadow-slate-200/40 dark:shadow-black/40 transition-all duration-300">
+            <div className="px-6 py-4 border-b border-slate-200/80 dark:border-slate-800/80 flex justify-between items-center transition-colors">
               <h2 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2 group-hover:text-indigo-400 transition-colors">
                 <PartyPopper size={16} className="text-indigo-400" /> Upcoming Events
               </h2>
             </div>
-            <div className="p-6 space-y-4 overflow-y-auto max-h-[400px]">
+            <div className="p-6 space-y-4 overflow-y-auto max-h-[300px]">
               {events.length === 0 ? (
                 <div className="text-center text-slate-500 dark:text-slate-500 py-4">No upcoming events scheduled.</div>
               ) : (
                 events.map(event => (
-                  <div key={event.id} className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-lg p-4 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-indigo-900/50 transition-all hover:-translate-y-0.5 cursor-default">
+                  <div key={event.id} className="bg-slate-50/80 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-800 rounded-lg p-4 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all hover:-translate-y-0.5 cursor-default">
                     <h3 className="font-medium text-slate-800 dark:text-slate-200 mb-1">{event.title}</h3>
-                    <div className="text-xs text-slate-500 dark:text-slate-500 dark:text-slate-400 mb-2 line-clamp-2">{event.description}</div>
+                    <div className="text-xs text-slate-600 dark:text-slate-400 mb-2 line-clamp-2">{event.description}</div>
                     <div className="text-[10px] text-slate-500 dark:text-slate-500 font-medium">
                       <span className="text-slate-700 dark:text-slate-300 mr-2">{new Date(event.date).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} at {event.time}</span>
                       <span>{event.location}</span>
@@ -532,23 +532,23 @@ const Dashboard = () => {
         </div>
 
         {/* Holidays Panel */}
-        <div className="bg-white dark:bg-[#1A1D23]/60 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden flex flex-col group hover:border-slate-300 dark:border-slate-700 hover:shadow-xl hover:shadow-emerald-500/5 transition-all duration-300">
-          <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center group-hover:border-slate-300 dark:border-slate-700 transition-colors">
+        <div className="bg-white/85 dark:bg-[#0C1017]/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-xl overflow-hidden flex flex-col group hover:border-slate-300 dark:hover:border-slate-700 shadow-lg shadow-slate-200/40 dark:shadow-black/40 transition-all duration-300">
+          <div className="px-6 py-4 border-b border-slate-200/80 dark:border-slate-800/80 flex justify-between items-center transition-colors">
             <h2 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2 group-hover:text-emerald-400 transition-colors">
               <Calendar size={16} className="text-emerald-400" /> Upcoming Holidays
             </h2>
           </div>
-          <div className="p-6 space-y-4 overflow-y-auto">
+          <div className="p-6 space-y-4 overflow-y-auto max-h-[624px]">
             {holidays.length === 0 ? (
               <div className="text-center text-slate-500 dark:text-slate-500 py-4">No upcoming holidays scheduled.</div>
             ) : (
               holidays.map(hol => (
-                <div key={hol.id} className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-lg p-4 hover:bg-slate-100 dark:hover:bg-slate-800 hover:border-emerald-900/50 transition-all hover:-translate-y-0.5 cursor-default">
+                <div key={hol.id} className="bg-slate-50/80 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-800 rounded-lg p-4 hover:bg-slate-100 dark:hover:bg-slate-800 transition-all hover:-translate-y-0.5 cursor-default">
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="font-medium text-slate-800 dark:text-slate-200">{hol.name}</h3>
                     <span className="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700 rounded text-[9px] uppercase font-bold tracking-widest">{hol.type}</span>
                   </div>
-                  <div className="mt-2 text-xs text-slate-500 dark:text-slate-500 dark:text-slate-400">
+                  <div className="mt-2 text-xs text-slate-600 dark:text-slate-400">
                     <span className="text-slate-700 dark:text-slate-300 font-medium">{hol.startDate}</span>
                     {hol.startDate !== hol.endDate && <span> to <span className="text-slate-700 dark:text-slate-300 font-medium">{hol.endDate}</span></span>}
                   </div>
@@ -563,9 +563,9 @@ const Dashboard = () => {
       </div>
 
       {canViewAll && (
-        <div className="mt-6">
-          <div className="bg-white dark:bg-[#1A1D23]/60 backdrop-blur-md border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden flex flex-col group hover:border-slate-300 dark:border-slate-700 hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300">
-            <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center group-hover:border-slate-300 dark:border-slate-700 transition-colors">
+        <div className="pt-2">
+          <div className="bg-white/85 dark:bg-[#0C1017]/90 backdrop-blur-xl border border-slate-200/80 dark:border-slate-800/80 rounded-xl overflow-hidden flex flex-col group hover:border-slate-300 dark:hover:border-slate-700 shadow-lg shadow-slate-200/40 dark:shadow-black/40 transition-all duration-300">
+            <div className="px-6 py-4 border-b border-slate-200/80 dark:border-slate-800/80 flex justify-between items-center transition-colors">
               <h2 className="text-sm font-semibold text-slate-900 dark:text-white flex items-center gap-2 group-hover:text-indigo-400 transition-colors">
                 <Clock size={16} className="text-indigo-400" /> Recent System Activity
               </h2>
@@ -576,7 +576,7 @@ const Dashboard = () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {recentActivities.map(activity => (
-                    <div key={activity.id} className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-lg p-4 flex gap-4 items-start hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-default">
+                    <div key={activity.id} className="bg-slate-50/80 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-800 rounded-lg p-4 flex gap-4 items-start hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-default">
                       <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${activity.bgColor} border ${activity.borderColor}`}>
                         {activity.icon}
                       </div>
