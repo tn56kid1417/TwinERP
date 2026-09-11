@@ -27,6 +27,66 @@ const saveAttendances = () => {
   }
 };
 
+const NOTIFICATION_FILE = process.env.VERCEL ? '/tmp/erp_notifications.json' : path.join(process.cwd(), '.notifications.json');
+
+const seedNotifications = (): any[] => [
+  {
+    id: 'n1',
+    type: 'approval',
+    title: 'Pending Approval',
+    message: 'Leave request from Alice Smith requires your approval.',
+    time: '10 mins ago',
+    timestamp: new Date(Date.now() - 10 * 60000).toISOString(),
+    read: false,
+    targetRole: 'HR'
+  },
+  {
+    id: 'n2',
+    type: 'alert',
+    title: 'Project Deadline Alert',
+    message: 'Website Redesign project is due in 2 days.',
+    time: '1 hour ago',
+    timestamp: new Date(Date.now() - 60 * 60000).toISOString(),
+    read: false,
+    targetRole: 'All'
+  },
+  {
+    id: 'n3',
+    type: 'policy',
+    title: 'HR Policy Change',
+    message: 'Updated work from home guidelines have been published.',
+    time: '1 day ago',
+    timestamp: new Date(Date.now() - 24 * 3600000).toISOString(),
+    read: true,
+    targetRole: 'All'
+  }
+];
+
+const loadNotifications = (): any[] => {
+  try {
+    if (fs.existsSync(NOTIFICATION_FILE)) {
+      const data = fs.readFileSync(NOTIFICATION_FILE, 'utf-8');
+      const parsed = JSON.parse(data);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    }
+  } catch (err) {
+    console.error('Failed to load notifications from file:', err);
+  }
+  return seedNotifications();
+};
+
+const saveNotifications = () => {
+  try {
+    fs.writeFileSync(NOTIFICATION_FILE, JSON.stringify(notifications, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('Failed to save notifications to file:', err);
+  }
+};
+
+let notifications: any[] = loadNotifications();
+
 // --- In-Memory Database ---
 let employees: any[] = [
   { id: 'e1', firstName: 'Alice', lastName: 'Smith', email: 'alice@example.com', department: 'Engineering', role: 'Developer', hireDate: '2023-01-15', isActive: true, shift: 'Morning' },
@@ -269,6 +329,100 @@ export function createApp() {
   router.get('/attendance/:employeeId', (req, res) => {
     const empAtt = attendances.filter(a => a.employeeId === req.params.employeeId);
     res.json(empAtt);
+  });
+
+  // Check Overdue Breaks Endpoint (Alerts HR Manager)
+  router.post('/attendance/check-overdue-breaks', (req, res) => {
+    const { breakDurationMinutes = 45 } = req.body;
+    const today = new Date().toISOString().split('T')[0];
+    const now = Date.now();
+    const limitMs = Number(breakDurationMinutes) * 60 * 1000;
+
+    const overdueList: any[] = [];
+
+    attendances.forEach(att => {
+      if (att.date === today && att.breakInTime && !att.breakOutTime) {
+        const breakStartTime = new Date(att.breakInTime).getTime();
+        const elapsed = now - breakStartTime;
+        if (elapsed > limitMs) {
+          const overdueMinutes = Math.floor((elapsed - limitMs) / 60000);
+          const emp = employees.find(e => e.id === att.employeeId);
+          const empName = emp ? `${emp.firstName} ${emp.lastName}` : `Employee ${att.employeeId}`;
+
+          overdueList.push({
+            employeeId: att.employeeId,
+            employeeName: empName,
+            breakInTime: att.breakInTime,
+            overdueMinutes: overdueMinutes > 0 ? overdueMinutes : 1
+          });
+
+          // Check if notification already exists for this overdue break today
+          const alreadyNotified = notifications.some(
+            n => n.type === 'overdue_break' && 
+                 n.employeeId === att.employeeId && 
+                 n.timestamp && n.timestamp.startsWith(today)
+          );
+
+          if (!alreadyNotified) {
+            const newNotif = {
+              id: `notif_break_${Date.now()}_${att.employeeId}`,
+              type: 'overdue_break',
+              title: 'Overdue Break Alert',
+              message: `${empName} has exceeded the allocated break time (${breakDurationMinutes} mins) and has not broken out on time.`,
+              time: 'Just now',
+              timestamp: new Date().toISOString(),
+              read: false,
+              targetRole: 'HR',
+              employeeId: att.employeeId,
+              employeeName: empName,
+              overdueMinutes: overdueMinutes > 0 ? overdueMinutes : 1
+            };
+            notifications.unshift(newNotif);
+            saveNotifications();
+          }
+        }
+      }
+    });
+
+    res.json({
+      overdueCount: overdueList.length,
+      overdueEmployees: overdueList,
+      notifications
+    });
+  });
+
+  // Notifications API
+  router.get('/notifications', (req, res) => {
+    res.json(notifications);
+  });
+
+  router.post('/notifications', (req, res) => {
+    const newNotif = {
+      id: `notif_${Date.now()}`,
+      time: 'Just now',
+      timestamp: new Date().toISOString(),
+      read: false,
+      ...req.body
+    };
+    notifications.unshift(newNotif);
+    saveNotifications();
+    res.status(201).json(newNotif);
+  });
+
+  router.put('/notifications/:id/read', (req, res) => {
+    const notif = notifications.find(n => n.id === req.params.id);
+    if (notif) {
+      notif.read = true;
+      saveNotifications();
+      return res.json(notif);
+    }
+    res.status(404).json({ error: 'Notification not found' });
+  });
+
+  router.post('/notifications/mark-all-read', (req, res) => {
+    notifications.forEach(n => { n.read = true; });
+    saveNotifications();
+    res.json({ success: true, count: notifications.length });
   });
 
   // Module C: Leave Management

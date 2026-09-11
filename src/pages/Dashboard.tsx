@@ -1,14 +1,15 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion } from 'motion/react';
-import { Users, UserPlus, Clock, CheckCircle, LogIn, LogOut, Megaphone, Award as AwardIcon, Calendar, Coffee, Settings, PartyPopper, Zap, FolderPlus, X } from 'lucide-react';
+import { Users, UserPlus, Clock, CheckCircle, LogIn, LogOut, Megaphone, Award as AwardIcon, Calendar, Coffee, Settings, PartyPopper, Zap, FolderPlus, X, AlertTriangle } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { getEmployees, clockIn, clockOut, breakIn, breakOut, getAllAttendance, getAnnouncements, getAwards, getHolidays, getEvents, getLeaves } from '../api';
+import toast from 'react-hot-toast';
+import { getEmployees, clockIn, clockOut, breakIn, breakOut, getAllAttendance, getAnnouncements, getAwards, getHolidays, getEvents, getLeaves, checkOverdueBreaks } from '../api';
 import { Employee, Attendance, Announcement, Award, Holiday, AppEvent, LeaveRequest } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
 
 const Dashboard = () => {
-  const { user, canViewAll, canEdit } = useAuth();
+  const { user, canViewAll, canEdit, isHR, isAdmin } = useAuth();
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [attendances, setAttendances] = useState<Attendance[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
@@ -26,6 +27,9 @@ const Dashboard = () => {
   const [isEditingBreak, setIsEditingBreak] = useState(false);
   const [tempBreakDuration, setTempBreakDuration] = useState(breakDurationMinutes.toString());
   const [breakTimeRemaining, setBreakTimeRemaining] = useState<number | null>(null);
+  const [breakOverdueSeconds, setBreakOverdueSeconds] = useState<number>(0);
+  const [overdueEmployees, setOverdueEmployees] = useState<any[]>([]);
+  const hasTriggeredAlertRef = useRef<Record<string, boolean>>({});
 
   const today = new Date().toISOString().split('T')[0];
   const currentEmpId = user?.id || selectedEmpId || (employees[0]?.id ?? '');
@@ -95,6 +99,34 @@ const Dashboard = () => {
   const isOnBreak = selectedEmpAttendance?.breakInTime !== null && selectedEmpAttendance?.breakInTime !== undefined && !selectedEmpAttendance?.breakOutTime;
   const hasTakenBreak = selectedEmpAttendance?.breakOutTime !== null && selectedEmpAttendance?.breakOutTime !== undefined;
 
+  const checkOverdueBreaksPeriodically = async () => {
+    try {
+      const res = await checkOverdueBreaks(breakDurationMinutes);
+      if (res && res.overdueEmployees) {
+        setOverdueEmployees(res.overdueEmployees);
+        if ((isHR || isAdmin) && res.overdueEmployees.length > 0) {
+          res.overdueEmployees.forEach((emp: any) => {
+            if (!hasTriggeredAlertRef.current[emp.employeeId]) {
+              hasTriggeredAlertRef.current[emp.employeeId] = true;
+              toast.error(
+                `HR Alert: ${emp.employeeName} exceeded break limit (${breakDurationMinutes} mins) without breaking out!`,
+                { duration: 8000, id: `break-alert-${emp.employeeId}`, icon: '⚠️' }
+              );
+            }
+          });
+        }
+      }
+    } catch (err) {
+      console.error('Failed to check overdue breaks:', err);
+    }
+  };
+
+  useEffect(() => {
+    checkOverdueBreaksPeriodically();
+    const interval = setInterval(checkOverdueBreaksPeriodically, 12000);
+    return () => clearInterval(interval);
+  }, [breakDurationMinutes, isHR, isAdmin, attendances]);
+
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (isOnBreak && selectedEmpAttendance?.breakInTime) {
@@ -102,14 +134,29 @@ const Dashboard = () => {
         const breakStart = new Date(selectedEmpAttendance.breakInTime!).getTime();
         const now = new Date().getTime();
         const elapsed = Math.floor((now - breakStart) / 1000);
-        const remaining = (breakDurationMinutes * 60) - elapsed;
-        setBreakTimeRemaining(remaining > 0 ? remaining : 0);
+        const limit = breakDurationMinutes * 60;
+        const remaining = limit - elapsed;
+
+        if (remaining > 0) {
+          setBreakTimeRemaining(remaining);
+          setBreakOverdueSeconds(0);
+        } else {
+          setBreakTimeRemaining(0);
+          const overdue = Math.abs(remaining);
+          setBreakOverdueSeconds(overdue);
+          // When current user break expires, ensure HR alert is immediately dispatched
+          if (!hasTriggeredAlertRef.current[currentEmpId]) {
+            hasTriggeredAlertRef.current[currentEmpId] = true;
+            checkOverdueBreaksPeriodically();
+          }
+        }
       }, 1000);
     } else {
       setBreakTimeRemaining(null);
+      setBreakOverdueSeconds(0);
     }
     return () => clearInterval(interval);
-  }, [isOnBreak, selectedEmpAttendance, breakDurationMinutes]);
+  }, [isOnBreak, selectedEmpAttendance, breakDurationMinutes, currentEmpId]);
 
   const handleSaveBreakDuration = () => {
     const val = parseInt(tempBreakDuration, 10);
@@ -332,6 +379,40 @@ const Dashboard = () => {
         </div>
       )}
 
+      {/* Overdue Break Alert Banner for HR Manager */}
+      {(isHR || isAdmin) && overdueEmployees.length > 0 && (
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }} 
+          animate={{ opacity: 1, y: 0 }} 
+          className="bg-gradient-to-r from-rose-500/15 via-rose-500/10 to-amber-500/10 border border-rose-500/30 dark:border-rose-500/40 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-rose-500/20 text-rose-500 flex items-center justify-center flex-shrink-0">
+              <AlertTriangle size={20} className="animate-pulse" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-rose-600 dark:text-rose-400 flex items-center gap-2">
+                HR Alert: Overdue Break Detected
+                <span className="text-[10px] uppercase font-extrabold px-2 py-0.5 rounded bg-rose-500/20 text-rose-600 dark:text-rose-400">
+                  {overdueEmployees.length} Employee{overdueEmployees.length > 1 ? 's' : ''} Overdue
+                </span>
+              </h4>
+              <p className="text-xs text-slate-600 dark:text-slate-300 mt-0.5">
+                {overdueEmployees.map(e => `${e.employeeName} (+${e.overdueMinutes}m overdue)`).join(', ')} exceeded the {breakDurationMinutes} mins break limit without breaking out.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button 
+              onClick={() => checkOverdueBreaksPeriodically()}
+              className="text-xs font-bold px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-white transition-colors shadow-sm flex items-center gap-1.5 cursor-pointer"
+            >
+              Check Again
+            </button>
+          </div>
+        </motion.div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         {canViewAll && (
           <>
@@ -443,9 +524,15 @@ const Dashboard = () => {
                   <Coffee size={14} />
                   <span>Break Time: 
                     {isOnBreak && breakTimeRemaining !== null ? (
-                      <strong className={`ml-1 ${breakTimeRemaining === 0 ? 'text-red-400 animate-pulse' : 'text-amber-300'}`}>
-                        {Math.floor(breakTimeRemaining / 60)}:{(breakTimeRemaining % 60).toString().padStart(2, '0')} min remaining
-                      </strong>
+                      breakOverdueSeconds > 0 ? (
+                        <strong className="ml-1 text-rose-500 font-extrabold animate-pulse">
+                          ⚠️ OVERDUE by {Math.floor(breakOverdueSeconds / 60)}:{(breakOverdueSeconds % 60).toString().padStart(2, '0')} (HR Manager Alerted)
+                        </strong>
+                      ) : (
+                        <strong className="ml-1 text-amber-500 dark:text-amber-300">
+                          {Math.floor(breakTimeRemaining / 60)}:{(breakTimeRemaining % 60).toString().padStart(2, '0')} min remaining
+                        </strong>
+                      )
                     ) : (
                       <strong className="ml-1 text-slate-700 dark:text-slate-300">{breakDurationMinutes} mins</strong>
                     )}

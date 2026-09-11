@@ -5,6 +5,7 @@
 
 import React, { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import Login from './pages/Login';
@@ -113,6 +114,7 @@ export default function App() {
             
             <Sidebar />
             <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden z-10 relative">
+              <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
               <Header />
               <main className="flex-1 overflow-y-auto overflow-x-hidden">
                 <Suspense fallback={<PageLoader />}>

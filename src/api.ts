@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Employee, Attendance, LeaveRequest, Payslip, SalaryStructure, Resignation, Termination, Holiday, Award, Announcement, AppEvent } from './types';
+import { Employee, Attendance, LeaveRequest, Payslip, SalaryStructure, Resignation, Termination, Holiday, Award, Announcement, AppEvent, AppNotification } from './types';
 
 
 const api = axios.create({
@@ -88,3 +88,11 @@ export const getClients = () => api.get<import('./types').Client[]>('/clients').
 export const addClient = (data: Omit<import('./types').Client, 'id'>) => api.post<import('./types').Client>('/clients', data).then(res => res.data);
 export const updateClient = (id: string, data: Partial<import('./types').Client>) => api.put<import('./types').Client>(`/clients/${id}`, data).then(res => res.data);
 export const deleteClient = (id: string) => api.delete(`/clients/${id}`);
+
+// Notifications & Overdue Break APIs
+export const getNotifications = () => api.get<AppNotification[]>('/notifications').then(res => res.data);
+export const createNotification = (data: Partial<AppNotification>) => api.post<AppNotification>('/notifications', data).then(res => res.data);
+export const markNotificationRead = (id: string) => api.put<AppNotification>(`/notifications/${id}/read`).then(res => res.data);
+export const markAllNotificationsRead = () => api.post<{ success: boolean; count: number }>('/notifications/mark-all-read').then(res => res.data);
+export const checkOverdueBreaks = (breakDurationMinutes: number) => 
+  api.post<{ overdueCount: number; overdueEmployees: any[]; notifications: AppNotification[] }>('/attendance/check-overdue-breaks', { breakDurationMinutes }).then(res => res.data);

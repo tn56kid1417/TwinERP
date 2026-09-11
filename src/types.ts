@@ -149,3 +149,17 @@ export interface Client {
   industry: string;
   status: 'Active' | 'Inactive';
 }
+
+export interface AppNotification {
+  id: string;
+  type: 'approval' | 'alert' | 'policy' | 'overdue_break';
+  title: string;
+  message: string;
+  time: string;
+  timestamp: string;
+  read: boolean;
+  targetRole?: string;
+  employeeId?: string;
+  employeeName?: string;
+  overdueMinutes?: number;
+}
