@@ -134,7 +134,7 @@ const Sidebar = () => {
         </div>
       </div>
       
-      <nav className="flex-1 min-h-0 px-4 pb-28 space-y-1 overflow-y-auto">
+      <nav className="flex-1 min-h-0 px-4 py-1 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
           const isExactMatch = location.pathname === item.path;
           const isSubRouteMatch = item.path !== '/' && item.path !== '/crm' && item.path !== '/projects' && location.pathname.startsWith(item.path);
@@ -159,8 +159,8 @@ const Sidebar = () => {
         })}
       </nav>
       
-      <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-slate-200/80 dark:border-slate-800/50 bg-slate-50 dark:bg-[#11141B]/95">
-        <div className="flex items-center gap-3 p-2 rounded-lg bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800">
+      <div className="p-4 border-t border-slate-200/80 dark:border-slate-800/50 bg-slate-50 dark:bg-[#11141B] shrink-0 z-10">
+        <div className="flex items-center gap-3 p-2 rounded-lg bg-white/70 dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800">
           <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex-shrink-0 border border-slate-300 dark:border-slate-600 flex items-center justify-center text-xs font-bold text-slate-900 dark:text-white">
             {user?.firstName?.[0]}{user?.lastName?.[0]}
           </div>
