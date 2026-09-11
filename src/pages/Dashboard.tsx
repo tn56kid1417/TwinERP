@@ -278,7 +278,7 @@ const Dashboard = () => {
             {!isClockedIn ? (
               <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} 
                 onClick={handleClockIn}
-                className="w-full bg-[#306D29] hover:bg-[#306D29]/90 border border-transparent text-slate-900 dark:text-white px-4 py-2 rounded text-xs font-bold uppercase tracking-widest transition-colors h-[38px] flex items-center justify-center gap-2"
+                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white shadow-md shadow-emerald-500/25 dark:bg-emerald-600 dark:hover:bg-emerald-500 border border-transparent px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all h-[38px] flex items-center justify-center gap-2"
               >
                 <LogIn size={14} /> Punch In
               </motion.button>
@@ -288,14 +288,14 @@ const Dashboard = () => {
                   <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} 
                     onClick={handleBreakIn}
                     disabled={hasTakenBreak}
-                    className="flex-1 bg-amber-600 hover:bg-amber-600/90 border border-transparent text-slate-900 dark:text-white px-4 py-2 rounded text-xs font-bold uppercase tracking-widest transition-colors h-[38px] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 bg-amber-500 hover:bg-amber-600 text-white shadow-sm dark:bg-amber-600 dark:hover:bg-amber-500 border border-transparent px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all h-[38px] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Coffee size={14} /> {hasTakenBreak ? 'Break Taken' : 'Break In'}
                   </motion.button>
                 ) : (
                   <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} 
                     onClick={handleBreakOut}
-                    className="flex-1 bg-amber-500 hover:bg-amber-500/90 border border-transparent text-slate-900 dark:text-white px-4 py-2 rounded text-xs font-bold uppercase tracking-widest transition-colors h-[38px] flex items-center justify-center gap-2"
+                    className="flex-1 bg-amber-500 hover:bg-amber-600 text-white shadow-sm dark:bg-amber-600 dark:hover:bg-amber-500 border border-transparent px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all h-[38px] flex items-center justify-center gap-2"
                   >
                     <Coffee size={14} /> Break Out
                   </motion.button>
@@ -304,7 +304,7 @@ const Dashboard = () => {
                 <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} 
                   onClick={handleClockOut}
                   disabled={isOnBreak}
-                  className="flex-1 bg-[#D90000] hover:bg-[#D90000]/90 border border-transparent text-slate-900 dark:text-white px-4 py-2 rounded text-xs font-bold uppercase tracking-widest transition-colors h-[38px] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 bg-rose-500 hover:bg-rose-600 text-white shadow-sm dark:bg-rose-600 dark:hover:bg-rose-500 border border-transparent px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all h-[38px] flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <LogOut size={14} /> Punch Out
                 </motion.button>
