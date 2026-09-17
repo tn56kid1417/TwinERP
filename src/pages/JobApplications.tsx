@@ -160,30 +160,32 @@ export default function JobApplications() {
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="p-8 max-w-7xl mx-auto flex flex-col min-h-full space-y-6"
+      className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto flex flex-col min-h-full space-y-4 sm:space-y-6"
     >
       {/* Back button & Page title */}
-      <div className="flex items-center gap-4">
-        <button
-          onClick={() => navigate('/careers')}
-          className="p-2.5 rounded-xl bg-white/80 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors shadow-sm"
-        >
-          <ArrowLeft size={18} />
-        </button>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
-            <span>Careers Pipeline</span>
-            <span>/</span>
-            <span className="truncate">{job?.department || 'Engineering'}</span>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+          <button
+            onClick={() => navigate('/careers')}
+            className="p-2.5 rounded-xl bg-white/80 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors shadow-sm cursor-pointer shrink-0"
+          >
+            <ArrowLeft size={18} />
+          </button>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
+              <span>Careers Pipeline</span>
+              <span>/</span>
+              <span className="truncate">{job?.department || 'Engineering'}</span>
+            </div>
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white truncate">
+              {job?.title || 'Applicant Pipeline'}
+            </h1>
           </div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white truncate">
-            {job?.title || 'Applicant Pipeline'}
-          </h1>
         </div>
 
         <button
           onClick={() => setNewCandidateModal(true)}
-          className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-md shadow-indigo-600/30"
+          className="flex items-center justify-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-md shadow-indigo-600/30 cursor-pointer self-start sm:self-auto"
         >
           <Plus size={16} /> Add Candidate
         </button>

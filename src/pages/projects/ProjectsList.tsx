@@ -111,23 +111,23 @@ const ProjectsList = () => {
   };
 
   return (
-    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="p-8 max-w-7xl mx-auto h-full flex flex-col relative">
-      <div className="mb-8 flex justify-between items-end">
+    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto h-full flex flex-col relative">
+      <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
-          <h1 className="text-3xl font-medium text-slate-900 dark:text-white tracking-tight">Projects</h1>
-          <p className="text-slate-500 dark:text-slate-500 mt-1">
+          <h1 className="text-2xl sm:text-3xl font-medium text-slate-900 dark:text-white tracking-tight">Projects</h1>
+          <p className="text-slate-500 dark:text-slate-500 mt-1 text-sm">
             {canEdit ? 'Manage company projects and assign them to Team Leaders.' : 'View your assigned projects and manage tasks.'}
           </p>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="relative">
+        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+          <div className="relative flex-1 sm:flex-initial">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-500" />
             <input 
               type="text" 
               placeholder="Search projects..." 
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
-              className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-indigo-500/50 w-64"
+              className="bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-indigo-500/50 w-full sm:w-64"
             />
           </div>
           {canEdit && (

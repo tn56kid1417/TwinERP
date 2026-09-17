@@ -150,16 +150,16 @@ export default function HRMUserAnalytics() {
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="p-8 max-w-7xl mx-auto flex flex-col min-h-full space-y-6"
+      className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto flex flex-col min-h-full space-y-4 sm:space-y-6"
     >
       {/* Top Page Title & Subtitle */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 shrink-0">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
-            <BarChart2 className="text-indigo-600 dark:text-indigo-400 h-8 w-8" />
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2 sm:gap-3">
+            <BarChart2 className="text-indigo-600 dark:text-indigo-400 h-7 w-7 sm:h-8 sm:w-8" />
             User Analytics & Insights
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
+          <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm mt-1">
             Individual attendance, punctuality trends, break metrics, and cross-team comparative benchmarks.
           </p>
         </div>

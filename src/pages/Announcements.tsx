@@ -97,10 +97,10 @@ const Announcements = () => {
   };
 
   return (
-    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="p-8 max-w-7xl mx-auto h-full flex flex-col">
-      <div className="mb-8">
-        <h1 className="text-3xl font-medium text-slate-900 dark:text-white tracking-tight">Announcements</h1>
-        <p className="text-slate-500 dark:text-slate-500 mt-1">{canEdit ? 'Create and manage company-wide announcements.' : 'Latest news and updates from the company.'}</p>
+    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto h-full flex flex-col">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-medium text-slate-900 dark:text-white tracking-tight">Announcements</h1>
+        <p className="text-slate-500 dark:text-slate-500 mt-1 text-sm">{canEdit ? 'Create and manage company-wide announcements.' : 'Latest news and updates from the company.'}</p>
       </div>
 
       <div className={`grid grid-cols-1 gap-8 flex-1 min-h-0 ${canEdit ? 'lg:grid-cols-3' : 'lg:grid-cols-1'}`}>
@@ -151,7 +151,7 @@ const Announcements = () => {
               <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Published Announcements</h2>
             </div>
             
-            <div className="flex-1 overflow-auto p-6 space-y-4">
+            <div className="flex-1 overflow-auto p-4 sm:p-6 space-y-4">
               {loading ? (
                 <div className="text-center text-slate-500 dark:text-slate-500 py-8">Loading...</div>
               ) : announcements.length === 0 ? (

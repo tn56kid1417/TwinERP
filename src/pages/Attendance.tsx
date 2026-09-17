@@ -75,17 +75,17 @@ const Attendance = () => {
     : employees.filter(e => e.id === selectedEmp);
 
   return (
-    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="p-8 max-w-7xl mx-auto h-full flex flex-col">
-      <div className="mb-8">
-        <h1 className="text-3xl font-medium text-slate-900 dark:text-white tracking-tight">Manage Attendances</h1>
-        <p className="text-slate-500 dark:text-slate-500 mt-1">View and manage employee attendance records.</p>
+    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto h-full flex flex-col">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-medium text-slate-900 dark:text-white tracking-tight">Manage Attendances</h1>
+        <p className="text-slate-500 dark:text-slate-500 mt-1 text-sm">View and manage employee attendance records.</p>
       </div>
 
       <div className="flex-1 flex flex-col min-h-0 bg-white dark:bg-[#1A1D23] rounded-xl border border-slate-200 dark:border-slate-800">
         
         {/* Filters Top Bar */}
-        <div className="p-4 border-b border-slate-800/80 bg-slate-900/40 flex flex-wrap gap-4 items-end">
-          <div className="flex-1 min-w-[200px]">
+        <div className="p-3 sm:p-4 border-b border-slate-800/80 bg-slate-900/40 flex flex-wrap gap-3 sm:gap-4 items-end">
+          <div className="flex-1 min-w-[160px] sm:min-w-[200px]">
              <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Employee</label>
              <select 
                className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner cursor-pointer"
@@ -99,7 +99,7 @@ const Attendance = () => {
              </select>
           </div>
           
-          <div className="w-48">
+          <div className="w-36 sm:w-48">
              <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Month</label>
              <select 
                className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner cursor-pointer"
@@ -112,7 +112,7 @@ const Attendance = () => {
              </select>
           </div>
 
-          <div className="w-32">
+          <div className="w-28 sm:w-32">
              <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1.5">Year</label>
              <select 
                className="w-full bg-[#07090E]/90 border border-slate-700/60 text-slate-100 rounded-xl px-3.5 py-2 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/25 transition-all shadow-inner cursor-pointer"
@@ -125,17 +125,17 @@ const Attendance = () => {
              </select>
           </div>
 
-          <button className="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 text-white px-6 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all shadow-lg shadow-indigo-500/25 h-[38px] flex items-center justify-center gap-2 cursor-pointer">
+          <button className="bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 text-white px-5 sm:px-6 py-2 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all shadow-lg shadow-indigo-500/25 h-[38px] flex items-center justify-center gap-2 cursor-pointer">
             <Search size={14} /> Apply
           </button>
         </div>
 
         {/* Legend */}
-        <div className="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs bg-white/30 dark:bg-slate-900/20">
+        <div className="p-3 sm:p-4 border-b border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-xs bg-white/30 dark:bg-slate-900/20">
           <div className="font-bold text-indigo-400 uppercase tracking-widest text-[10px]">
             Attendance Report: {MONTHS[selectedMonth-1]} {selectedYear}
           </div>
-          <div className="flex gap-6 font-medium text-[10px] uppercase tracking-widest">
+          <div className="flex flex-wrap gap-4 sm:gap-6 font-medium text-[10px] uppercase tracking-widest">
             <span className="flex items-center gap-1"><span className="text-emerald-400 font-bold text-sm leading-none">✓</span> <span className="text-slate-500 dark:text-slate-500 dark:text-slate-400">Present</span></span>
             <span className="flex items-center gap-1"><span className="text-red-400 font-bold text-sm leading-none">✕</span> <span className="text-slate-500 dark:text-slate-500 dark:text-slate-400">Absent</span></span>
             <span className="flex items-center gap-1"><span className="text-amber-400 font-bold text-sm leading-none">½</span> <span className="text-slate-500 dark:text-slate-500 dark:text-slate-400">Half Day</span></span>

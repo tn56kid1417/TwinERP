@@ -107,17 +107,17 @@ export default function ProjectKanban() {
   if (!project) return <div className="p-8 text-slate-500 dark:text-slate-500 dark:text-slate-400">Loading...</div>;
 
   return (
-    <div className="p-8 max-w-[1600px] mx-auto h-full flex flex-col">
-      <div className="mb-8 flex items-center gap-4">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto h-full flex flex-col">
+      <div className="mb-6 sm:mb-8 flex items-center gap-3 sm:gap-4">
         <button 
           onClick={() => navigate('/projects/all')}
-          className="p-2 text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+          className="p-2 text-slate-500 dark:text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:text-white hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer shrink-0"
         >
           <ArrowLeft size={20} />
         </button>
         <div>
-          <h1 className="text-3xl font-medium text-slate-900 dark:text-white tracking-tight">{project.name}</h1>
-          <p className="text-slate-500 dark:text-slate-500 mt-1">Kanban Board for {project.client}</p>
+          <h1 className="text-2xl sm:text-3xl font-medium text-slate-900 dark:text-white tracking-tight">{project.name}</h1>
+          <p className="text-slate-500 dark:text-slate-500 mt-1 text-sm">Kanban Board for {project.client}</p>
         </div>
       </div>
 

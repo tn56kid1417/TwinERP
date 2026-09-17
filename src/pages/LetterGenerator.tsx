@@ -143,10 +143,10 @@ const LetterGenerator = () => {
   }
 
   return (
-    <div className="p-6 md:p-8 max-w-4xl mx-auto w-full">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Letter Generator</h1>
-        <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto w-full">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-2">Letter Generator</h1>
+        <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400 text-sm">
           Upload a .docx template containing <code className="bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded text-indigo-300">{`{name}`}</code> and <code className="bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded text-indigo-300">{`{role}`}</code> placeholders to generate custom letters.
         </p>
       </div>

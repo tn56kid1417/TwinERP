@@ -195,16 +195,16 @@ export default function UserManagement() {
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="p-8 max-w-7xl mx-auto flex flex-col min-h-full space-y-6"
+      className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto flex flex-col min-h-full space-y-4 sm:space-y-6"
     >
       {/* Top Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
-            <Shield className="text-indigo-600 dark:text-indigo-400 h-8 w-8" />
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2 sm:gap-3">
+            <Shield className="text-indigo-600 dark:text-indigo-400 h-7 w-7 sm:h-8 sm:w-8" />
             User Management & Access Control
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
+          <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm mt-1">
             Manage employee logins, assign organizational roles, and configure system permissions.
           </p>
         </div>
@@ -321,7 +321,7 @@ export default function UserManagement() {
           <div className="p-12 text-center text-slate-500 text-xs">No users matching filter criteria.</div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm">
+            <table className="w-full min-w-[700px] text-left text-sm">
               <thead className="bg-slate-50/75 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 uppercase text-[11px] font-bold tracking-wider border-b border-slate-200/80 dark:border-slate-800">
                 <tr>
                   <th className="py-4 px-6">User / Account</th>

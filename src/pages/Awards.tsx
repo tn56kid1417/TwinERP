@@ -93,10 +93,10 @@ const Awards = () => {
   };
 
   return (
-    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="p-8 max-w-7xl mx-auto h-full flex flex-col">
-      <div className="mb-8">
-        <h1 className="text-3xl font-medium text-slate-900 dark:text-white tracking-tight">Manage Awards</h1>
-        <p className="text-slate-500 dark:text-slate-500 mt-1">Recognize and reward employee achievements.</p>
+    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto h-full flex flex-col">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-medium text-slate-900 dark:text-white tracking-tight">Manage Awards</h1>
+        <p className="text-slate-500 dark:text-slate-500 mt-1 text-sm">Recognize and reward employee achievements.</p>
       </div>
 
       <div className={`grid grid-cols-1 gap-8 flex-1 min-h-0 ${canEdit ? 'lg:grid-cols-3' : 'lg:grid-cols-1'}`}>
@@ -173,8 +173,8 @@ const Awards = () => {
               <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Awards List</h2>
             </div>
             
-            <div className="flex-1 overflow-auto">
-              <table className="w-full text-left border-collapse min-w-max">
+            <div className="flex-1 overflow-x-auto">
+              <table className="w-full min-w-[550px] text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-50/80 dark:bg-slate-900/50 text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200/80 dark:border-slate-800/50">
                     <th className="px-6 py-3 font-semibold">Employee</th>

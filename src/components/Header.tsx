@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, X, Check, Clock, AlertTriangle, FileText, UserX } from 'lucide-react';
+import { Bell, X, Check, Clock, AlertTriangle, FileText, UserX, Menu } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useAuth } from '../context/AuthContext';
 import { getNotifications, markAllNotificationsRead, markNotificationRead } from '../api';
 import { AppNotification } from '../types';
 
-export default function Header() {
+interface HeaderProps {
+  onToggleSidebar?: () => void;
+}
+
+export default function Header({ onToggleSidebar }: HeaderProps) {
   const { user, isHR, isAdmin } = useAuth();
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
@@ -145,11 +149,21 @@ export default function Header() {
 
   return (
     <>
-      <header className="sticky top-0 z-40 bg-slate-50/80 dark:bg-[#0A0C10]/80 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/50 px-8 py-3 flex justify-between items-center">
-        <div>
-           {/* Left side spacing or title if needed */}
+      <header className="sticky top-0 z-30 bg-slate-50/80 dark:bg-[#0A0C10]/80 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/50 px-4 sm:px-8 py-3 flex justify-between items-center">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={onToggleSidebar}
+            className="lg:hidden p-2 text-slate-600 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-xl hover:bg-slate-200/80 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            aria-label="Open Navigation Menu"
+          >
+            <Menu size={22} />
+          </button>
+          <div className="lg:hidden flex items-center gap-2">
+            <img src="/logo.png" alt="TwinERP Logo" className="h-6 object-contain invert dark:invert-0" />
+          </div>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4">
           <button 
             onClick={() => {
               setIsNotificationsOpen(true);
@@ -184,7 +198,7 @@ export default function Header() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 bottom-0 w-[440px] max-w-full bg-white dark:bg-[#11141B] border-l border-slate-200 dark:border-slate-800 shadow-2xl z-50 flex flex-col"
+              className="fixed top-0 right-0 bottom-0 w-full sm:w-[440px] max-w-full bg-white dark:bg-[#11141B] border-l border-slate-200 dark:border-slate-800 shadow-2xl z-50 flex flex-col"
             >
               {/* Header */}
               <div className="p-5 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-900/50">

@@ -58,30 +58,30 @@ export default function ClientsList() {
   );
 
   return (
-    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="p-8 max-w-7xl mx-auto h-full flex flex-col">
-      <div className="mb-8 flex justify-between items-end">
+    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto h-full flex flex-col">
+      <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
-          <h1 className="text-3xl font-medium text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
-            <Building className="text-indigo-500" size={32} />
+          <h1 className="text-2xl sm:text-3xl font-medium text-slate-900 dark:text-white tracking-tight flex items-center gap-2 sm:gap-3">
+            <Building className="text-indigo-500 h-7 w-7 sm:h-8 sm:w-8" />
             Clients Database
           </h1>
-          <p className="text-slate-500 dark:text-slate-500 mt-2">Manage client relationships and contact details.</p>
+          <p className="text-slate-500 dark:text-slate-500 mt-1 text-sm">Manage client relationships and contact details.</p>
         </div>
-        <div className="flex gap-4">
-          <div className="relative">
+        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+          <div className="relative flex-1 sm:flex-initial">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 dark:text-slate-500" size={18} />
             <input 
               type="text" 
               placeholder="Search clients..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 bg-white dark:bg-[#1A1D23] border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 rounded-lg text-sm focus:outline-none focus:border-indigo-500 transition-colors w-64"
+              className="pl-10 pr-4 py-2 bg-white dark:bg-[#1A1D23] border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-200 rounded-lg text-sm focus:outline-none focus:border-indigo-500 transition-colors w-full sm:w-64"
             />
           </div>
         {canEdit && (
           <button 
             onClick={() => setIsAddModalOpen(true)}
-            className="bg-indigo-600 hover:bg-indigo-500 text-slate-900 dark:text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium transition-colors shadow-lg shadow-indigo-500/20"
+            className="bg-indigo-600 hover:bg-indigo-500 text-slate-900 dark:text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium transition-colors shadow-lg shadow-indigo-500/20 cursor-pointer"
           >
             <Plus size={18} />
             Add Client

@@ -42,9 +42,9 @@ const Settings = () => {
   };
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
-      <div className="mb-8 text-left">
-        <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Workspace Settings</h1>
+    <div className="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto">
+      <div className="mb-6 sm:mb-8 text-left">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 dark:text-white">Workspace Settings</h1>
         <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
           Manage your personal login credentials and profile settings.
         </p>

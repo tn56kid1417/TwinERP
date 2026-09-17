@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   FileText, Shield, FileCheck, Plus, Trash2, Eye, ExternalLink,
-  Download, Search, X, Calendar, UserCheck
+  Download, Search, X, Calendar, UserCheck, BookOpen
 } from 'lucide-react';
 import {
   getHRDocuments, createHRDocument, deleteHRDocument,
@@ -178,16 +178,16 @@ export default function DocumentsContracts() {
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="p-8 max-w-7xl mx-auto flex flex-col min-h-full space-y-6"
+      className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto flex flex-col min-h-full space-y-4 sm:space-y-6"
     >
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
-            <FileText className="text-indigo-600 dark:text-indigo-400 h-8 w-8" />
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white tracking-tight flex items-center gap-2 sm:gap-3">
+            <FileText className="text-indigo-600 dark:text-indigo-400 h-7 w-7 sm:h-8 sm:w-8" />
             Documents & Contracts
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
+          <p className="text-slate-500 dark:text-slate-400 text-xs sm:text-sm mt-1">
             Store organizational policies, manage legally binding employee contracts, and access formal letter templates.
           </p>
         </div>
@@ -223,10 +223,10 @@ export default function DocumentsContracts() {
       </div>
 
       {/* Tabs Row */}
-      <div className="flex items-center gap-2 border-b border-slate-200/80 dark:border-slate-800 pb-2">
+      <div className="flex items-center gap-2 border-b border-slate-200/80 dark:border-slate-800 pb-2 overflow-x-auto">
         <button
           onClick={() => setActiveTab('hr-documents')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
             activeTab === 'hr-documents'
               ? 'bg-indigo-600 text-white shadow-sm'
               : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'
@@ -237,7 +237,7 @@ export default function DocumentsContracts() {
 
         <button
           onClick={() => setActiveTab('agreements')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
             activeTab === 'agreements'
               ? 'bg-indigo-600 text-white shadow-sm'
               : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'
@@ -248,13 +248,13 @@ export default function DocumentsContracts() {
 
         <button
           onClick={() => setActiveTab('templates')}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-colors ${
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
             activeTab === 'templates'
               ? 'bg-indigo-600 text-white shadow-sm'
               : 'text-slate-500 hover:text-slate-900 dark:hover:text-slate-200'
           }`}
         >
-          <FileText size={16} /> Document Templates ({templates.length})
+          <BookOpen size={16} /> Standard Templates ({templates.length})
         </button>
       </div>
 
@@ -267,7 +267,7 @@ export default function DocumentsContracts() {
             <div className="p-12 text-center text-slate-500 text-xs">No documents uploaded yet.</div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
+              <table className="w-full min-w-[650px] text-left text-sm">
                 <thead className="bg-slate-50/75 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 uppercase text-[11px] font-bold tracking-wider border-b border-slate-200/80 dark:border-slate-800">
                   <tr>
                     <th className="py-4 px-6">Document Name</th>
@@ -333,7 +333,7 @@ export default function DocumentsContracts() {
             <div className="p-12 text-center text-slate-500 text-xs">No employee agreements registered yet.</div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm">
+              <table className="w-full min-w-[650px] text-left text-sm">
                 <thead className="bg-slate-50/75 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 uppercase text-[11px] font-bold tracking-wider border-b border-slate-200/80 dark:border-slate-800">
                   <tr>
                     <th className="py-4 px-6">Employee</th>

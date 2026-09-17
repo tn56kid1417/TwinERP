@@ -71,15 +71,15 @@ const Events = () => {
   };
 
   return (
-    <div className="p-6 md:p-8 max-w-6xl mx-auto">
-      <div className="flex justify-between items-center mb-8">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-6xl mx-auto">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Company Events</h1>
-          <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400">View upcoming company events and gatherings.</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-1">Company Events</h1>
+          <p className="text-slate-500 dark:text-slate-500 dark:text-slate-400 text-sm">View upcoming company events and gatherings.</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8">
         {/* Events List */}
         <div className={`space-y-4 ${canEdit ? 'lg:col-span-2' : 'lg:col-span-3'}`}>
           {loading ? (

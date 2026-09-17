@@ -103,6 +103,7 @@ class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundarySta
 
 export default function App() {
   const { user } = useAuth();
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
   return (
     <ErrorBoundary>
@@ -118,10 +119,10 @@ export default function App() {
               <div className="grid-bg"></div>
             </div>
             
-            <Sidebar />
+            <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
             <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden z-10 relative">
               <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
-              <Header />
+              <Header onToggleSidebar={() => setSidebarOpen(prev => !prev)} />
               <main className="flex-1 overflow-y-auto overflow-x-hidden">
                 <Suspense fallback={<PageLoader />}>
                   <Routes>

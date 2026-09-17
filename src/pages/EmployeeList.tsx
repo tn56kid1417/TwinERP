@@ -77,16 +77,16 @@ const EmployeeList = () => {
   };
 
   return (
-    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="p-8 max-w-7xl mx-auto h-full flex flex-col">
-      <div className="flex items-center justify-between mb-8">
+    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto h-full flex flex-col">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-3xl font-medium text-slate-900 dark:text-white tracking-tight">Employees</h1>
-          <p className="text-slate-500 dark:text-slate-500 mt-1">Manage your team members and their details.</p>
+          <h1 className="text-2xl sm:text-3xl font-medium text-slate-900 dark:text-white tracking-tight">Employees</h1>
+          <p className="text-slate-500 dark:text-slate-500 mt-1 text-sm">Manage your team members and their details.</p>
         </div>
         {canEdit && (
           <button 
             onClick={() => setIsAdding(!isAdding)}
-            className="bg-indigo-600 hover:bg-indigo-500 text-slate-900 dark:text-white px-5 py-2.5 rounded text-[10px] uppercase font-bold tracking-widest flex items-center gap-2 transition-colors"
+            className="bg-indigo-600 hover:bg-indigo-500 text-slate-900 dark:text-white px-5 py-2.5 rounded text-[10px] uppercase font-bold tracking-widest flex items-center gap-2 transition-colors cursor-pointer"
           >
             <Plus size={16} />
             {isAdding ? 'Cancel' : 'Add Employee'}
@@ -125,8 +125,8 @@ const EmployeeList = () => {
       )}
 
       <div className="bg-white/90 dark:bg-[#1A1D23]/70 backdrop-blur-xl rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-lg shadow-slate-200/50 dark:shadow-none overflow-hidden flex-1 flex flex-col">
-        <div className="flex-1 overflow-auto">
-          <table className="w-full text-left border-collapse">
+        <div className="flex-1 overflow-x-auto">
+          <table className="w-full min-w-[650px] text-left border-collapse">
             <thead>
               <tr className="bg-slate-50/80 dark:bg-slate-900/50 text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200/80 dark:border-slate-800/50">
                 <th className="px-6 py-3 font-semibold">Employee</th>

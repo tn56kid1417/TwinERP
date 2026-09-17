@@ -200,11 +200,11 @@ export default function ProjectsDashboard() {
   }
 
   return (
-    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="p-8 max-w-7xl mx-auto h-full flex flex-col relative overflow-y-auto">
-      <div className="mb-8 flex justify-between items-end">
+    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto h-full flex flex-col relative overflow-y-auto">
+      <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
-          <h1 className="text-3xl font-medium text-slate-900 dark:text-white tracking-tight">Projects Dashboard</h1>
-          <p className="text-slate-500 dark:text-slate-500 mt-1">Overview of your projects and tasks</p>
+          <h1 className="text-2xl sm:text-3xl font-medium text-slate-900 dark:text-white tracking-tight">Projects Dashboard</h1>
+          <p className="text-slate-500 dark:text-slate-500 mt-1 text-sm">Overview of your projects and tasks</p>
         </div>
         <div className="flex items-center gap-4">
           {canViewAll && (

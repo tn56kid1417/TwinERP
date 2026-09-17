@@ -69,10 +69,10 @@ const LeaveRequests = () => {
   };
 
   return (
-    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="p-8 max-w-7xl mx-auto h-full flex flex-col">
-      <div className="mb-8">
-        <h1 className="text-3xl font-medium text-slate-900 dark:text-white tracking-tight">Leave Management</h1>
-        <p className="text-slate-500 dark:text-slate-500 mt-1">Request and manage employee time off.</p>
+    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto h-full flex flex-col">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-medium text-slate-900 dark:text-white tracking-tight">Leave Management</h1>
+        <p className="text-slate-500 dark:text-slate-500 mt-1 text-sm">Request and manage employee time off.</p>
       </div>
 
       <div className={`grid grid-cols-1 gap-8 flex-1 min-h-0 ${showForm ? 'lg:grid-cols-3' : 'lg:grid-cols-1'}`}>
@@ -142,8 +142,8 @@ const LeaveRequests = () => {
 
         )}<div className={`flex flex-col min-h-0 ${showForm ? 'lg:col-span-2' : 'max-w-5xl mx-auto w-full'}`}>
           <div className="bg-white dark:bg-[#1A1D23] rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden flex-1 flex flex-col">
-            <div className="flex-1 overflow-auto">
-              <table className="w-full text-left border-collapse">
+            <div className="flex-1 overflow-x-auto">
+              <table className="w-full min-w-[550px] text-left border-collapse">
                 <thead>
                   <tr className="bg-white/50 dark:bg-slate-900/50 text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-500 border-b border-slate-200/80 dark:border-slate-800/50">
                     <th className="px-6 py-3 font-semibold">Employee</th>

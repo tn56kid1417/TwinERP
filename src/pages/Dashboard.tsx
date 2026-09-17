@@ -365,17 +365,17 @@ const Dashboard = () => {
       initial={{ opacity: 0, y: 15 }} 
       animate={{ opacity: 1, y: 0 }} 
       transition={{ duration: 0.4 }}
-      className="p-8 max-w-7xl mx-auto w-full min-h-full flex flex-col space-y-8 pb-16"
+      className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full min-h-full flex flex-col space-y-6 sm:space-y-8 pb-16"
     >
-      <div className="flex justify-between items-end">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4">
         <div>
-          <h1 className="text-3xl font-medium text-slate-900 dark:text-white tracking-tight">Dashboard Overview</h1>
-          <p className="text-slate-500 dark:text-slate-500 mt-1">Welcome back, {user?.firstName}. Here is what's happening today.</p>
+          <h1 className="text-2xl sm:text-3xl font-medium text-slate-900 dark:text-white tracking-tight">Dashboard Overview</h1>
+          <p className="text-slate-500 dark:text-slate-500 mt-1 text-sm">Welcome back, {user?.firstName}. Here is what's happening today.</p>
         </div>
         {canEdit && (
           <button 
             onClick={() => setIsQuickActionsOpen(true)}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-colors shadow-sm"
+            className="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-colors shadow-sm cursor-pointer"
           >
             <Zap size={16} /> Quick Actions
           </button>

@@ -98,11 +98,11 @@ const Terminations = () => {
   };
 
   return (
-    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="p-8 max-w-7xl mx-auto h-full flex flex-col">
-      <div className="mb-8 flex justify-between items-start">
+    <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }} className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto h-full flex flex-col">
+      <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-medium text-slate-900 dark:text-white tracking-tight">Manage Terminations</h1>
-          <p className="text-slate-500 dark:text-slate-500 mt-1">Process and track employee terminations.</p>
+          <h1 className="text-2xl sm:text-3xl font-medium text-slate-900 dark:text-white tracking-tight">Manage Terminations</h1>
+          <p className="text-slate-500 dark:text-slate-500 mt-1 text-sm">Process and track employee terminations.</p>
         </div>
         <div className="flex items-center gap-2 bg-rose-500/10 text-rose-400 border border-rose-500/20 px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-widest">
           <ShieldAlert size={14} /> HR Admin Only
@@ -181,8 +181,8 @@ const Terminations = () => {
               <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Terminations List</h2>
             </div>
             
-            <div className="flex-1 overflow-auto">
-              <table className="w-full text-left border-collapse min-w-max">
+            <div className="flex-1 overflow-x-auto">
+              <table className="w-full min-w-[550px] text-left border-collapse">
                 <thead>
                   <tr className="bg-slate-50/80 dark:bg-slate-900/50 text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200/80 dark:border-slate-800/50">
                     <th className="px-6 py-3 font-semibold">Employee</th>
