@@ -125,7 +125,7 @@ export const Payments: React.FC = () => {
           paymentLink: newPayment.paymentLink,
           approver: newPayment.approver,
           expires: newPayment.expires,
-          createdBy: mainUser?.name || 'System'
+          createdBy: (mainUser as any)?.name || `${mainUser?.firstName || ''} ${mainUser?.lastName || ''}`.trim() || 'System'
         })
       }
       setIsModalOpen(false)

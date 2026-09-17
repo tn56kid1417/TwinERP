@@ -179,6 +179,128 @@ let projectActivities: any[] = [
   { id: 'a3', taskId: 't1', projectId: 'p1', type: 'StatusChange', description: 'Task "Design Mockups" moved to In Progress', timestamp: new Date(Date.now() - 3600000 * 5).toISOString() },
 ];
 
+let jobPostings: any[] = [
+  {
+    id: 'job-1',
+    title: 'Senior Full Stack Engineer',
+    slug: 'senior-full-stack-engineer',
+    status: 'PUBLISHED',
+    department: 'Engineering',
+    location: 'Remote / Chennai',
+    employmentType: 'Full-Time',
+    createdAt: new Date(Date.now() - 7 * 86400000).toISOString(),
+    publishedAt: new Date(Date.now() - 6 * 86400000).toISOString(),
+    fields: [
+      { id: 'f1', label: 'Experience', value: '4+ Years in Node & React', fieldType: 'TEXT', section: 'PRIMARY', order: 1 },
+      { id: 'f2', label: 'Salary Range', value: '$80,000 - $110,000 / yr', fieldType: 'TAG', section: 'PRIMARY', order: 2 },
+      { id: 'f3', label: 'Tech Stack', value: 'React, TypeScript, Express, Tailwind', fieldType: 'TAG', section: 'PRIMARY', order: 3 },
+      { id: 'f4', label: 'Job Description', value: 'We are seeking an experienced Full Stack Engineer to lead architectural design and feature development for our core ERP applications.', fieldType: 'TEXTAREA', section: 'SECONDARY', order: 1 },
+      { id: 'f5', label: 'Perks', value: 'Health insurance, annual learning stipend, flexible remote schedule.', fieldType: 'TEXTAREA', section: 'SECONDARY', order: 2 },
+    ],
+    rounds: [
+      { id: 'r1', title: 'Resume Screening', shortDescription: 'Initial profile review by HR', order: 1 },
+      { id: 'r2', title: 'Technical Interview', shortDescription: 'System design and live coding', order: 2 },
+      { id: 'r3', title: 'Cultural Fit & Leadership', shortDescription: 'Discussion with Engineering Director', order: 3 },
+      { id: 'r4', title: 'Offer & Finalization', shortDescription: 'Salary breakdown and onboarding terms', order: 4 },
+    ]
+  },
+  {
+    id: 'job-2',
+    title: 'UI/UX Product Designer',
+    slug: 'ui-ux-product-designer',
+    status: 'PUBLISHED',
+    department: 'Design',
+    location: 'Hybrid',
+    employmentType: 'Full-Time',
+    createdAt: new Date(Date.now() - 3 * 86400000).toISOString(),
+    publishedAt: new Date(Date.now() - 2 * 86400000).toISOString(),
+    fields: [
+      { id: 'f21', label: 'Experience', value: '3+ Years in SaaS UX', fieldType: 'TEXT', section: 'PRIMARY', order: 1 },
+      { id: 'f22', label: 'Tooling', value: 'Figma, Design Systems, Prototyping', fieldType: 'TAG', section: 'PRIMARY', order: 2 },
+      { id: 'f23', label: 'Overview', value: 'Craft intuitive, visually breathtaking enterprise workflows.', fieldType: 'TEXTAREA', section: 'SECONDARY', order: 1 }
+    ],
+    rounds: [
+      { id: 'r21', title: 'Portfolio Review', shortDescription: 'Walkthrough of past designs', order: 1 },
+      { id: 'r22', title: 'Design Challenge', shortDescription: '48hr mock design sprint', order: 2 },
+      { id: 'r23', title: 'Founder Alignment', shortDescription: 'Vision and fit', order: 3 }
+    ]
+  }
+];
+
+let jobApplications: any[] = [
+  {
+    id: 'app-1',
+    jobId: 'job-1',
+    candidateName: 'Vikram Sundaram',
+    candidateEmail: 'vikram.s@example.com',
+    candidatePhone: '+91 98401 23456',
+    resumeUrl: 'https://example.com/resumes/vikram.pdf',
+    portfolioUrl: 'https://github.com/vikrams',
+    currentRoundId: 'r2',
+    status: 'INTERVIEWING',
+    appliedAt: new Date(Date.now() - 4 * 86400000).toISOString(),
+    notes: 'Exceptional TypeScript knowledge. Completed round 1 with top remarks.',
+    rating: 5
+  },
+  {
+    id: 'app-2',
+    jobId: 'job-1',
+    candidateName: 'Priya Narayanan',
+    candidateEmail: 'priya.n@example.com',
+    candidatePhone: '+91 97890 54321',
+    resumeUrl: 'https://example.com/resumes/priya.pdf',
+    portfolioUrl: 'https://linkedin.com/in/priya',
+    currentRoundId: 'r1',
+    status: 'IN_REVIEW',
+    appliedAt: new Date(Date.now() - 2 * 86400000).toISOString(),
+    notes: 'Solid full-stack background, 5 years exp.',
+    rating: 4
+  },
+  {
+    id: 'app-3',
+    jobId: 'job-2',
+    candidateName: 'Aravind Menon',
+    candidateEmail: 'aravind.m@example.com',
+    candidatePhone: '+91 99400 11223',
+    resumeUrl: 'https://example.com/resumes/aravind.pdf',
+    portfolioUrl: 'https://dribbble.com/aravind',
+    currentRoundId: 'r22',
+    status: 'INTERVIEWING',
+    appliedAt: new Date(Date.now() - 1 * 86400000).toISOString(),
+    notes: 'Superb visual craftsmanship and typography.',
+    rating: 5
+  }
+];
+
+let hrDocuments: any[] = [
+  { id: 'doc-1', name: 'Employee Code of Conduct 2026', category: 'Policy', uploadedAt: '2026-01-10T10:00:00Z', fileUrl: 'https://example.com/docs/code_of_conduct_2026.pdf', fileSize: '1.2 MB' },
+  { id: 'doc-2', name: 'Information Security & Data Protection Policy', category: 'Security', uploadedAt: '2026-01-15T11:30:00Z', fileUrl: 'https://example.com/docs/infosec_policy.pdf', fileSize: '850 KB' },
+  { id: 'doc-3', name: 'Health & Remote Work Guidelines', category: 'HR Guidelines', uploadedAt: '2026-02-01T09:15:00Z', fileUrl: 'https://example.com/docs/remote_work.pdf', fileSize: '520 KB' },
+];
+
+let agreements: any[] = [
+  { id: 'agr-1', employee: 'Alice Smith', duration: 'Permanent / Full-Time', agreementType: 'Employment Contract', startDate: '2023-01-15', endDate: '2028-01-15', fileUrl: 'https://example.com/contracts/alice_employment.pdf', status: 'Active' },
+  { id: 'agr-2', employee: 'Bob Johnson', duration: 'Permanent / Full-Time', agreementType: 'Non-Disclosure Agreement', startDate: '2022-11-01', endDate: '2027-11-01', fileUrl: 'https://example.com/contracts/bob_nda.pdf', status: 'Active' },
+  { id: 'agr-3', employee: 'David Developer', duration: '12 Months', agreementType: 'Consultant & IP Agreement', startDate: '2023-03-20', endDate: '2024-03-20', fileUrl: 'https://example.com/contracts/david_consultant.pdf', status: 'Active' },
+];
+
+let documentTemplates: any[] = [
+  { id: 'tpl-1', name: 'Standard Full-Time Offer Letter', type: 'Offer Letter', fileUrl: 'https://example.com/templates/offer_letter.docx', description: 'Standard compensation and joining formal letter' },
+  { id: 'tpl-2', name: 'Summer & Fall Intern Agreement', type: 'Intern Letter', fileUrl: 'https://example.com/templates/intern_agreement.docx', description: 'Stipend, project scope and internship duration' },
+  { id: 'tpl-3', name: 'Mutual NDA Agreement', type: 'NDA', fileUrl: 'https://example.com/templates/mutual_nda.docx', description: 'Standard company and employee IP & confidentiality pact' },
+  { id: 'tpl-4', name: 'Consulting Scope & Quotation', type: 'Quotation', fileUrl: 'https://example.com/templates/quotation.docx', description: 'External vendor or contractor quotation template' },
+];
+
+let promotions: any[] = [
+  { id: 'pro-1', employee: 'Alice Smith', oldDepartment: 'Engineering', oldRole: 'Junior Developer', newDepartment: 'Engineering', newRole: 'Senior Developer', effectiveDate: '2025-01-01', approvedBy: 'Jane CTO' },
+  { id: 'pro-2', employee: 'David Developer', oldDepartment: 'Engineering', oldRole: 'Developer', newDepartment: 'Engineering', newRole: 'Lead Engineer', effectiveDate: '2025-06-01', approvedBy: 'John CEO' },
+];
+
+let complaints: any[] = [
+  { id: 'cmp-1', employee: 'Eve Engineer', category: 'Workplace', targetEmployee: 'Management', description: 'Requesting ergonomic monitors for 2nd floor workstations.', status: 'Resolved', submittedDate: '2026-02-10' },
+  { id: 'cmp-2', employee: 'Frank Frontend', category: 'Salary', description: 'Discrepancy in overtime computation for weekend deployment.', status: 'Investigating', submittedDate: '2026-03-01' },
+];
+
 export function createApp() {
   const app = express();
 
@@ -736,6 +858,319 @@ export function createApp() {
   });
   router.delete('/tasks/:id', (req, res) => {
     tasks = tasks.filter(t => t.id !== req.params.id);
+    res.status(204).end();
+  });
+
+  // --- Careers & Job Postings Endpoints ---
+  router.get('/careers/admin', (req, res) => {
+    res.json(jobPostings);
+  });
+
+  router.get('/careers/admin/:id', (req, res) => {
+    const job = jobPostings.find(j => j.id === req.params.id);
+    if (!job) return res.status(404).json({ message: 'Job posting not found' });
+    res.json(job);
+  });
+
+  router.post('/careers/admin', (req, res) => {
+    const newJob = {
+      id: `job-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+      status: 'DRAFT',
+      fields: [],
+      rounds: [],
+      ...req.body,
+      slug: req.body.slug || req.body.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+    };
+    jobPostings.unshift(newJob);
+    res.status(201).json(newJob);
+  });
+
+  router.patch('/careers/admin/:id', (req, res) => {
+    const index = jobPostings.findIndex(j => j.id === req.params.id);
+    if (index === -1) return res.status(404).json({ message: 'Job not found' });
+    jobPostings[index] = { ...jobPostings[index], ...req.body };
+    res.json(jobPostings[index]);
+  });
+
+  router.patch('/careers/admin/:id/publish', (req, res) => {
+    const job = jobPostings.find(j => j.id === req.params.id);
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+    job.status = 'PUBLISHED';
+    job.publishedAt = new Date().toISOString();
+    res.json(job);
+  });
+
+  router.patch('/careers/admin/:id/close', (req, res) => {
+    const job = jobPostings.find(j => j.id === req.params.id);
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+    job.status = 'CLOSED';
+    job.closedAt = new Date().toISOString();
+    res.json(job);
+  });
+
+  router.delete('/careers/admin/:id', (req, res) => {
+    jobPostings = jobPostings.filter(j => j.id !== req.params.id);
+    jobApplications = jobApplications.filter(a => a.jobId !== req.params.id);
+    res.status(204).end();
+  });
+
+  // --- Applications & Candidate Pipeline ---
+  router.get('/careers/:jobId/applications', (req, res) => {
+    const apps = jobApplications.filter(a => a.jobId === req.params.jobId);
+    res.json(apps);
+  });
+
+  router.post('/careers/:jobId/applications', (req, res) => {
+    const newApp = {
+      id: `app-${Date.now()}`,
+      jobId: req.params.jobId,
+      status: 'APPLIED',
+      appliedAt: new Date().toISOString(),
+      ...req.body,
+    };
+    jobApplications.unshift(newApp);
+    res.status(201).json(newApp);
+  });
+
+  router.patch('/applications/:id/round', (req, res) => {
+    const app = jobApplications.find(a => a.id === req.params.id);
+    if (!app) return res.status(404).json({ message: 'Application not found' });
+    app.currentRoundId = req.body.roundId;
+    if (req.body.status) app.status = req.body.status;
+    res.json(app);
+  });
+
+  router.patch('/applications/:id/status', (req, res) => {
+    const app = jobApplications.find(a => a.id === req.params.id);
+    if (!app) return res.status(404).json({ message: 'Application not found' });
+    app.status = req.body.status;
+    if (req.body.notes !== undefined) app.notes = req.body.notes;
+    res.json(app);
+  });
+
+  router.delete('/applications/:id', (req, res) => {
+    jobApplications = jobApplications.filter(a => a.id !== req.params.id);
+    res.status(204).end();
+  });
+
+  // --- Documents & Contracts Endpoints ---
+  router.get('/documents', (req, res) => res.json(hrDocuments));
+  router.post('/documents', (req, res) => {
+    const newDoc = {
+      id: `doc-${Date.now()}`,
+      uploadedAt: new Date().toISOString(),
+      ...req.body
+    };
+    hrDocuments.unshift(newDoc);
+    res.status(201).json(newDoc);
+  });
+  router.delete('/documents/:id', (req, res) => {
+    hrDocuments = hrDocuments.filter(d => d.id !== req.params.id);
+    res.status(204).end();
+  });
+
+  router.get('/documents/agreements', (req, res) => res.json(agreements));
+  router.post('/documents/agreements', (req, res) => {
+    const newAgr = {
+      id: `agr-${Date.now()}`,
+      status: 'Active',
+      ...req.body
+    };
+    agreements.unshift(newAgr);
+    res.status(201).json(newAgr);
+  });
+  router.delete('/documents/agreements/:id', (req, res) => {
+    agreements = agreements.filter(a => a.id !== req.params.id);
+    res.status(204).end();
+  });
+
+  router.get('/documents/templates', (req, res) => res.json(documentTemplates));
+  router.post('/documents/templates', (req, res) => {
+    const newTpl = {
+      id: `tpl-${Date.now()}`,
+      ...req.body
+    };
+    documentTemplates.unshift(newTpl);
+    res.status(201).json(newTpl);
+  });
+  router.delete('/documents/templates/:id', (req, res) => {
+    documentTemplates = documentTemplates.filter(t => t.id !== req.params.id);
+    res.status(204).end();
+  });
+
+  // --- User Management Endpoints ---
+  router.get('/users', (req, res) => {
+    const { search, role, status, department, page = 1, limit = 50 } = req.query;
+    let list = employees.map(e => ({
+      id: e.id,
+      name: `${e.firstName} ${e.lastName}`,
+      email: e.email,
+      phone: e.phone || '+91 98765 43210',
+      role: e.role,
+      department: e.department,
+      departmentId: e.department,
+      designation: e.designation || e.role,
+      employmentType: 'FullTime',
+      branch: 'Global HQ',
+      branchId: 'hq',
+      shift: e.shift || 'Morning',
+      shiftId: 's1',
+      address: 'Chennai, TN',
+      joiningDate: e.hireDate || '2023-01-01',
+      status: e.isActive ? 'Active' : 'Terminated'
+    }));
+
+    if (search) {
+      const q = String(search).toLowerCase();
+      list = list.filter(u => u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q));
+    }
+    if (role && role !== 'all') {
+      list = list.filter(u => u.role.toLowerCase() === String(role).toLowerCase());
+    }
+    if (status && status !== 'all') {
+      list = list.filter(u => u.status.toLowerCase() === String(status).toLowerCase());
+    }
+    if (department && department !== 'all') {
+      list = list.filter(u => u.department.toLowerCase() === String(department).toLowerCase());
+    }
+
+    const total = list.length;
+    res.json({
+      data: list,
+      users: list,
+      total,
+      page: Number(page),
+      limit: Number(limit),
+      totalPages: Math.ceil(total / Number(limit)) || 1
+    });
+  });
+
+  router.post('/users', (req, res) => {
+    const { name, email, role, department, designation, shift, phone } = req.body;
+    const parts = (name || 'New User').trim().split(' ');
+    const firstName = parts[0] || 'New';
+    const lastName = parts.slice(1).join(' ') || 'User';
+    const newEmp = {
+      id: `e${Date.now()}`,
+      firstName,
+      lastName,
+      email: email || `user${Date.now()}@example.com`,
+      department: department || 'Engineering',
+      role: role || 'Developer',
+      designation: designation || role || 'Team Member',
+      hireDate: new Date().toISOString().split('T')[0],
+      isActive: true,
+      shift: shift || 'Morning',
+      phone: phone || ''
+    };
+    employees.push(newEmp);
+    res.status(201).json({
+      id: newEmp.id,
+      name: `${newEmp.firstName} ${newEmp.lastName}`,
+      ...newEmp,
+      status: 'Active'
+    });
+  });
+
+  router.patch('/users/:id', (req, res) => {
+    const emp = employees.find(e => e.id === req.params.id);
+    if (!emp) return res.status(404).json({ message: 'User not found' });
+    if (req.body.name) {
+      const parts = req.body.name.trim().split(' ');
+      emp.firstName = parts[0];
+      emp.lastName = parts.slice(1).join(' ');
+    }
+    if (req.body.email) emp.email = req.body.email;
+    if (req.body.role) emp.role = req.body.role;
+    if (req.body.department) emp.department = req.body.department;
+    if (req.body.departmentId) emp.department = req.body.departmentId;
+    if (req.body.designation) emp.designation = req.body.designation;
+    if (req.body.shift) emp.shift = req.body.shift;
+    if (req.body.status) emp.isActive = req.body.status === 'Active';
+    res.json({
+      id: emp.id,
+      name: `${emp.firstName} ${emp.lastName}`,
+      ...emp,
+      status: emp.isActive ? 'Active' : 'Terminated'
+    });
+  });
+
+  router.delete('/users/:id', (req, res) => {
+    const emp = employees.find(e => e.id === req.params.id);
+    if (emp) emp.isActive = false;
+    res.status(204).end();
+  });
+
+  router.patch('/users/:id/reset-password', (req, res) => {
+    res.json({ success: true, message: 'Password reset successfully' });
+  });
+
+  router.get('/org-structure/departments', (req, res) => {
+    res.json([
+      { id: 'Engineering', name: 'Engineering' },
+      { id: 'Sales', name: 'Sales' },
+      { id: 'Marketing', name: 'Marketing' },
+      { id: 'HR', name: 'HR' },
+      { id: 'Design', name: 'Design' },
+      { id: 'Finance', name: 'Finance' },
+      { id: 'Executive', name: 'Executive' }
+    ]);
+  });
+
+  router.get('/org-structure/branches', (req, res) => {
+    res.json([
+      { id: 'hq', name: 'Global HQ' },
+      { id: 'chennai', name: 'Chennai Tech Campus' },
+      { id: 'remote', name: 'Remote Network' }
+    ]);
+  });
+
+  router.get('/attendance/shifts', (req, res) => {
+    res.json([
+      { id: 's1', name: 'Morning', startTime: '09:00', endTime: '18:00' },
+      { id: 's2', name: 'Evening', startTime: '13:00', endTime: '22:00' },
+      { id: 's3', name: 'Night', startTime: '21:00', endTime: '06:00' }
+    ]);
+  });
+
+  // --- Lifecycle Endpoints (Promotions & Complaints) ---
+  router.get('/lifecycle/promotions', (req, res) => res.json(promotions));
+  router.post('/lifecycle/promotions', (req, res) => {
+    const newPromo = {
+      id: `pro-${Date.now()}`,
+      ...req.body
+    };
+    promotions.unshift(newPromo);
+    const emp = employees.find(e => `${e.firstName} ${e.lastName}` === req.body.employee);
+    if (emp) {
+      if (req.body.newDepartment) emp.department = req.body.newDepartment;
+      if (req.body.newRole) emp.role = req.body.newRole;
+    }
+    res.status(201).json(newPromo);
+  });
+
+  router.get('/lifecycle/complaints', (req, res) => res.json(complaints));
+  router.post('/lifecycle/complaints', (req, res) => {
+    const newComp = {
+      id: `cmp-${Date.now()}`,
+      status: 'Pending',
+      submittedDate: new Date().toISOString().split('T')[0],
+      ...req.body
+    };
+    complaints.unshift(newComp);
+    res.status(201).json(newComp);
+  });
+
+  router.patch('/lifecycle/complaints/:id/status', (req, res) => {
+    const comp = complaints.find(c => c.id === req.params.id);
+    if (!comp) return res.status(404).json({ message: 'Complaint not found' });
+    comp.status = req.body.status;
+    res.json(comp);
+  });
+
+  router.delete('/lifecycle/complaints/:id', (req, res) => {
+    complaints = complaints.filter(c => c.id !== req.params.id);
     res.status(204).end();
   });
 

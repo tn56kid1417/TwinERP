@@ -147,7 +147,7 @@ const MemberCard: React.FC<MemberCardProps> = ({
       </div>
       <Button
         size="sm"
-        variant={selectedCount > 0 ? 'default' : 'ghost'}
+        variant={selectedCount > 0 ? 'primary' : 'ghost'}
         className={cn(
           'w-full text-xs gap-1.5 cursor-pointer',
           selectedCount === 0 && 'opacity-50 cursor-not-allowed'

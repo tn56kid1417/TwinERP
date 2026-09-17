@@ -31,6 +31,11 @@ const ProjectsDashboard= lazy(() => import('./pages/projects/ProjectsDashboard')
 const ProjectsList     = lazy(() => import('./pages/projects/ProjectsList'));
 const ProjectKanban    = lazy(() => import('./pages/projects/ProjectKanban'));
 const ClientsList      = lazy(() => import('./pages/projects/ClientsList'));
+const CareersAdmin     = lazy(() => import('./pages/CareersAdmin'));
+const JobApplications  = lazy(() => import('./pages/JobApplications'));
+const DocumentsContracts = lazy(() => import('./pages/DocumentsContracts'));
+const UserManagement   = lazy(() => import('./pages/UserManagement'));
+const Lifecycle        = lazy(() => import('./pages/Lifecycle'));
 
 // CRM module — lazy loaded as a group
 const DashboardDispatcher = lazy(() => import('./twin-crm/router/DashboardDispatcher'));
@@ -51,11 +56,12 @@ const PageLoader = () => (
   </div>
 );
 
+interface ErrorBoundaryProps { children: React.ReactNode; }
 interface ErrorBoundaryState { hasError: boolean; error: Error | null; }
-class ErrorBoundary extends React.Component<{ children: React.ReactNode }, ErrorBoundaryState> {
-  constructor(props: { children: React.ReactNode }) {
+class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  override state: ErrorBoundaryState = { hasError: false, error: null };
+  constructor(props: ErrorBoundaryProps) {
     super(props);
-    this.state = { hasError: false, error: null };
   }
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
     return { hasError: true, error };
@@ -134,6 +140,11 @@ export default function App() {
                     <Route path="/letters" element={<LetterGenerator />} />
                     <Route path="/analytics" element={<HRMUserAnalytics />} />
                     <Route path="/settings" element={<Settings />} />
+                    <Route path="/careers" element={<CareersAdmin />} />
+                    <Route path="/careers/:jobId/applications" element={<JobApplications />} />
+                    <Route path="/documents" element={<DocumentsContracts />} />
+                    <Route path="/user-management" element={<UserManagement />} />
+                    <Route path="/lifecycle" element={<Lifecycle />} />
 
                     {/* CRM Module Routes */}
                     <Route path="/crm">

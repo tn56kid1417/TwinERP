@@ -97,3 +97,51 @@ export const markNotificationRead = (id: string) => api.put<AppNotification>(`/n
 export const markAllNotificationsRead = () => api.post<{ success: boolean; count: number }>('/notifications/mark-all-read').then(res => res.data);
 export const checkOverdueBreaks = (breakDurationMinutes: number) => 
   api.post<{ overdueCount: number; overdueEmployees: any[]; notifications: AppNotification[] }>('/attendance/check-overdue-breaks', { breakDurationMinutes }).then(res => res.data);
+
+// --- Careers & Job Postings APIs ---
+export const getJobs = () => api.get<import('./types').JobPosting[]>('/careers/admin').then(res => res.data);
+export const getJob = (id: string) => api.get<import('./types').JobPosting>(`/careers/admin/${id}`).then(res => res.data);
+export const createJob = (data: Partial<import('./types').JobPosting>) => api.post<import('./types').JobPosting>('/careers/admin', data).then(res => res.data);
+export const updateJob = (id: string, data: Partial<import('./types').JobPosting>) => api.patch<import('./types').JobPosting>(`/careers/admin/${id}`, data).then(res => res.data);
+export const publishJob = (id: string) => api.patch<import('./types').JobPosting>(`/careers/admin/${id}/publish`).then(res => res.data);
+export const closeJob = (id: string) => api.patch<import('./types').JobPosting>(`/careers/admin/${id}/close`).then(res => res.data);
+export const deleteJob = (id: string) => api.delete(`/careers/admin/${id}`);
+
+export const getJobApplications = (jobId: string) => api.get<import('./types').JobApplication[]>(`/careers/${jobId}/applications`).then(res => res.data);
+export const createJobApplication = (jobId: string, data: Partial<import('./types').JobApplication>) => api.post<import('./types').JobApplication>(`/careers/${jobId}/applications`, data).then(res => res.data);
+export const updateApplicationRound = (id: string, roundId: string, status?: string) => api.patch<import('./types').JobApplication>(`/applications/${id}/round`, { roundId, status }).then(res => res.data);
+export const updateApplicationStatus = (id: string, status: string, notes?: string) => api.patch<import('./types').JobApplication>(`/applications/${id}/status`, { status, notes }).then(res => res.data);
+export const deleteJobApplication = (id: string) => api.delete(`/applications/${id}`);
+
+// --- Documents & Contracts APIs ---
+export const getHRDocuments = () => api.get<import('./types').HRDocument[]>('/documents').then(res => res.data);
+export const createHRDocument = (data: Partial<import('./types').HRDocument>) => api.post<import('./types').HRDocument>('/documents', data).then(res => res.data);
+export const deleteHRDocument = (id: string) => api.delete(`/documents/${id}`);
+
+export const getAgreements = () => api.get<import('./types').Agreement[]>('/documents/agreements').then(res => res.data);
+export const createAgreement = (data: Partial<import('./types').Agreement>) => api.post<import('./types').Agreement>('/documents/agreements', data).then(res => res.data);
+export const deleteAgreement = (id: string) => api.delete(`/documents/agreements/${id}`);
+
+export const getTemplates = () => api.get<import('./types').DocumentTemplate[]>('/documents/templates').then(res => res.data);
+export const createTemplate = (data: Partial<import('./types').DocumentTemplate>) => api.post<import('./types').DocumentTemplate>('/documents/templates', data).then(res => res.data);
+export const deleteTemplate = (id: string) => api.delete(`/documents/templates/${id}`);
+
+// --- User Management APIs ---
+export const getUsers = (params?: { search?: string; role?: string; status?: string; department?: string; page?: number; limit?: number }) => 
+  api.get<{ data: import('./types').UserAccount[]; users: import('./types').UserAccount[]; total: number; page: number; totalPages: number }>('/users', { params }).then(res => res.data);
+export const createUser = (data: any) => api.post<import('./types').UserAccount>('/users', data).then(res => res.data);
+export const updateUser = (id: string, data: any) => api.patch<import('./types').UserAccount>(`/users/${id}`, data).then(res => res.data);
+export const deleteUser = (id: string) => api.delete(`/users/${id}`);
+export const resetUserPassword = (id: string, newPassword?: string) => api.patch<{ success: boolean }>(`/users/${id}/reset-password`, { newPassword }).then(res => res.data);
+export const getDepartments = () => api.get<{ id: string; name: string }[]>('/org-structure/departments').then(res => res.data);
+export const getBranches = () => api.get<{ id: string; name: string }[]>('/org-structure/branches').then(res => res.data);
+export const getShifts = () => api.get<{ id: string; name: string; startTime: string; endTime: string }[]>('/attendance/shifts').then(res => res.data);
+
+// --- Lifecycle APIs ---
+export const getPromotions = () => api.get<import('./types').Promotion[]>('/lifecycle/promotions').then(res => res.data);
+export const createPromotion = (data: Partial<import('./types').Promotion>) => api.post<import('./types').Promotion>('/lifecycle/promotions', data).then(res => res.data);
+
+export const getComplaints = () => api.get<import('./types').Complaint[]>('/lifecycle/complaints').then(res => res.data);
+export const createComplaint = (data: Partial<import('./types').Complaint>) => api.post<import('./types').Complaint>('/lifecycle/complaints', data).then(res => res.data);
+export const updateComplaintStatus = (id: string, status: string) => api.patch<import('./types').Complaint>(`/lifecycle/complaints/${id}/status`, { status }).then(res => res.data);
+export const deleteComplaint = (id: string) => api.delete(`/lifecycle/complaints/${id}`);

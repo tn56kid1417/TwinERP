@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'motion/react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Phone, Users, Clock, Calendar, FileText, LayoutDashboard, BarChart2, UserMinus, UserX, Award, Megaphone, LogOut, Mail, PartyPopper, Briefcase, Building, PieChart, Sun, Moon, UserPlus, Settings as SettingsIcon, CreditCard , UploadCloud, Shuffle } from 'lucide-react';
+import { Phone, Users, Clock, Calendar, FileText, LayoutDashboard, BarChart2, UserMinus, UserX, Award, Megaphone, LogOut, Mail, PartyPopper, Briefcase, Building, PieChart, Sun, Moon, UserPlus, Settings as SettingsIcon, CreditCard, UploadCloud, Shuffle, Shield, TrendingUp } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 type Module = 'HRM' | 'CRM' | 'Projects';
@@ -52,7 +52,11 @@ const Sidebar = () => {
 
   const hrmNavItems = [
     { name: 'Dashboard', path: '/', icon: <LayoutDashboard size={20} />, hrOnly: false },
+    { name: 'User Accounts', path: '/user-management', icon: <Shield size={20} />, hrOnly: true },
     { name: 'Employees', path: '/employees', icon: <Users size={20} />, hrOnly: true },
+    { name: 'Careers & Jobs', path: '/careers', icon: <Briefcase size={20} />, hrOnly: false },
+    { name: 'Documents', path: '/documents', icon: <FileText size={20} />, hrOnly: false },
+    { name: 'Lifecycle', path: '/lifecycle', icon: <TrendingUp size={20} />, hrOnly: false },
     { name: 'Attendances', path: '/attendance', icon: <Clock size={20} />, hrOnly: true },
     { name: 'Leave Requests', path: '/leaves', icon: <Calendar size={20} />, hrOnly: false },
     { name: 'Leave Balance', path: '/leave-balance', icon: <BarChart2 size={20} />, hrOnly: false },

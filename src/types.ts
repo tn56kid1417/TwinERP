@@ -163,3 +163,122 @@ export interface AppNotification {
   employeeName?: string;
   overdueMinutes?: number;
 }
+
+// --- Careers & Recruitment Types ---
+export interface JobField {
+  id: string;
+  label: string;
+  value: string;
+  fieldType: 'TEXT' | 'TEXTAREA' | 'NUMBER' | 'DATE' | 'TAG' | 'LINK';
+  section: 'PRIMARY' | 'SECONDARY';
+  order: number;
+}
+
+export interface InterviewRound {
+  id: string;
+  title: string;
+  shortDescription: string;
+  longDescription?: string;
+  order: number;
+  emailTemplate?: string;
+}
+
+export interface JobPosting {
+  id: string;
+  title: string;
+  slug: string;
+  status: 'DRAFT' | 'PUBLISHED' | 'CLOSED';
+  department?: string;
+  location?: string;
+  employmentType?: string;
+  fields: JobField[];
+  rounds: InterviewRound[];
+  createdAt: string;
+  publishedAt?: string;
+  closedAt?: string;
+}
+
+export interface JobApplication {
+  id: string;
+  jobId: string;
+  candidateName: string;
+  candidateEmail: string;
+  candidatePhone?: string;
+  resumeUrl?: string;
+  portfolioUrl?: string;
+  currentRoundId?: string;
+  status: 'APPLIED' | 'IN_REVIEW' | 'INTERVIEWING' | 'HIRED' | 'REJECTED';
+  appliedAt: string;
+  notes?: string;
+  rating?: number;
+}
+
+// --- Documents & Contracts Types ---
+export interface HRDocument {
+  id: string;
+  name: string;
+  category: string;
+  uploadedAt: string;
+  fileUrl: string;
+  fileSize?: string;
+}
+
+export interface Agreement {
+  id: string;
+  employee: string;
+  duration: string;
+  agreementType: string;
+  startDate: string;
+  endDate: string;
+  fileUrl: string;
+  status?: 'Active' | 'Expired' | 'Pending';
+}
+
+export interface DocumentTemplate {
+  id: string;
+  name: string;
+  type: 'Offer Letter' | 'Intern Letter' | 'Quotation' | 'NDA' | 'Policy' | 'Other';
+  fileUrl: string;
+  description?: string;
+}
+
+// --- User Management Types ---
+export interface UserAccount {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  role: 'HR' | 'TL' | 'Member' | 'CEO' | 'COO' | 'CTO' | 'Admin' | string;
+  department: string;
+  designation?: string;
+  branch?: string;
+  shift?: string;
+  employmentType?: 'FullTime' | 'Intern' | 'Contract';
+  joiningDate?: string;
+  address?: string;
+  status: 'Active' | 'Resigned' | 'Terminated';
+}
+
+// --- Lifecycle Types (Promotions & Complaints) ---
+export interface Promotion {
+  id: string;
+  employee: string;
+  employeeId?: string;
+  oldDepartment: string;
+  oldRole: string;
+  newDepartment: string;
+  newRole: string;
+  effectiveDate: string;
+  approvedBy?: string;
+}
+
+export interface Complaint {
+  id: string;
+  employee: string;
+  employeeId?: string;
+  category: 'Management' | 'Salary' | 'AgainstMember' | 'Workplace';
+  targetEmployee?: string;
+  description: string;
+  status: 'Pending' | 'Investigating' | 'Resolved' | 'Dismissed';
+  submittedDate: string;
+}
