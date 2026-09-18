@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { login as apiLogin } from '../api';
 import { UserCircle } from 'lucide-react';
@@ -17,6 +17,7 @@ const DEMO_ACCOUNTS = [
 ];
 
 const Login = () => {
+  const loginPageRef = useRef<HTMLDivElement>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -27,6 +28,7 @@ const Login = () => {
   // This way, by the time the user fills in credentials and clicks Sign In,
   // the cold start has already happened and the API responds instantly.
   useEffect(() => {
+    loginPageRef.current?.scrollTo({ top: 0, behavior: 'auto' });
     fetch('/api/health').catch(() => {});
   }, []);
 
@@ -60,7 +62,7 @@ const Login = () => {
   };
 
   return (
-    <div className="h-dvh min-h-screen bg-[#f8fafc] dark:bg-[#0A0C10] bg-live-mesh flex flex-col items-center justify-start px-4 py-10 relative overflow-x-hidden overflow-y-auto overscroll-contain">
+    <div ref={loginPageRef} className="h-dvh min-h-screen bg-[#f8fafc] dark:bg-[#0A0C10] bg-live-mesh flex flex-col items-center justify-start px-4 py-10 relative overflow-x-hidden overflow-y-auto overscroll-contain">
       <div className="mb-8 text-center flex flex-col items-center">
         <img src="/logo-transparent.png" alt="TwinERP Logo" className="h-16 object-contain mb-4" loading="eager" />
         <p className="text-slate-500 mt-2 text-sm">Human Resource Management System</p>
