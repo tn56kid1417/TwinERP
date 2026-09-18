@@ -60,9 +60,9 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0A0C10] bg-live-mesh flex flex-col items-center justify-start sm:justify-center px-4 py-8 relative overflow-x-hidden overflow-y-auto">
+    <div className="h-dvh min-h-screen bg-[#f8fafc] dark:bg-[#0A0C10] bg-live-mesh flex flex-col items-center justify-start sm:justify-center px-4 py-8 relative overflow-x-hidden overflow-y-auto overscroll-contain">
       <div className="mb-8 text-center flex flex-col items-center">
-        <img src="/logo.png" alt="TwinERP Logo" className="h-16 object-contain mb-4" loading="eager" />
+        <img src="/logo-transparent.png" alt="TwinERP Logo" className="h-16 object-contain mb-4" loading="eager" />
         <p className="text-slate-500 mt-2 text-sm">Human Resource Management System</p>
       </div>
 
@@ -112,7 +112,7 @@ const Login = () => {
 
         <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800/80">
           <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-4 text-center">Quick Demo Login</p>
-          <div className="grid grid-cols-2 gap-2 max-h-[280px] overflow-y-auto pr-1 custom-scrollbar">
+          <div className="grid grid-cols-2 gap-2 max-h-[280px] overflow-y-auto overscroll-contain touch-pan-y pr-1 custom-scrollbar">
             {DEMO_ACCOUNTS.map(emp => (
               <button
                 key={emp.email}
