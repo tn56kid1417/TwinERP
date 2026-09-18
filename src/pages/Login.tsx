@@ -66,7 +66,7 @@ const Login = () => {
         <p className="text-slate-500 mt-2 text-sm">Human Resource Management System</p>
       </div>
 
-      <div className="bg-white/85 dark:bg-[#0C1017]/95 backdrop-blur-2xl border border-slate-200/90 dark:border-slate-700/60 rounded-2xl w-full max-w-md p-8 shadow-2xl shadow-slate-900/10 dark:shadow-black/80 ring-1 ring-black/5 dark:ring-white/10 relative overflow-hidden">
+      <div className="shrink-0 bg-white/85 dark:bg-[#0C1017]/95 backdrop-blur-2xl border border-slate-200/90 dark:border-slate-700/60 rounded-2xl w-full max-w-md p-8 shadow-2xl shadow-slate-900/10 dark:shadow-black/80 ring-1 ring-black/5 dark:ring-white/10 relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-indigo-500/80 to-transparent" />
         <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6 tracking-tight">Sign In to Your Account</h2>
 
