@@ -64,7 +64,7 @@ const Login = () => {
   return (
     <div ref={loginPageRef} className="h-dvh min-h-screen bg-[#f8fafc] dark:bg-[#0A0C10] bg-live-mesh flex flex-col items-center justify-start px-4 py-10 relative overflow-x-hidden overflow-y-auto overscroll-contain">
       <div className="mb-8 text-center flex flex-col items-center">
-        <img src="/logo-transparent.png" alt="TwinERP Logo" className="h-16 object-contain mb-4" loading="eager" />
+        <img src="/logo.png" alt="TwinERP Logo" className="h-16 object-contain mb-4" loading="eager" />
         <p className="text-slate-500 mt-2 text-sm">Human Resource Management System</p>
       </div>
 
