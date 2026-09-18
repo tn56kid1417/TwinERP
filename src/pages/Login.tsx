@@ -60,7 +60,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0A0C10] bg-live-mesh flex flex-col items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0A0C10] bg-live-mesh flex flex-col items-center justify-start sm:justify-center px-4 py-8 relative overflow-x-hidden overflow-y-auto">
       <div className="mb-8 text-center flex flex-col items-center">
         <img src="/logo.png" alt="TwinERP Logo" className="h-16 object-contain mb-4" loading="eager" />
         <p className="text-slate-500 mt-2 text-sm">Human Resource Management System</p>
