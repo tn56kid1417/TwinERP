@@ -343,6 +343,14 @@ export interface ChatMembership {
   removed_by?: string | null;
 }
 
+export interface ChatAttachment {
+  id: string;
+  message_id: string;
+  url: string;
+  file_name: string;
+  mime_type: string;
+}
+
 export interface ChatMessage {
   id: string;
   team_id: string;
@@ -353,6 +361,7 @@ export interface ChatMessage {
   created_at: string;
   edited_at?: string | null;
   deleted_at?: string | null;
+  attachments?: ChatAttachment[];
 }
 
 export interface ChatReadState {

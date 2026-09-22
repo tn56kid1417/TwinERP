@@ -86,10 +86,22 @@ const saveNotifications = () => {
   }
 };
 
-let notifications: any[] = loadNotifications();
+export const addNotification = (notif: { title: string; message: string; type?: string; targetRole?: string; targetUserId?: string }) => {
+  const newNotif = {
+    id: `notif_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    time: 'Just now',
+    timestamp: new Date().toISOString(),
+    read: false,
+    type: notif.type || 'mention',
+    ...notif
+  };
+  notifications.unshift(newNotif);
+  saveNotifications();
+  return newNotif;
+};
 
 // --- In-Memory Database ---
-let employees: any[] = [
+export let employees: any[] = [
   { id: 'e1', firstName: 'Alice', lastName: 'Smith', email: 'alice@example.com', department: 'Engineering', role: 'Developer', hireDate: '2023-01-15', isActive: true, shift: 'Morning' },
   { id: 'e2', firstName: 'Bob', lastName: 'Johnson', email: 'bob@example.com', department: 'HR', role: 'Manager', hireDate: '2022-11-01', isActive: true, shift: 'Evening' },
   { id: 'e3', firstName: 'System', lastName: 'Admin', email: 'admin@example.com', department: 'Administration', role: 'Admin', hireDate: '2023-01-01', isActive: true, shift: 'Morning' },

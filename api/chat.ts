@@ -281,8 +281,31 @@ router.get('/chat/teams/:teamId/messages', async (req: Request, res: Response) =
 
   if (error) return void res.status(500).json({ error: error.message });
 
+  const rawMessages = messages || [];
+
+  // Phase 2: fetch attachments for these messages
+  const msgIds = rawMessages.map(m => m.id);
+  let attachmentsByMsg: Record<string, any[]> = {};
+  if (msgIds.length > 0) {
+    const { data: atts } = await sb
+      .from('chat_message_attachments')
+      .select('*')
+      .in('message_id', msgIds);
+    if (atts) {
+      atts.forEach(a => {
+        if (!attachmentsByMsg[a.message_id]) attachmentsByMsg[a.message_id] = [];
+        attachmentsByMsg[a.message_id].push(a);
+      });
+    }
+  }
+
+  const enriched = rawMessages.map(m => ({
+    ...m,
+    attachments: attachmentsByMsg[m.id] || []
+  }));
+
   // Return in ascending order for the UI
-  res.json((messages || []).reverse());
+  res.json(enriched.reverse());
 });
 
 // ─── POST /api/chat/teams/:teamId/messages — send a message ──────────────────
@@ -292,8 +315,10 @@ router.post('/chat/teams/:teamId/messages', async (req: Request, res: Response) 
   if (!caller) return void res.status(401).json({ error: 'Unauthorized' });
 
   const { teamId } = req.params;
-  const { content, type = 'text' } = req.body;
-  if (!content?.trim()) return void res.status(400).json({ error: 'Message content required' });
+  const { content, type = 'text', attachments = [] } = req.body;
+  if (!content?.trim() && (!attachments || attachments.length === 0)) {
+    return void res.status(400).json({ error: 'Message content or attachment required' });
+  }
 
   const sb = supabaseAdmin!;
 
@@ -312,14 +337,78 @@ router.post('/chat/teams/:teamId/messages', async (req: Request, res: Response) 
   }
 
   const msgId = `msg-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+  const msgType = attachments && attachments.length > 0 && !content?.trim() ? 'file' : type;
 
   const { data: message, error } = await sb
     .from('chat_messages')
-    .insert({ id: msgId, team_id: teamId, sender_id: caller.userId, content: content.trim(), type })
+    .insert({ id: msgId, team_id: teamId, sender_id: caller.userId, content: (content || '').trim(), type: msgType })
     .select()
     .single();
 
   if (error) return void res.status(500).json({ error: error.message });
+
+  // Phase 2: Save attachments if provided
+  let savedAttachments: any[] = [];
+  if (Array.isArray(attachments) && attachments.length > 0) {
+    const toInsert = attachments.map((att: any) => ({
+      id: `att-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+      message_id: msgId,
+      url: att.url,
+      file_name: att.fileName || att.file_name || 'attachment',
+      mime_type: att.mimeType || att.mime_type || 'application/octet-stream',
+    }));
+    const { data: attData } = await sb.from('chat_message_attachments').insert(toInsert).select();
+    savedAttachments = attData || [];
+  }
+
+  // Phase 2: Parse @mentions and trigger ERP notification pipeline
+  try {
+    const mentionRegex = /@([a-zA-Z0-9_.-]+(?:\s+[a-zA-Z0-9_.-]+)?)/g;
+    const mentions = (content || '').match(mentionRegex);
+    if (mentions && mentions.length > 0) {
+      const { data: teamData } = await sb.from('chat_teams').select('name').eq('id', teamId).single();
+      const teamName = teamData?.name || 'team chat';
+      
+      const { data: members } = await sb
+        .from('chat_team_memberships')
+        .select('user_id')
+        .eq('team_id', teamId)
+        .eq('status', 'active');
+      
+      const memberUserIds = new Set((members || []).map(m => m.user_id));
+
+      // Check against in-memory ERP employees
+      const { employees, addNotification } = require('./index');
+      if (Array.isArray(employees) && typeof addNotification === 'function') {
+        const cleanedMentions = mentions.map((m: string) => m.slice(1).toLowerCase().trim());
+        
+        employees.forEach((emp: any) => {
+          if (emp.id === caller.userId) return; // Don't notify self
+          if (!memberUserIds.has(emp.id)) return; // Only notify team members
+
+          const fullName = `${emp.firstName || ''} ${emp.lastName || ''}`.toLowerCase().trim();
+          const firstName = (emp.firstName || '').toLowerCase().trim();
+          const username = (emp.email ? emp.email.split('@')[0] : '').toLowerCase().trim();
+
+          const isMentioned = cleanedMentions.some((m: string) => 
+            m === fullName || m === firstName || m === username || m === emp.id.toLowerCase()
+          );
+
+          if (isMentioned) {
+            addNotification({
+              title: `Mentioned in ${teamName}`,
+              message: `${caller.userId} mentioned you in ${teamName}: "${content.length > 60 ? content.slice(0, 57) + '...' : content}"`,
+              type: 'mention',
+              targetRole: 'All',
+              targetUserId: emp.id
+            });
+          }
+        });
+      }
+    }
+  } catch (err) {
+    console.error('[chat] Failed to process mentions:', err);
+  }
 
   // Update read state for sender
   await sb.from('chat_message_read_state').upsert({
@@ -329,7 +418,10 @@ router.post('/chat/teams/:teamId/messages', async (req: Request, res: Response) 
     updated_at: new Date().toISOString(),
   }, { onConflict: 'user_id,team_id' });
 
-  res.status(201).json(message);
+  res.status(201).json({
+    ...message,
+    attachments: savedAttachments
+  });
 });
 
 // ─── PATCH /api/chat/teams/:teamId/messages/:messageId — edit own message ─────
@@ -550,6 +642,107 @@ router.post('/chat/teams/:teamId/read-state', async (req: Request, res: Response
   }, { onConflict: 'user_id,team_id' });
 
   res.json({ success: true });
+});
+
+// ─── GET /api/chat/teams/:teamId/search — search messages in a team ───────────
+router.get('/chat/teams/:teamId/search', async (req: Request, res: Response) => {
+  if (!requireSupabase(res)) return;
+  const caller = getCallerFromHeaders(req);
+  if (!caller) return void res.status(401).json({ error: 'Unauthorized' });
+
+  const { teamId } = req.params;
+  const q = req.query.q as string;
+  if (!q || !q.trim()) return void res.json([]);
+
+  const sb = supabaseAdmin!;
+
+  // Check active membership
+  const { data: membership } = await sb
+    .from('chat_team_memberships')
+    .select('status')
+    .eq('team_id', teamId)
+    .eq('user_id', caller.userId)
+    .eq('status', 'active')
+    .single();
+
+  if (!membership && !isElevated(caller.userRole)) {
+    return void res.status(403).json({ error: 'Not a member of this team' });
+  }
+
+  const { data: messages, error } = await sb
+    .from('chat_messages')
+    .select('*')
+    .eq('team_id', teamId)
+    .is('deleted_at', null)
+    .ilike('content', `%${q.trim()}%`)
+    .order('created_at', { ascending: false })
+    .limit(50);
+
+  if (error) return void res.status(500).json({ error: error.message });
+  res.json(messages || []);
+});
+
+// ─── POST /api/chat/workflow-system-message — post cross-module system message ─
+router.post('/chat/workflow-system-message', async (req: Request, res: Response) => {
+  if (!requireSupabase(res)) return;
+  const caller = getCallerFromHeaders(req);
+  if (!caller) return void res.status(401).json({ error: 'Unauthorized' });
+  if (!isElevated(caller.userRole)) return void res.status(403).json({ error: 'Only managers/executives can trigger workflow messages' });
+
+  const { teamId, text } = req.body;
+  if (!teamId || !text?.trim()) return void res.status(400).json({ error: 'teamId and text required' });
+
+  await postSystemMessage(teamId, text.trim());
+  res.json({ success: true });
+});
+
+// ─── GET /api/chat/teams/:teamId/export — export team chat history to CSV ──────
+router.get('/chat/teams/:teamId/export', async (req: Request, res: Response) => {
+  if (!requireSupabase(res)) return;
+  const caller = getCallerFromHeaders(req);
+  if (!caller) return void res.status(401).json({ error: 'Unauthorized' });
+  if (!isElevated(caller.userRole)) return void res.status(403).json({ error: 'Only elevated roles (Admin/HR/Managers) can export chat logs' });
+
+  const { teamId } = req.params;
+  const sb = supabaseAdmin!;
+
+  const { data: team } = await sb.from('chat_teams').select('name').eq('id', teamId).single();
+  const { data: messages, error } = await sb
+    .from('chat_messages')
+    .select('*')
+    .eq('team_id', teamId)
+    .order('created_at', { ascending: true });
+
+  if (error) return void res.status(500).json({ error: error.message });
+
+  // Convert to CSV: timestamp, senderId, type, content, isDeleted, editedAt
+  const rows = [
+    ['Message ID', 'Timestamp', 'Sender ID', 'Type', 'Content', 'Status', 'Edited At'].join(',')
+  ];
+
+  (messages || []).forEach(m => {
+    const isDel = !!m.deleted_at;
+    const cleanContent = isDel 
+      ? '[message removed]' 
+      : `"${(m.content || '').replace(/"/g, '""').replace(/\n/g, ' ')}"`;
+    
+    rows.push([
+      `"${m.id}"`,
+      `"${m.created_at}"`,
+      `"${m.sender_id}"`,
+      `"${m.type}"`,
+      cleanContent,
+      isDel ? '"Deleted"' : '"Active"',
+      m.edited_at ? `"${m.edited_at}"` : '""'
+    ].join(','));
+  });
+
+  const csvData = rows.join('\r\n');
+  const safeName = (team?.name || teamId).replace(/[^a-zA-Z0-9_-]/g, '_');
+
+  res.setHeader('Content-Type', 'text/csv');
+  res.setHeader('Content-Disposition', `attachment; filename="${safeName}_chat_export_${Date.now()}.csv"`);
+  res.send(csvData);
 });
 
 export default router;

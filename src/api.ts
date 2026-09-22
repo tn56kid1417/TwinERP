@@ -166,14 +166,21 @@ export const getChatTeams = () =>
 export const createChatTeam = (data: { name: string; memberIds?: string[]; restrictHistory?: boolean }) =>
   api.post<import('./types').ChatTeam>('/chat/teams', data).then(res => res.data);
 
+
+
 export const getChatTeamDetail = (teamId: string) =>
   api.get<{ team: import('./types').ChatTeam; members: import('./types').ChatMembership[] }>(`/chat/teams/${teamId}`).then(res => res.data);
 
 export const getChatMessages = (teamId: string, params?: { before?: string; limit?: number }) =>
   api.get<import('./types').ChatMessage[]>(`/chat/teams/${teamId}/messages`, { params }).then(res => res.data);
 
-export const sendChatMessage = (teamId: string, content: string, type: 'text' | 'file' | 'system' = 'text') =>
-  api.post<import('./types').ChatMessage>(`/chat/teams/${teamId}/messages`, { content, type }).then(res => res.data);
+export const sendChatMessage = (
+  teamId: string, 
+  content: string, 
+  type: 'text' | 'file' | 'system' = 'text',
+  attachments?: { url: string; fileName: string; mimeType: string }[]
+) =>
+  api.post<import('./types').ChatMessage>(`/chat/teams/${teamId}/messages`, { content, type, attachments }).then(res => res.data);
 
 export const editChatMessage = (teamId: string, messageId: string, content: string) =>
   api.patch<import('./types').ChatMessage>(`/chat/teams/${teamId}/messages/${messageId}`, { content }).then(res => res.data);
@@ -192,3 +199,12 @@ export const getChatReadState = (teamId: string) =>
 
 export const updateChatReadState = (teamId: string, lastReadMessageId: string) =>
   api.post(`/chat/teams/${teamId}/read-state`, { lastReadMessageId }).then(res => res.data);
+
+export const searchChatMessages = (teamId: string, query: string) =>
+  api.get<import('./types').ChatMessage[]>(`/chat/teams/${teamId}/search`, { params: { q: query } }).then(res => res.data);
+
+export const exportChatHistory = (teamId: string) =>
+  api.get(`/chat/teams/${teamId}/export`, { responseType: 'blob' }).then(res => res.data);
+
+export const postWorkflowSystemMessage = (teamId: string, text: string) =>
+  api.post('/chat/workflow-system-message', { teamId, text }).then(res => res.data);

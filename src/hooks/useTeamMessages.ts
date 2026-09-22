@@ -26,7 +26,7 @@ interface UseTeamMessagesResult {
   loading:       boolean;
   sending:       boolean;
   hasMore:       boolean;
-  sendMessage:   (content: string) => Promise<void>;
+  sendMessage:   (content: string, attachments?: { url: string; fileName: string; mimeType: string }[]) => Promise<void>;
   editMessage:   (messageId: string, content: string) => Promise<void>;
   deleteMessage: (messageId: string) => Promise<void>;
   loadMore:      () => Promise<void>;
@@ -135,11 +135,11 @@ export function useTeamMessages(teamId: string | null): UseTeamMessagesResult {
   }, []);
 
   // ─── Send ──────────────────────────────────────────────────────────────────
-  const sendMessage = useCallback(async (content: string) => {
-    if (!teamId || !content.trim()) return;
+  const sendMessage = useCallback(async (content: string, attachments?: { url: string; fileName: string; mimeType: string }[]) => {
+    if (!teamId || (!content.trim() && (!attachments || attachments.length === 0))) return;
     setSending(true);
     try {
-      const msg = await sendChatMessage(teamId, content.trim());
+      const msg = await sendChatMessage(teamId, content.trim(), attachments && attachments.length > 0 && !content.trim() ? 'file' : 'text', attachments);
       setMessages(prev => [...prev, msg]);
     } finally {
       setSending(false);
