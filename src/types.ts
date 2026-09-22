@@ -282,3 +282,37 @@ export interface Complaint {
   status: 'Pending' | 'Investigating' | 'Resolved' | 'Dismissed';
   submittedDate: string;
 }
+
+// --- Admin Privileges Types ---
+export type ModuleKey =
+  | 'dashboard'
+  | 'user-management'
+  | 'employees'
+  | 'careers'
+  | 'documents'
+  | 'lifecycle'
+  | 'attendance'
+  | 'leaves'
+  | 'leave-balance'
+  | 'holidays'
+  | 'payslips'
+  | 'awards'
+  | 'announcements'
+  | 'events'
+  | 'letters'
+  | 'resignations'
+  | 'terminations'
+  | 'analytics'
+  | 'settings'
+  | 'crm'
+  | 'projects';
+
+export interface UserPrivileges {
+  userId: string;
+  allowedModules: ModuleKey[];
+  grantedBy: string; // admin user ID
+  updatedAt: string;
+}
+
+/** Map of userId → UserPrivileges, stored in localStorage under 'erp_privileges' */
+export type PrivilegesMap = Record<string, UserPrivileges>;

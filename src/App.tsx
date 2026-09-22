@@ -36,6 +36,7 @@ const JobApplications  = lazy(() => import('./pages/JobApplications'));
 const DocumentsContracts = lazy(() => import('./pages/DocumentsContracts'));
 const UserManagement   = lazy(() => import('./pages/UserManagement'));
 const Lifecycle        = lazy(() => import('./pages/Lifecycle'));
+const Privileges       = lazy(() => import('./pages/Privileges'));
 
 // CRM module — lazy loaded as a group
 const DashboardDispatcher = lazy(() => import('./twin-crm/router/DashboardDispatcher'));
@@ -146,6 +147,7 @@ export default function App() {
                     <Route path="/documents" element={<DocumentsContracts />} />
                     <Route path="/user-management" element={<UserManagement />} />
                     <Route path="/lifecycle" element={<Lifecycle />} />
+                    <Route path="/privileges" element={<Privileges />} />
 
                     {/* CRM Module Routes */}
                     <Route path="/crm">

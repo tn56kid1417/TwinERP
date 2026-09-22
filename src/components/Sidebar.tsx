@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'motion/react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Phone, Users, Clock, Calendar, FileText, LayoutDashboard, BarChart2, UserMinus, UserX, Award, Megaphone, LogOut, Mail, PartyPopper, Briefcase, Building, PieChart, Sun, Moon, UserPlus, Settings as SettingsIcon, CreditCard, UploadCloud, Shuffle, Shield, TrendingUp, X } from 'lucide-react';
+import { Phone, Users, Clock, Calendar, FileText, LayoutDashboard, BarChart2, UserMinus, UserX, Award, Megaphone, LogOut, Mail, PartyPopper, Briefcase, Building, PieChart, Sun, Moon, UserPlus, Settings as SettingsIcon, CreditCard, UploadCloud, Shuffle, Shield, ShieldCheck, TrendingUp, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 type Module = 'HRM' | 'CRM' | 'Projects';
@@ -15,7 +15,7 @@ interface SidebarProps {
 const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user, logout, canViewAll } = useAuth();
+  const { user, logout, canViewAll, isAdmin, hasModuleAccess } = useAuth();
   const [activeModule, setActiveModule] = useState<Module>('HRM');
   
   useEffect(() => {
@@ -60,25 +60,26 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
   };
 
   const hrmNavItems = [
-    { name: 'Dashboard', path: '/', icon: <LayoutDashboard size={20} />, hrOnly: false },
-    { name: 'User Accounts', path: '/user-management', icon: <Shield size={20} />, hrOnly: true },
-    { name: 'Employees', path: '/employees', icon: <Users size={20} />, hrOnly: true },
-    { name: 'Careers & Jobs', path: '/careers', icon: <Briefcase size={20} />, hrOnly: false },
-    { name: 'Documents', path: '/documents', icon: <FileText size={20} />, hrOnly: false },
-    { name: 'Lifecycle', path: '/lifecycle', icon: <TrendingUp size={20} />, hrOnly: false },
-    { name: 'Attendances', path: '/attendance', icon: <Clock size={20} />, hrOnly: true },
-    { name: 'Leave Requests', path: '/leaves', icon: <Calendar size={20} />, hrOnly: false },
-    { name: 'Leave Balance', path: '/leave-balance', icon: <BarChart2 size={20} />, hrOnly: false },
-    { name: 'Holidays', path: '/holidays', icon: <Calendar size={20} />, hrOnly: true },
-    { name: 'Payslips', path: '/payslips', icon: <FileText size={20} />, hrOnly: false },
-    { name: 'Awards', path: '/awards', icon: <Award size={20} />, hrOnly: true },
-    { name: 'Announcements', path: '/announcements', icon: <Megaphone size={20} />, hrOnly: false },
-    { name: 'Events', path: '/events', icon: <PartyPopper size={20} />, hrOnly: false },
-    { name: 'Letter Generator', path: '/letters', icon: <Mail size={20} />, hrOnly: true },
-    { name: 'Resignations', path: '/resignations', icon: <UserMinus size={20} />, hrOnly: false },
-    { name: 'Terminations', path: '/terminations', icon: <UserX size={20} />, hrOnly: true },
-    { name: 'Analytics', path: '/analytics', icon: <BarChart2 size={20} />, hrOnly: false },
-    { name: 'Settings', path: '/settings', icon: <SettingsIcon size={20} />, hrOnly: false },
+    { name: 'Dashboard',        path: '/',               icon: <LayoutDashboard size={20} />, hrOnly: false, adminOnly: false, moduleKey: 'dashboard' as const },
+    { name: 'Privileges',       path: '/privileges',     icon: <ShieldCheck size={20} />,     hrOnly: false, adminOnly: true,  moduleKey: null },
+    { name: 'User Accounts',    path: '/user-management',icon: <Shield size={20} />,          hrOnly: true,  adminOnly: false, moduleKey: 'user-management' as const },
+    { name: 'Employees',        path: '/employees',      icon: <Users size={20} />,           hrOnly: true,  adminOnly: false, moduleKey: 'employees' as const },
+    { name: 'Careers & Jobs',   path: '/careers',        icon: <Briefcase size={20} />,       hrOnly: false, adminOnly: false, moduleKey: 'careers' as const },
+    { name: 'Documents',        path: '/documents',      icon: <FileText size={20} />,        hrOnly: false, adminOnly: false, moduleKey: 'documents' as const },
+    { name: 'Lifecycle',        path: '/lifecycle',      icon: <TrendingUp size={20} />,      hrOnly: false, adminOnly: false, moduleKey: 'lifecycle' as const },
+    { name: 'Attendances',      path: '/attendance',     icon: <Clock size={20} />,           hrOnly: true,  adminOnly: false, moduleKey: 'attendance' as const },
+    { name: 'Leave Requests',   path: '/leaves',         icon: <Calendar size={20} />,        hrOnly: false, adminOnly: false, moduleKey: 'leaves' as const },
+    { name: 'Leave Balance',    path: '/leave-balance',  icon: <BarChart2 size={20} />,       hrOnly: false, adminOnly: false, moduleKey: 'leave-balance' as const },
+    { name: 'Holidays',         path: '/holidays',       icon: <Calendar size={20} />,        hrOnly: true,  adminOnly: false, moduleKey: 'holidays' as const },
+    { name: 'Payslips',         path: '/payslips',       icon: <FileText size={20} />,        hrOnly: false, adminOnly: false, moduleKey: 'payslips' as const },
+    { name: 'Awards',           path: '/awards',         icon: <Award size={20} />,           hrOnly: true,  adminOnly: false, moduleKey: 'awards' as const },
+    { name: 'Announcements',    path: '/announcements',  icon: <Megaphone size={20} />,       hrOnly: false, adminOnly: false, moduleKey: 'announcements' as const },
+    { name: 'Events',           path: '/events',         icon: <PartyPopper size={20} />,     hrOnly: false, adminOnly: false, moduleKey: 'events' as const },
+    { name: 'Letter Generator', path: '/letters',        icon: <Mail size={20} />,            hrOnly: true,  adminOnly: false, moduleKey: 'letters' as const },
+    { name: 'Resignations',     path: '/resignations',   icon: <UserMinus size={20} />,       hrOnly: false, adminOnly: false, moduleKey: 'resignations' as const },
+    { name: 'Terminations',     path: '/terminations',   icon: <UserX size={20} />,           hrOnly: true,  adminOnly: false, moduleKey: 'terminations' as const },
+    { name: 'Analytics',        path: '/analytics',      icon: <BarChart2 size={20} />,       hrOnly: false, adminOnly: false, moduleKey: 'analytics' as const },
+    { name: 'Settings',         path: '/settings',       icon: <SettingsIcon size={20} />,    hrOnly: false, adminOnly: false, moduleKey: 'settings' as const },
   ];
 
   const crmNavItems = [
@@ -115,7 +116,17 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
         items = hrmNavItems;
         break;
     }
-    return items.filter(item => !item.hrOnly || canViewAll);
+    return items.filter(item => {
+      // Admin-only items (e.g. Privileges) — show only to Admin
+      if (item.adminOnly) return isAdmin;
+      // Admin sees everything
+      if (isAdmin) return true;
+      // hrOnly items require elevated role
+      if (item.hrOnly && !canViewAll) return false;
+      // If admin has set custom privileges for this user, check module access
+      if (item.moduleKey) return hasModuleAccess(item.moduleKey);
+      return true;
+    });
   };
 
   const navItems = getActiveNavItems();
