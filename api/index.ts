@@ -78,6 +78,8 @@ const loadNotifications = (): any[] => {
   return seedNotifications();
 };
 
+let notifications: any[] = loadNotifications();
+
 const saveNotifications = () => {
   try {
     fs.writeFileSync(NOTIFICATION_FILE, JSON.stringify(notifications, null, 2), 'utf-8');
@@ -1203,6 +1205,13 @@ export function createApp() {
   if (process.env.NODE_ENV !== "production") {
     app.use(express.static(path.join(process.cwd(), 'public')));
   }
+
+  // Global Express error handler to guarantee API responses never return raw error objects
+  app.use((err: any, _req: any, res: any, _next: any) => {
+    console.error('Unhandled API Error:', err);
+    const message = typeof err === 'string' ? err : err?.message || 'Internal Server Error';
+    res.status(500).json({ error: message });
+  });
 
   return app;
 }

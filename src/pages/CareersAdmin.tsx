@@ -8,6 +8,7 @@ import {
 import { getJobs, createJob, updateJob, publishJob, closeJob, deleteJob } from '../api';
 import { JobPosting, JobField, InterviewRound } from '../types';
 import { useAuth } from '../context/AuthContext';
+import { getErrorMessage } from '../utils/error';
 import toast from 'react-hot-toast';
 
 const defaultFields: JobField[] = [
@@ -124,7 +125,7 @@ export default function CareersAdmin() {
       setShowModal(false);
       fetchJobs();
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Failed to save job posting');
+      toast.error(getErrorMessage(err, 'Failed to save job posting'));
     } finally {
       setSubmitting(false);
     }

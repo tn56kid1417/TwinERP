@@ -1,8 +1,9 @@
 import { motion } from 'motion/react';
 import React, { useEffect, useState } from 'react';
 import { FileText, Download, DollarSign, Settings, Lock } from 'lucide-react';
-import { getAllPayslips, generatePayslip, getEmployees, getSalaryStructures, setSalaryStructure } from '../api';
-import { Payslip, Employee, SalaryStructure } from '../types';
+import { getEmployees, getPayslips, getAllPayslips, generatePayslip, getSalaryStructures, setSalaryStructure } from '../api';
+import { Employee, Payslip, SalaryStructure } from '../types';
+import { getErrorMessage } from '../utils/error';
 import { useAuth } from '../context/AuthContext';
 
 const Payslips = () => {
@@ -71,7 +72,7 @@ const Payslips = () => {
       await generatePayslip(formData.employeeId, formData.month, formData.year);
       await loadData();
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to generate payslip');
+      setError(getErrorMessage(err, 'Failed to generate payslip'));
     } finally {
       setIsGenerating(false);
     }
@@ -85,7 +86,7 @@ const Payslips = () => {
       await setSalaryStructure(structureData);
       await loadData();
     } catch (err: any) {
-      setStructureError(err.response?.data?.error || 'Failed to save salary structure');
+      setStructureError(getErrorMessage(err, 'Failed to save salary structure'));
     } finally {
       setIsSavingStructure(false);
     }
@@ -119,7 +120,7 @@ const Payslips = () => {
               
               {error && (
                 <div className="bg-rose-500/10 text-rose-500 dark:text-rose-400 border border-rose-500/20 p-3 rounded-xl text-xs mb-4">
-                  {error}
+                  {typeof error === 'string' ? error : (error as any)?.message || 'Failed to generate payslip'}
                 </div>
               )}
 
@@ -183,7 +184,7 @@ const Payslips = () => {
 
               {structureError && (
                 <div className="bg-rose-500/10 text-rose-500 dark:text-rose-400 border border-rose-500/20 p-3 rounded-xl text-xs mb-4">
-                  {structureError}
+                  {typeof structureError === 'string' ? structureError : (structureError as any)?.message || 'Failed to save salary structure'}
                 </div>
               )}
 

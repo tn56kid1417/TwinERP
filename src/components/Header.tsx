@@ -346,7 +346,7 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
                                       ? 'text-slate-700 dark:text-slate-300' 
                                       : 'text-slate-900 dark:text-white'
                                 }`}>
-                                  {notification.title}
+                                  {typeof notification.title === 'string' ? notification.title : (notification.title as any)?.message || 'Notification'}
                                 </h4>
                               </div>
                               {!notification.read && (
@@ -360,7 +360,7 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
                                   ? 'text-slate-500' 
                                   : 'text-slate-600 dark:text-slate-300'
                             }`}>
-                              {notification.message}
+                              {typeof notification.message === 'string' ? notification.message : (notification.message as any)?.message || JSON.stringify(notification.message || '')}
                             </p>
                             <div className="flex items-center justify-between">
                               <p className="text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest flex items-center gap-1.5">

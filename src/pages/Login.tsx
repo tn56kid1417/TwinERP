@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { login as apiLogin } from '../api';
 
+import { getErrorMessage } from '../utils/error';
+
 const Login = () => {
   const loginPageRef = useRef<HTMLDivElement>(null);
   const [email, setEmail] = useState('');
@@ -26,7 +28,7 @@ const Login = () => {
       const response = await apiLogin(email, password);
       login(response.user, response.token);
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to login');
+      setError(getErrorMessage(err, 'Failed to login'));
     } finally {
       setLoading(false);
     }
@@ -45,7 +47,7 @@ const Login = () => {
 
         {error && (
           <div className="bg-rose-500/10 border border-rose-500/25 text-rose-500 dark:text-rose-400 p-3.5 rounded-xl text-sm mb-6 flex items-center gap-2">
-            {error}
+            {typeof error === 'string' ? error : (error as any)?.message || 'Failed to login'}
           </div>
         )}
 

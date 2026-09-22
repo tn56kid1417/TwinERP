@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { UserMinus, Check, X, Tag } from 'lucide-react';
 import { getEmployees, getResignations, addResignation, updateResignationStatus } from '../api';
 import { Employee, Resignation } from '../types';
+import { getErrorMessage } from '../utils/error';
 import { useAuth } from '../context/AuthContext';
 
 const Resignations = () => {
@@ -54,7 +55,7 @@ const Resignations = () => {
       await loadData();
       setFormData({ ...formData, reason: '', lastWorkingDate: '' });
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to submit resignation');
+      setError(getErrorMessage(err, 'Failed to submit resignation'));
     }
   };
 
@@ -101,7 +102,7 @@ const Resignations = () => {
             
             {error && (
               <div className="bg-rose-500/10 text-rose-500 dark:text-rose-400 border border-rose-500/20 p-3 rounded-xl text-xs mb-4">
-                {error}
+                {typeof error === 'string' ? error : (error as any)?.message || 'Failed to submit resignation'}
               </div>
             )}
 

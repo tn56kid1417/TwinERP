@@ -4,6 +4,7 @@ import { Calendar as CalendarIcon, CheckCircle, XCircle, Clock, Check, X } from 
 import { getLeaves, requestLeave, getEmployees, updateLeaveStatus } from '../api';
 import { LeaveRequest, Employee } from '../types';
 import { format } from 'date-fns';
+import { getErrorMessage } from '../utils/error';
 import { useAuth } from '../context/AuthContext';
 
 const LeaveRequests = () => {
@@ -42,7 +43,7 @@ const LeaveRequests = () => {
       setFormData({...formData, startDate: '', endDate: ''});
       loadData();
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to submit leave request');
+      setError(getErrorMessage(err, 'Failed to submit leave request'));
     }
   };
 
@@ -86,7 +87,7 @@ const LeaveRequests = () => {
             
             {error && (
               <div className="bg-rose-500/10 text-rose-500 dark:text-rose-400 border border-rose-500/20 p-3 rounded-xl text-xs mb-4">
-                {error}
+                {typeof error === 'string' ? error : (error as any)?.message || 'Failed to submit leave request'}
               </div>
             )}
 

@@ -1,8 +1,9 @@
 import { motion } from 'motion/react';
 import React, { useEffect, useState } from 'react';
 import { Award as AwardIcon, Plus, Trash2, Gift, ShieldAlert } from 'lucide-react';
-import { getEmployees, getAwards, addAward, deleteAward } from '../api';
-import { Employee, Award } from '../types';
+import { getAwards, addAward, deleteAward, getEmployees } from '../api';
+import { Award, Employee } from '../types';
+import { getErrorMessage } from '../utils/error';
 import { useAuth } from '../context/AuthContext';
 import { Navigate } from 'react-router-dom';
 import ConfirmationModal from '../components/ConfirmationModal';
@@ -65,7 +66,7 @@ const Awards = () => {
       await loadData();
       setFormData({ ...formData, awardType: '', date: '', gift: '', description: '' });
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to assign award');
+      setError(getErrorMessage(err, 'Failed to assign award'));
     }
   };
 
@@ -111,7 +112,7 @@ const Awards = () => {
               
               {error && (
                 <div className="bg-rose-500/10 text-rose-500 dark:text-rose-400 border border-rose-500/20 p-3 rounded-xl text-xs mb-4">
-                  {error}
+                  {typeof error === 'string' ? error : (error as any)?.message || 'Failed to assign award'}
                 </div>
               )}
 

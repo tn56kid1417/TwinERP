@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Calendar, Tag, Trash2, Plus } from 'lucide-react';
 import { getHolidays, addHoliday, deleteHoliday } from '../api';
 import { Holiday } from '../types';
+import { getErrorMessage } from '../utils/error';
 import { useAuth } from '../context/AuthContext';
 import { Navigate } from 'react-router-dom';
 import ConfirmationModal from '../components/ConfirmationModal';
@@ -66,7 +67,7 @@ const Holidays = () => {
         isPaid: true
       });
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to add holiday');
+      setError(getErrorMessage(err, 'Failed to add holiday'));
     }
   };
 
@@ -107,7 +108,7 @@ const Holidays = () => {
               
               {error && (
                 <div className="bg-rose-500/10 text-rose-500 dark:text-rose-400 border border-rose-500/20 p-3 rounded-xl text-xs mb-4">
-                  {error}
+                  {typeof error === 'string' ? error : (error as any)?.message || 'Failed to add holiday'}
                 </div>
               )}
 

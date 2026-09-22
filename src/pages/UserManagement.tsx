@@ -10,6 +10,7 @@ import {
 } from '../api';
 import { UserAccount } from '../types';
 import { useAuth } from '../context/AuthContext';
+import { getErrorMessage } from '../utils/error';
 import toast from 'react-hot-toast';
 
 const ROLE_OPTIONS = ['HR', 'TL', 'Member', 'CEO', 'COO', 'CTO', 'Admin', 'Developer', 'Sales Rep', 'Marketing'];
@@ -132,7 +133,7 @@ export default function UserManagement() {
       setShowAddModal(false);
       loadData();
     } catch (err: any) {
-      toast.error(err?.response?.data?.message || 'Failed to save user');
+      toast.error(getErrorMessage(err, 'Failed to save user'));
     } finally {
       setSubmitting(false);
     }

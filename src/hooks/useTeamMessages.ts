@@ -50,23 +50,24 @@ export function useTeamMessages(teamId: string | null): UseTeamMessagesResult {
     try {
       const data = await getChatMessages(teamId, { limit: 50 });
       if (!mountedRef.current) return;
+      const validMessages = Array.isArray(data) ? data : [];
 
       setMessages(prev => {
         // On silent poll: merge new messages (append any not already in list)
         if (silent && prev.length > 0) {
           const existingIds = new Set(prev.map(m => m.id));
-          const incoming = data.filter(m => !existingIds.has(m.id));
+          const incoming = validMessages.filter(m => m && m.id && !existingIds.has(m.id));
           if (incoming.length === 0) return prev;
           return [...prev, ...incoming];
         }
-        return data;
+        return validMessages;
       });
 
-      setHasMore(data.length === 50);
+      setHasMore(validMessages.length === 50);
 
       // Mark last message as read
-      if (data.length > 0) {
-        const lastId = data[data.length - 1].id;
+      if (validMessages.length > 0) {
+        const lastId = validMessages[validMessages.length - 1].id;
         updateChatReadState(teamId, lastId).catch(() => {/* non-critical */});
       }
     } catch (err) {
@@ -165,8 +166,9 @@ export function useTeamMessages(teamId: string | null): UseTeamMessagesResult {
     if (!teamId || messages.length === 0) return;
     const oldestId = messages[0].id;
     const older = await getChatMessages(teamId, { before: oldestId, limit: 50 });
-    setMessages(prev => [...older, ...prev]);
-    setHasMore(older.length === 50);
+    const validOlder = Array.isArray(older) ? older : [];
+    setMessages(prev => [...validOlder, ...prev]);
+    setHasMore(validOlder.length === 50);
   }, [teamId, messages]);
 
   return { messages, loading, sending, hasMore, sendMessage, editMessage, deleteMessage, loadMore, refresh: () => fetchMessages(false) };

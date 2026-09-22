@@ -7,6 +7,7 @@ import { getEmployees, clockIn, clockOut, breakIn, breakOut, getAllAttendance, g
 import { Employee, Attendance, Announcement, Award, Holiday, AppEvent, LeaveRequest } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { PieChart, Pie, Cell, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend } from 'recharts';
+import { getErrorMessage } from '../utils/error';
 
 const Dashboard = () => {
   const { user, canViewAll, canEdit, isHR, isAdmin } = useAuth();
@@ -245,7 +246,7 @@ const Dashboard = () => {
         setAttendances(prev => prev.map(a => (a.employeeId === targetId && a.date === today) ? updated : a));
         setActionMessage('Clocked out successfully');
       } else {
-        setActionError(err.response?.data?.error || 'Failed to clock out');
+        setActionError(getErrorMessage(err, 'Failed to clock out'));
       }
     }
   };
@@ -271,7 +272,7 @@ const Dashboard = () => {
         setAttendances(prev => prev.map(a => (a.employeeId === targetId && a.date === today) ? updated : a));
         setActionMessage('Break started successfully');
       } else {
-        setActionError(err.response?.data?.error || 'Failed to start break');
+        setActionError(getErrorMessage(err, 'Failed to start break'));
       }
     }
   };
@@ -298,7 +299,7 @@ const Dashboard = () => {
         setAttendances(prev => prev.map(a => (a.employeeId === targetId && a.date === today) ? updated : a));
         setActionMessage('Break ended successfully');
       } else {
-        setActionError(err.response?.data?.error || 'Failed to end break');
+        setActionError(getErrorMessage(err, 'Failed to end break'));
       }
     }
   };
@@ -488,7 +489,7 @@ const Dashboard = () => {
           
           {actionError && (
             <div className="text-xs text-rose-500 dark:text-rose-400 mb-3 bg-rose-500/10 p-2.5 rounded-lg border border-rose-500/20 flex items-center justify-between gap-2">
-              <span>{actionError}</span>
+              <span>{typeof actionError === 'string' ? actionError : (actionError as any)?.message || 'Action failed'}</span>
               <button 
                 type="button"
                 onClick={() => setActionError('')} 

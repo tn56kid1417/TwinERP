@@ -16,6 +16,7 @@ import {
   searchChatMessages, exportChatHistory
 } from '../api';
 import type { ChatTeamWithMeta, ChatMembership, ChatMessage, ChatAttachment } from '../types';
+import { getErrorMessage } from '../utils/error';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function timeAgo(iso: string): string {
@@ -55,7 +56,8 @@ function initials(name: string): string {
 
 /** Render content with highlighted @mentions */
 function renderMessageContent(content: string, isOwn: boolean) {
-  const parts = content.split(/(@[a-zA-Z0-9_.-]+(?:\s+[a-zA-Z0-9_.-]+)?)/g);
+  const safeText = typeof content === 'string' ? content : (typeof content === 'object' && content !== null ? ((content as any).message || JSON.stringify(content)) : String(content || ''));
+  const parts = safeText.split(/(@[a-zA-Z0-9_.-]+(?:\s+[a-zA-Z0-9_.-]+)?)/g);
   return parts.map((part, idx) => {
     if (part.startsWith('@')) {
       return (
@@ -101,10 +103,11 @@ function MessageBubble({
   const [hovered, setHovered] = useState(false);
 
   if (msg.type === 'system') {
+    const sysText = typeof msg.content === 'string' ? msg.content : (typeof msg.content === 'object' && msg.content !== null ? ((msg.content as any).message || JSON.stringify(msg.content)) : String(msg.content || ''));
     return (
       <div className="flex justify-center my-2">
         <span className="text-[11px] text-slate-500 dark:text-slate-400 italic bg-slate-100/70 dark:bg-slate-800/60 px-3 py-1 rounded-full border border-slate-200/40 dark:border-slate-700/40">
-          {msg.content}
+          {sysText}
         </span>
       </div>
     );
@@ -212,7 +215,7 @@ function MessageBubble({
       </div>
 
       {/* Action buttons on hover */}
-      {!isDeleted && hovered && (msg.type !== 'system') && (
+      {!isDeleted && hovered && (
         <div className={`flex items-center gap-0.5 ${isOwn ? 'mr-1' : 'ml-1'}`}>
           {canEdit && isOwn && (
             <button
@@ -297,9 +300,10 @@ export default function TeamChat() {
     try {
       setTeamsLoading(true);
       const data = await getChatTeams();
-      setTeams(data);
-      if (!selectedTeamId && data.length > 0) {
-        setSelectedTeamId(data[0].id);
+      const validTeams = Array.isArray(data) ? data : [];
+      setTeams(validTeams);
+      if (!selectedTeamId && validTeams.length > 0) {
+        setSelectedTeamId(validTeams[0].id);
       }
     } catch {
       toast.error('Failed to load teams');
@@ -353,7 +357,7 @@ export default function TeamChat() {
       textareaRef.current?.focus();
       setTeams(prev => prev.map(t => t.id === selectedTeamId ? { ...t, unreadCount: 0 } : t));
     } catch (e: any) {
-      toast.error(e?.response?.data?.error || 'Failed to send message');
+      toast.error(getErrorMessage(e, 'Failed to send message'));
     }
   };
 
@@ -372,7 +376,7 @@ export default function TeamChat() {
     try {
       await deleteMessage(id);
     } catch (e: any) {
-      toast.error(e?.response?.data?.error || 'Failed to delete message');
+      toast.error(getErrorMessage(e, 'Failed to delete message'));
     }
   };
 
@@ -534,7 +538,7 @@ export default function TeamChat() {
       setSelectedTeamId(team.id);
       toast.success(`Team "${team.name}" created`);
     } catch (e: any) {
-      toast.error(e?.response?.data?.error || 'Failed to create team');
+      toast.error(getErrorMessage(e, 'Failed to create team'));
     } finally {
       setCreating(false);
     }
@@ -555,7 +559,7 @@ export default function TeamChat() {
       setAddMemberUserId('');
       getChatTeamDetail(selectedTeamId).then(({ members: m }) => setMembers(m));
     } catch (e: any) {
-      toast.error(e?.response?.data?.error || 'Failed to add member');
+      toast.error(getErrorMessage(e, 'Failed to add member'));
     }
   };
 
@@ -567,7 +571,7 @@ export default function TeamChat() {
       toast.success('Member removed');
       getChatTeamDetail(selectedTeamId).then(({ members: m }) => setMembers(m));
     } catch (e: any) {
-      toast.error(e?.response?.data?.error || 'Failed to remove member');
+      toast.error(getErrorMessage(e, 'Failed to remove member'));
     }
   };
 

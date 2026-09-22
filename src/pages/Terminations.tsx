@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { UserX, Check, X, ShieldAlert, Tag } from 'lucide-react';
 import { getEmployees, getTerminations, addTermination, updateTerminationStatus } from '../api';
 import { Employee, Termination } from '../types';
+import { getErrorMessage } from '../utils/error';
 import { useAuth } from '../context/AuthContext';
 import { Navigate } from 'react-router-dom';
 import ConfirmationModal from '../components/ConfirmationModal';
@@ -66,7 +67,7 @@ const Terminations = () => {
       await loadData();
       setFormData({ ...formData, noticeDate: '', terminationDate: '' });
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to submit termination');
+      setError(getErrorMessage(err, 'Failed to submit termination'));
     } finally {
       setTerminateModalOpen(false);
     }
@@ -121,7 +122,7 @@ const Terminations = () => {
               
               {error && (
                 <div className="bg-rose-500/10 text-rose-500 dark:text-rose-400 border border-rose-500/20 p-3 rounded-xl text-xs mb-4">
-                  {error}
+                  {typeof error === 'string' ? error : (error as any)?.message || 'Failed to submit termination'}
                 </div>
               )}
 

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Megaphone, Plus, Trash2, Edit2, Check, X } from 'lucide-react';
 import { getAnnouncements, addAnnouncement, updateAnnouncement, deleteAnnouncement } from '../api';
 import { Announcement } from '../types';
+import { getErrorMessage } from '../utils/error';
 import { useAuth } from '../context/AuthContext';
 import ConfirmationModal from '../components/ConfirmationModal';
 
@@ -54,7 +55,7 @@ const Announcements = () => {
       await loadData();
       setFormData({ ...formData, title: '', content: '' });
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to add announcement');
+      setError(getErrorMessage(err, 'Failed to add announcement'));
     }
   };
 
@@ -115,7 +116,7 @@ const Announcements = () => {
               
               {error && (
                 <div className="bg-rose-500/10 text-rose-500 dark:text-rose-400 border border-rose-500/20 p-3 rounded-xl text-xs mb-4">
-                  {error}
+                  {typeof error === 'string' ? error : (error as any)?.message || 'Failed to add announcement'}
                 </div>
               )}
 
