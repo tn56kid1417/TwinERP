@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Bell, X, Check, Clock, AlertTriangle, FileText, UserX, Menu } from 'lucide-react';
+import { Bell, X, Check, Clock, AlertTriangle, FileText, UserX, Menu, MessageSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getNotifications, markAllNotificationsRead, markNotificationRead } from '../api';
 import { AppNotification } from '../types';
@@ -10,7 +11,9 @@ interface HeaderProps {
 }
 
 export default function Header({ onToggleSidebar }: HeaderProps) {
+  const navigate = useNavigate();
   const { user, isHR, isAdmin } = useAuth();
+
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
   const [activeTab, setActiveTab] = useState<'all' | 'manager' | 'overdue'>('all');
@@ -48,12 +51,15 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
         new Date(b.timestamp || 0).getTime() - new Date(a.timestamp || 0).getTime()
       );
 
-      // Filter for target role or show all for HR/Manager/Admin
+      // Filter for target user or role
       const filtered = merged.filter(n => {
+        if (n.targetUserId && user?.id) {
+          if (n.targetUserId !== user.id && !isAdmin) return false;
+        }
         if (!n.targetRole || n.targetRole === 'All') return true;
         if (isManager) {
           if (n.targetRole === 'HR' || n.targetRole === 'Manager' || n.targetRole.includes('Manager') || n.targetRole.includes('HR')) return true;
-          if (n.type === 'overdue_break') return true;
+          if (n.type === 'overdue_break' || n.type === 'mention') return true;
         }
         return false;
       });
@@ -141,6 +147,8 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
         return <Check size={16} className="text-emerald-500" />;
       case 'alert':
         return <AlertTriangle size={16} className="text-amber-500" />;
+      case 'mention':
+        return <MessageSquare size={16} className="text-indigo-500" />;
       case 'policy':
       default:
         return <FileText size={16} className="text-indigo-500" />;
@@ -310,7 +318,13 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
                     return (
                       <div 
                         key={notification.id} 
-                        onClick={() => !notification.read && handleMarkOneAsRead(notification.id)}
+                        onClick={() => {
+                          if (!notification.read) handleMarkOneAsRead(notification.id);
+                          if (notification.type === 'mention') {
+                            setIsNotificationsOpen(false);
+                            navigate('/team-chat');
+                          }
+                        }}
                         className={`p-4 rounded-xl border transition-all cursor-pointer ${
                           isOverdue && !notification.read
                             ? 'bg-rose-50/80 dark:bg-rose-950/20 border-rose-300 dark:border-rose-500/40 shadow-md ring-1 ring-rose-400/20'

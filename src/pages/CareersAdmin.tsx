@@ -3,12 +3,14 @@ import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
 import {
   Briefcase, Plus, Pencil, Trash2, Eye, Globe, FileText,
-  Users, Check, X, Search, Filter, Calendar, MapPin, Building
+  Users, Check, X, Search, Filter, Calendar, MapPin, Building,
+  Mail, ChevronDown, ChevronUp
 } from 'lucide-react';
 import { getJobs, createJob, updateJob, publishJob, closeJob, deleteJob } from '../api';
 import { JobPosting, JobField, InterviewRound } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { getErrorMessage } from '../utils/error';
+import { EmailTemplateEditor } from '../components/hrm/EmailTemplateEditor';
 import toast from 'react-hot-toast';
 
 const defaultFields: JobField[] = [
@@ -50,6 +52,35 @@ export default function CareersAdmin() {
   });
   const [fields, setFields] = useState<JobField[]>(defaultFields);
   const [rounds, setRounds] = useState<InterviewRound[]>(defaultRounds);
+  const [applicationConfirmationTemplate, setApplicationConfirmationTemplate] = useState('');
+  const [roundAdvanceTemplate, setRoundAdvanceTemplate] = useState('');
+  const [rejectionTemplate, setRejectionTemplate] = useState('');
+  const [hireTemplate, setHireTemplate] = useState('');
+  const [templatesOpen, setTemplatesOpen] = useState(false);
+
+  // Available merge tags for email templates
+  const availableTags = React.useMemo(() => {
+    const base = [
+      { tag: 'fullName', label: 'Applicant Name ({{fullName}})' },
+      { tag: 'email', label: 'Applicant Email ({{email}})' },
+      { tag: 'phone', label: 'Applicant Phone ({{phone}})' },
+      { tag: 'qualification', label: 'Qualification ({{qualification}})' },
+      { tag: 'experience', label: 'Experience ({{experience}})' },
+      { tag: 'currentOrg', label: 'Current Org ({{currentOrg}})' },
+      { tag: 'resumeLink', label: 'Resume Link ({{resumeLink}})' },
+      { tag: 'coverNote', label: 'Cover Note ({{coverNote}})' },
+      { tag: 'jobTitle', label: 'Job Title ({{jobTitle}})' },
+      { tag: 'roundTitle', label: 'Round Title ({{roundTitle}})' },
+      { tag: 'roundShortDescription', label: 'Round Description ({{roundShortDescription}})' },
+    ];
+    fields.forEach((f) => {
+      const slug = f.label.toLowerCase().trim().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '');
+      if (slug) {
+        base.push({ tag: `field_${slug}`, label: `${f.label} ({{field_${slug}}})` });
+      }
+    });
+    return base;
+  }, [fields]);
 
   // Delete modal state
   const [deleteTarget, setDeleteTarget] = useState<JobPosting | null>(null);
@@ -81,6 +112,11 @@ export default function CareersAdmin() {
     });
     setFields([...defaultFields]);
     setRounds([...defaultRounds]);
+    setApplicationConfirmationTemplate('');
+    setRoundAdvanceTemplate('');
+    setRejectionTemplate('');
+    setHireTemplate('');
+    setTemplatesOpen(false);
     setShowModal(true);
   };
 
@@ -95,6 +131,11 @@ export default function CareersAdmin() {
     });
     setFields(job.fields?.length ? job.fields : [...defaultFields]);
     setRounds(job.rounds?.length ? job.rounds : [...defaultRounds]);
+    setApplicationConfirmationTemplate(job.applicationConfirmationTemplate || '');
+    setRoundAdvanceTemplate(job.roundAdvanceTemplate || '');
+    setRejectionTemplate(job.rejectionTemplate || '');
+    setHireTemplate(job.hireTemplate || '');
+    setTemplatesOpen(false);
     setShowModal(true);
   };
 
@@ -107,19 +148,20 @@ export default function CareersAdmin() {
 
     try {
       setSubmitting(true);
+      const payload = {
+        ...formData,
+        fields,
+        rounds,
+        applicationConfirmationTemplate: applicationConfirmationTemplate.trim() || undefined,
+        roundAdvanceTemplate: roundAdvanceTemplate.trim() || undefined,
+        rejectionTemplate: rejectionTemplate.trim() || undefined,
+        hireTemplate: hireTemplate.trim() || undefined,
+      };
       if (editingJob) {
-        await updateJob(editingJob.id, {
-          ...formData,
-          fields,
-          rounds,
-        });
+        await updateJob(editingJob.id, payload);
         toast.success('Job posting updated successfully');
       } else {
-        await createJob({
-          ...formData,
-          fields,
-          rounds,
-        });
+        await createJob(payload);
         toast.success('Job posting created successfully');
       }
       setShowModal(false);
@@ -241,14 +283,24 @@ export default function CareersAdmin() {
           </p>
         </div>
 
-        {canViewAll && (
-          <button
-            onClick={openCreate}
-            className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-md shadow-indigo-600/30 active:scale-95"
+        <div className="flex items-center gap-3">
+          <a
+            href="/careers"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-3.5 py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold uppercase tracking-wider rounded-xl transition-all border border-slate-200 dark:border-slate-700"
           >
-            <Plus size={16} /> Post a Job
-          </button>
-        )}
+            <Globe size={15} /> View Public Portal
+          </a>
+          {canViewAll && (
+            <button
+              onClick={openCreate}
+              className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-md shadow-indigo-600/30 active:scale-95"
+            >
+              <Plus size={16} /> Post a Job
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Metrics Row */}
@@ -387,7 +439,7 @@ export default function CareersAdmin() {
                           {(job.rounds || []).length} Rounds
                         </span>
                         <button
-                          onClick={() => navigate(`/careers/${job.id}/applications`)}
+                          onClick={() => navigate(`/hrm/careers/${job.id}/applications`)}
                           className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer"
                         >
                           <Users size={14} /> Applicants
@@ -398,7 +450,7 @@ export default function CareersAdmin() {
                     <td className="py-4 px-6 text-right">
                       <div className="flex items-center justify-end gap-1.5">
                         <button
-                          onClick={() => navigate(`/careers/${job.id}/applications`)}
+                          onClick={() => navigate(`/hrm/careers/${job.id}/applications`)}
                           className="p-1.5 rounded-lg text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                           title="View Applicants"
                         >
@@ -648,6 +700,50 @@ export default function CareersAdmin() {
                       </div>
                     ))}
                   </div>
+                </div>
+
+                {/* Email Templates Accordion */}
+                <div className="border-t border-slate-100 dark:border-slate-800 pt-4">
+                  <button
+                    type="button"
+                    onClick={() => setTemplatesOpen(v => !v)}
+                    className="flex w-full items-center justify-between p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors"
+                  >
+                    <span className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                      <Mail size={16} className="text-indigo-600 dark:text-indigo-400" />
+                      Automated Email Templates (Optional — uses default if left blank)
+                    </span>
+                    {templatesOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                  </button>
+
+                  {templatesOpen && (
+                    <div className="mt-3 p-4 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 space-y-4">
+                      <EmailTemplateEditor
+                        label="1. Application Confirmation Email (sent immediately upon submission)"
+                        value={applicationConfirmationTemplate}
+                        onChange={setApplicationConfirmationTemplate}
+                        availableTags={availableTags}
+                      />
+                      <EmailTemplateEditor
+                        label="2. Round Advancement Email (sent when candidate passes to next round)"
+                        value={roundAdvanceTemplate}
+                        onChange={setRoundAdvanceTemplate}
+                        availableTags={availableTags}
+                      />
+                      <EmailTemplateEditor
+                        label="3. Rejection Email"
+                        value={rejectionTemplate}
+                        onChange={setRejectionTemplate}
+                        availableTags={availableTags}
+                      />
+                      <EmailTemplateEditor
+                        label="4. Offer / Hire Email"
+                        value={hireTemplate}
+                        onChange={setHireTemplate}
+                        availableTags={availableTags}
+                      />
+                    </div>
+                  )}
                 </div>
 
                 {/* Footer buttons */}

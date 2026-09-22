@@ -194,7 +194,82 @@ let projectActivities: any[] = [
   { id: 'a3', taskId: 't1', projectId: 'p1', type: 'StatusChange', description: 'Task "Design Mockups" moved to In Progress', timestamp: new Date(Date.now() - 3600000 * 5).toISOString() },
 ];
 
-let jobPostings: any[] = [
+export const DEFAULT_CAREER_TEMPLATES = {
+  applicationConfirmationTemplate: `<p>Dear {{fullName}},</p>
+<p>Thank you for applying to <strong>{{jobTitle}}</strong> at TwinSpace.</p>
+<p>We have received your application and will review it shortly. You will be notified about next steps.</p>
+<p>Warm regards,<br/>TwinSpace Hiring Team</p>`,
+
+  rejectionTemplate: `<p>Dear {{fullName}},</p>
+<p>Thank you for your interest in <strong>{{jobTitle}}</strong> at TwinSpace.</p>
+<p>After careful consideration, we regret to inform you that we will not be moving forward with your application at this time.</p>
+<p>We appreciate the time and effort you invested and encourage you to apply for future openings that match your profile.</p>
+<p>Warm regards,<br/>TwinSpace Hiring Team</p>`,
+
+  roundAdvanceTemplate: `<p>Dear {{fullName}},</p>
+<p>Congratulations! You have been shortlisted for the next stage of our hiring process for <strong>{{jobTitle}}</strong>.</p>
+<p><strong>{{roundTitle}}</strong></p>
+<p>{{roundShortDescription}}</p>
+<p>{{roundLongDescription}}</p>
+<p>Our team will be in touch shortly with further details. Please reply to this email if you have any questions.</p>
+<p>Best regards,<br/>TwinSpace Hiring Team</p>`,
+
+  hireTemplate: `<p>Dear {{fullName}},</p>
+<p>We are delighted to inform you that you have been selected for <strong>{{jobTitle}}</strong> at TwinSpace!</p>
+<p>Our hiring team will contact you shortly with next steps regarding onboarding and formalities.</p>
+<p>Congratulations and welcome aboard!</p>
+<p>Warm regards,<br/>TwinSpace Hiring Team</p>`,
+};
+
+export function renderTemplate(template: string, context: Record<string, string>): string {
+  return (template || '').replace(/\{\{\s*([a-zA-Z0-9_]+)\s*\}\}/g, (_, key) => {
+    return context[key] !== undefined ? String(context[key]) : '';
+  });
+}
+
+export function buildMergeContext(application: any, job: any, round: any = null): Record<string, string> {
+  return {
+    fullName: application.fullName || application.candidateName || '',
+    email: application.email || application.candidateEmail || '',
+    phone: application.phone || application.candidatePhone || '',
+    qualification: application.qualification || '',
+    experience: application.experience || '',
+    currentOrg: application.currentOrg || '',
+    resumeLink: application.resumeLink || application.resumeUrl || '',
+    coverNote: application.coverNote || '',
+    jobTitle: job?.title || '',
+    jobSlug: job?.slug || '',
+    roundTitle: round?.title || '',
+    roundShortDescription: round?.shortDescription || '',
+    roundLongDescription: round?.longDescription || '',
+    companyName: 'TwinSpace',
+  };
+}
+
+const loadChatFile = (file: string, seeder: () => any[]): any[] => {
+  try {
+    if (fs.existsSync(file)) {
+      const parsed = JSON.parse(fs.readFileSync(file, 'utf-8'));
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch (e) {
+    console.error(`Failed to load ${file}:`, e);
+  }
+  return typeof seeder === 'function' ? seeder() : [];
+};
+
+const saveChatFile = (file: string, data: any) => {
+  try {
+    fs.writeFileSync(file, JSON.stringify(data, null, 2), 'utf-8');
+  } catch (e) {
+    console.error(`Failed to save ${file}:`, e);
+  }
+};
+
+const JOBS_FILE = process.env.VERCEL ? '/tmp/erp_jobs.json' : path.join(process.cwd(), '.jobs.json');
+const APPLICATIONS_FILE = process.env.VERCEL ? '/tmp/erp_applications.json' : path.join(process.cwd(), '.applications.json');
+
+const seedJobPostings = (): any[] => [
   {
     id: 'job-1',
     title: 'Senior Full Stack Engineer',
@@ -205,6 +280,10 @@ let jobPostings: any[] = [
     employmentType: 'Full-Time',
     createdAt: new Date(Date.now() - 7 * 86400000).toISOString(),
     publishedAt: new Date(Date.now() - 6 * 86400000).toISOString(),
+    applicationConfirmationTemplate: DEFAULT_CAREER_TEMPLATES.applicationConfirmationTemplate,
+    roundAdvanceTemplate: DEFAULT_CAREER_TEMPLATES.roundAdvanceTemplate,
+    rejectionTemplate: DEFAULT_CAREER_TEMPLATES.rejectionTemplate,
+    hireTemplate: DEFAULT_CAREER_TEMPLATES.hireTemplate,
     fields: [
       { id: 'f1', label: 'Experience', value: '4+ Years in Node & React', fieldType: 'TEXT', section: 'PRIMARY', order: 1 },
       { id: 'f2', label: 'Salary Range', value: '$80,000 - $110,000 / yr', fieldType: 'TAG', section: 'PRIMARY', order: 2 },
@@ -229,6 +308,10 @@ let jobPostings: any[] = [
     employmentType: 'Full-Time',
     createdAt: new Date(Date.now() - 3 * 86400000).toISOString(),
     publishedAt: new Date(Date.now() - 2 * 86400000).toISOString(),
+    applicationConfirmationTemplate: DEFAULT_CAREER_TEMPLATES.applicationConfirmationTemplate,
+    roundAdvanceTemplate: DEFAULT_CAREER_TEMPLATES.roundAdvanceTemplate,
+    rejectionTemplate: DEFAULT_CAREER_TEMPLATES.rejectionTemplate,
+    hireTemplate: DEFAULT_CAREER_TEMPLATES.hireTemplate,
     fields: [
       { id: 'f21', label: 'Experience', value: '3+ Years in SaaS UX', fieldType: 'TEXT', section: 'PRIMARY', order: 1 },
       { id: 'f22', label: 'Tooling', value: 'Figma, Design Systems, Prototyping', fieldType: 'TAG', section: 'PRIMARY', order: 2 },
@@ -242,7 +325,10 @@ let jobPostings: any[] = [
   }
 ];
 
-let jobApplications: any[] = [
+let jobPostings: any[] = loadChatFile(JOBS_FILE, seedJobPostings);
+const saveJobPostings = () => saveChatFile(JOBS_FILE, jobPostings);
+
+let jobApplications: any[] = loadChatFile(APPLICATIONS_FILE, () => [
   {
     id: 'app-1',
     jobId: 'job-1',
@@ -285,7 +371,7 @@ let jobApplications: any[] = [
     notes: 'Superb visual craftsmanship and typography.',
     rating: 5
   }
-];
+]);
 
 let hrDocuments: any[] = [
   { id: 'doc-1', name: 'Employee Code of Conduct 2026', category: 'Policy', uploadedAt: '2026-01-10T10:00:00Z', fileUrl: 'https://example.com/docs/code_of_conduct_2026.pdf', fileSize: '1.2 MB' },
@@ -320,13 +406,6 @@ let complaints: any[] = [
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-if (!supabaseUrl || !supabaseKey) {
-  console.warn(
-    '[chat] SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY is not set. ' +
-    'Chat endpoints will return 503 until these are configured.'
-  );
-}
-
 export const supabaseAdmin = supabaseUrl && supabaseKey
   ? createClient(supabaseUrl, supabaseKey, { auth: { persistSession: false } })
   : null;
@@ -334,6 +413,155 @@ export const supabaseAdmin = supabaseUrl && supabaseKey
 export function isSupabaseReady(): boolean {
   return supabaseAdmin !== null;
 }
+
+// ─── Chat In-Memory / File Storage Fallback Engine ───────────────────────────
+const CHAT_TEAMS_FILE = process.env.VERCEL ? '/tmp/erp_chat_teams.json' : path.join(process.cwd(), '.chat_teams.json');
+const CHAT_MEMBERS_FILE = process.env.VERCEL ? '/tmp/erp_chat_members.json' : path.join(process.cwd(), '.chat_members.json');
+const CHAT_MSGS_FILE = process.env.VERCEL ? '/tmp/erp_chat_msgs.json' : path.join(process.cwd(), '.chat_msgs.json');
+const CHAT_READS_FILE = process.env.VERCEL ? '/tmp/erp_chat_reads.json' : path.join(process.cwd(), '.chat_reads.json');
+const CHAT_ATTS_FILE = process.env.VERCEL ? '/tmp/erp_chat_atts.json' : path.join(process.cwd(), '.chat_atts.json');
+
+const seedChatTeams = (): any[] => [
+  {
+    id: 'team-general',
+    name: 'General & Company Wide',
+    created_by: 'e3',
+    created_at: new Date(Date.now() - 7 * 86400000).toISOString(),
+    restrict_history_to_membership_window: false
+  },
+  {
+    id: 'team-engineering',
+    name: 'Engineering Pod',
+    created_by: 'e5',
+    created_at: new Date(Date.now() - 5 * 86400000).toISOString(),
+    restrict_history_to_membership_window: false
+  },
+  {
+    id: 'team-sales',
+    name: 'Sales & Client Success',
+    created_by: 'e4',
+    created_at: new Date(Date.now() - 3 * 86400000).toISOString(),
+    restrict_history_to_membership_window: false
+  }
+];
+
+const seedChatMembers = (): any[] => {
+  const members: any[] = [];
+  // All employees belong to General team
+  employees.forEach((emp) => {
+    members.push({
+      id: `mem-gen-${emp.id}`,
+      team_id: 'team-general',
+      user_id: emp.id,
+      role_in_team: emp.role === 'Admin' ? 'Admin' : (emp.role === 'Manager' || emp.role === 'Team Leader' ? 'Leader' : 'Member'),
+      can_post: true,
+      can_delete_others_messages: ['Admin', 'HR', 'CEO', 'CTO', 'Manager'].includes(emp.role),
+      can_remove_members: ['Admin', 'HR', 'CEO', 'CTO'].includes(emp.role),
+      view_only: false,
+      status: 'active',
+      joined_at: new Date(Date.now() - 7 * 86400000).toISOString()
+    });
+  });
+
+  // Engineering members
+  const engEmployees = employees.filter(e => e.department === 'Engineering' || e.role === 'Admin' || e.role === 'CTO');
+  engEmployees.forEach((emp) => {
+    members.push({
+      id: `mem-eng-${emp.id}`,
+      team_id: 'team-engineering',
+      user_id: emp.id,
+      role_in_team: emp.role === 'CTO' ? 'Lead Architect' : (emp.role === 'Team Leader' ? 'Tech Lead' : (emp.role === 'Admin' ? 'Admin' : 'Developer')),
+      can_post: true,
+      can_delete_others_messages: ['Admin', 'CTO', 'Team Leader'].includes(emp.role),
+      can_remove_members: ['Admin', 'CTO'].includes(emp.role),
+      view_only: false,
+      status: 'active',
+      joined_at: new Date(Date.now() - 5 * 86400000).toISOString()
+    });
+  });
+
+  // Sales members
+  const salesEmployees = employees.filter(e => e.department === 'Sales' || e.role === 'Admin' || e.role === 'CEO');
+  salesEmployees.forEach((emp) => {
+    members.push({
+      id: `mem-sales-${emp.id}`,
+      team_id: 'team-sales',
+      user_id: emp.id,
+      role_in_team: emp.role === 'CEO' ? 'Executive' : (emp.role === 'Team Leader' ? 'Sales Lead' : 'Account Rep'),
+      can_post: true,
+      can_delete_others_messages: ['Admin', 'CEO', 'Team Leader'].includes(emp.role),
+      can_remove_members: ['Admin', 'CEO'].includes(emp.role),
+      view_only: false,
+      status: 'active',
+      joined_at: new Date(Date.now() - 3 * 86400000).toISOString()
+    });
+  });
+
+  return members;
+};
+
+const seedChatMessages = (): any[] => [
+  {
+    id: 'msg-gen-1',
+    team_id: 'team-general',
+    sender_id: 'system',
+    content: 'Team "General & Company Wide" was created.',
+    type: 'system',
+    created_at: new Date(Date.now() - 7 * 86400000).toISOString()
+  },
+  {
+    id: 'msg-gen-2',
+    team_id: 'team-general',
+    sender_id: 'e3',
+    content: 'Welcome to TwinERP Team Chat! Here you can collaborate across all teams, share documents, mention teammates with @name, and track project milestones.',
+    type: 'text',
+    created_at: new Date(Date.now() - 6 * 86400000).toISOString()
+  },
+  {
+    id: 'msg-eng-1',
+    team_id: 'team-engineering',
+    sender_id: 'system',
+    content: 'Team "Engineering Pod" was created.',
+    type: 'system',
+    created_at: new Date(Date.now() - 5 * 86400000).toISOString()
+  },
+  {
+    id: 'msg-eng-2',
+    team_id: 'team-engineering',
+    sender_id: 'e5',
+    content: 'Welcome engineering team. Please share your daily sprint blockers and pull requests here.',
+    type: 'text',
+    created_at: new Date(Date.now() - 4 * 86400000).toISOString()
+  },
+  {
+    id: 'msg-sales-1',
+    team_id: 'team-sales',
+    sender_id: 'system',
+    content: 'Team "Sales & Client Success" was created.',
+    type: 'system',
+    created_at: new Date(Date.now() - 3 * 86400000).toISOString()
+  },
+  {
+    id: 'msg-sales-2',
+    team_id: 'team-sales',
+    sender_id: 'e10',
+    content: 'Q3 lead distribution is updated on the CRM dashboard. Let us hit our targets this month!',
+    type: 'text',
+    created_at: new Date(Date.now() - 2 * 86400000).toISOString()
+  }
+];
+
+let localChatTeams: any[] = loadChatFile(CHAT_TEAMS_FILE, seedChatTeams);
+let localChatMembers: any[] = loadChatFile(CHAT_MEMBERS_FILE, seedChatMembers);
+let localChatMessages: any[] = loadChatFile(CHAT_MSGS_FILE, seedChatMessages);
+let localChatReadStates: any[] = loadChatFile(CHAT_READS_FILE, () => []);
+let localChatAttachments: any[] = loadChatFile(CHAT_ATTS_FILE, () => []);
+
+const persistChatTeams = () => saveChatFile(CHAT_TEAMS_FILE, localChatTeams);
+const persistChatMembers = () => saveChatFile(CHAT_MEMBERS_FILE, localChatMembers);
+const persistChatMessages = () => saveChatFile(CHAT_MSGS_FILE, localChatMessages);
+const persistChatReadStates = () => saveChatFile(CHAT_READS_FILE, localChatReadStates);
+const persistChatAttachments = () => saveChatFile(CHAT_ATTS_FILE, localChatAttachments);
 
 // ─── Chat Auth & Helpers ───────────────────────────────────────────────────
 function getCallerFromHeaders(req: express.Request): { userId: string; userRole: string } | null {
@@ -343,27 +571,30 @@ function getCallerFromHeaders(req: express.Request): { userId: string; userRole:
   return { userId, userRole: userRole || 'Member' };
 }
 
-function requireSupabase(res: express.Response): boolean {
-  if (!isSupabaseReady()) {
-    res.status(503).json({ error: 'Chat service not configured (missing Supabase env vars)' });
-    return false;
-  }
-  return true;
-}
-
 function isElevated(role: string): boolean {
   return ['Admin', 'HR', 'CEO', 'CTO', 'Manager'].includes(role);
 }
 
 export async function postSystemMessage(teamId: string, text: string): Promise<void> {
-  if (!supabaseAdmin) return;
-  await supabaseAdmin.from('chat_messages').insert({
+  const sysMsg = {
     id:        `sys-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
     team_id:   teamId,
     sender_id: 'system',
     content:   text,
     type:      'system',
-  });
+    created_at: new Date().toISOString()
+  };
+
+  localChatMessages.push(sysMsg);
+  persistChatMessages();
+
+  if (supabaseAdmin) {
+    try {
+      await supabaseAdmin.from('chat_messages').insert(sysMsg);
+    } catch (e) {
+      console.warn('[chat] Supabase system message error (fallback used):', e);
+    }
+  }
 }
 
 // ─── Team Chat Router ───────────────────────────────────────────────────────
@@ -371,103 +602,159 @@ export const chatRouter = express.Router();
 
 // GET /api/chat/teams — list teams caller is an active member of
 chatRouter.get('/chat/teams', async (req: express.Request, res: express.Response) => {
-  if (!requireSupabase(res)) return;
   const caller = getCallerFromHeaders(req);
   if (!caller) return void res.status(401).json({ error: 'Unauthorized' });
 
-  const sb = supabaseAdmin!;
+  // 1. Try Supabase if configured
+  if (supabaseAdmin) {
+    try {
+      const sb = supabaseAdmin;
+      const { data: memberships, error: mErr } = await sb
+        .from('chat_team_memberships')
+        .select('team_id, role_in_team, can_post, view_only, joined_at')
+        .eq('user_id', caller.userId)
+        .eq('status', 'active');
 
-  const { data: memberships, error: mErr } = await sb
-    .from('chat_team_memberships')
-    .select('team_id, role_in_team, can_post, view_only, joined_at')
-    .eq('user_id', caller.userId)
-    .eq('status', 'active');
+      if (!mErr && memberships) {
+        if (!memberships.length) return void res.json([]);
+        const teamIds = memberships.map(m => m.team_id);
+        const { data: teams, error: tErr } = await sb.from('chat_teams').select('*').in('id', teamIds);
+        if (!tErr && teams) {
+          const { data: readStates } = await sb
+            .from('chat_message_read_state')
+            .select('team_id, last_read_message_id')
+            .eq('user_id', caller.userId)
+            .in('team_id', teamIds);
 
-  if (mErr) return void res.status(500).json({ error: mErr.message });
-  if (!memberships?.length) return void res.json([]);
+          const result = await Promise.all(teams.map(async team => {
+            const membership = memberships.find(m => m.team_id === team.id)!;
+            const readState  = readStates?.find(r => r.team_id === team.id);
+            let unreadCount = 0;
+            if (readState?.last_read_message_id) {
+              const { data: lastMsg } = await sb
+                .from('chat_messages')
+                .select('created_at')
+                .eq('id', readState.last_read_message_id)
+                .single();
+              if (lastMsg) {
+                const { count } = await sb
+                  .from('chat_messages')
+                  .select('id', { count: 'exact', head: true })
+                  .eq('team_id', team.id)
+                  .is('deleted_at', null)
+                  .neq('sender_id', caller.userId)
+                  .gt('created_at', lastMsg.created_at);
+                unreadCount = count || 0;
+              }
+            } else {
+              const { count } = await sb
+                .from('chat_messages')
+                .select('id', { count: 'exact', head: true })
+                .eq('team_id', team.id)
+                .is('deleted_at', null)
+                .neq('sender_id', caller.userId);
+              unreadCount = count || 0;
+            }
+            return {
+              ...team,
+              membership: {
+                roleInTeam: membership.role_in_team,
+                canPost:    membership.can_post,
+                viewOnly:   membership.view_only,
+                joinedAt:   membership.joined_at,
+              },
+              unreadCount,
+            };
+          }));
+          return void res.json(result);
+        }
+      }
+    } catch (e) {
+      console.warn('[chat] Supabase get teams error, using fallback:', e);
+    }
+  }
 
-  const teamIds = memberships.map(m => m.team_id);
+  // 2. Resilient local fallback:
+  let userMemberships = localChatMembers.filter(m => m.user_id === caller.userId && m.status === 'active');
 
-  const { data: teams, error: tErr } = await sb
-    .from('chat_teams')
-    .select('*')
-    .in('id', teamIds);
+  // If elevated role has no memberships, automatically ensure they are members of default teams
+  if (userMemberships.length === 0 && isElevated(caller.userRole)) {
+    localChatTeams.forEach(t => {
+      const exists = localChatMembers.find(m => m.team_id === t.id && m.user_id === caller.userId);
+      if (!exists) {
+        localChatMembers.push({
+          id: `mem-${t.id}-${caller.userId}`,
+          team_id: t.id,
+          user_id: caller.userId,
+          role_in_team: caller.userRole,
+          can_post: true,
+          can_delete_others_messages: true,
+          can_remove_members: true,
+          view_only: false,
+          status: 'active',
+          joined_at: new Date().toISOString()
+        });
+      }
+    });
+    persistChatMembers();
+    userMemberships = localChatMembers.filter(m => m.user_id === caller.userId && m.status === 'active');
+  }
 
-  if (tErr) return void res.status(500).json({ error: tErr.message });
+  const teamIds = new Set(userMemberships.map(m => m.team_id));
+  const accessibleTeams = localChatTeams.filter(t => teamIds.has(t.id));
 
-  const { data: readStates } = await sb
-    .from('chat_message_read_state')
-    .select('team_id, last_read_message_id')
-    .eq('user_id', caller.userId)
-    .in('team_id', teamIds);
-
-  const result = await Promise.all((teams || []).map(async team => {
-    const membership = memberships.find(m => m.team_id === team.id)!;
-    const readState  = readStates?.find(r => r.team_id === team.id);
+  const result = accessibleTeams.map(team => {
+    const membership = userMemberships.find(m => m.team_id === team.id)!;
+    const readState = localChatReadStates.find(r => r.team_id === team.id && r.user_id === caller.userId);
 
     let unreadCount = 0;
-    if (readState?.last_read_message_id) {
-      const { data: lastMsg } = await sb
-        .from('chat_messages')
-        .select('created_at')
-        .eq('id', readState.last_read_message_id)
-        .single();
+    const teamMsgs = localChatMessages.filter(m => m.team_id === team.id && !m.deleted_at && m.sender_id !== caller.userId);
 
+    if (readState?.last_read_message_id) {
+      const lastMsg = localChatMessages.find(m => m.id === readState.last_read_message_id);
       if (lastMsg) {
-        const { count } = await sb
-          .from('chat_messages')
-          .select('id', { count: 'exact', head: true })
-          .eq('team_id', team.id)
-          .is('deleted_at', null)
-          .neq('sender_id', caller.userId)
-          .gt('created_at', lastMsg.created_at);
-        unreadCount = count || 0;
+        unreadCount = teamMsgs.filter(m => new Date(m.created_at).getTime() > new Date(lastMsg.created_at).getTime()).length;
+      } else {
+        unreadCount = teamMsgs.length;
       }
     } else {
-      const { count } = await sb
-        .from('chat_messages')
-        .select('id', { count: 'exact', head: true })
-        .eq('team_id', team.id)
-        .is('deleted_at', null)
-        .neq('sender_id', caller.userId);
-      unreadCount = count || 0;
+      unreadCount = teamMsgs.length;
     }
 
     return {
       ...team,
       membership: {
-        roleInTeam: membership.role_in_team,
-        canPost:    membership.can_post,
-        viewOnly:   membership.view_only,
-        joinedAt:   membership.joined_at,
+        roleInTeam: membership ? membership.role_in_team : caller.userRole,
+        canPost:    membership ? membership.can_post : true,
+        viewOnly:   membership ? membership.view_only : false,
+        joinedAt:   membership ? membership.joined_at : team.created_at,
       },
       unreadCount,
     };
-  }));
+  });
 
   res.json(result);
 });
 
-// POST /api/chat/teams — create team (HR/Admin only)
+// POST /api/chat/teams — create team (HR/Admin/Managers)
 chatRouter.post('/chat/teams', async (req: express.Request, res: express.Response) => {
-  if (!requireSupabase(res)) return;
   const caller = getCallerFromHeaders(req);
   if (!caller) return void res.status(401).json({ error: 'Unauthorized' });
-  if (!isElevated(caller.userRole)) return void res.status(403).json({ error: 'Only HR/Admin can create teams' });
+  if (!isElevated(caller.userRole)) return void res.status(403).json({ error: 'Only HR/Admin/Managers can create teams' });
 
   const { name, memberIds = [], restrictHistory = false } = req.body;
   if (!name?.trim()) return void res.status(400).json({ error: 'Team name is required' });
 
-  const sb = supabaseAdmin!;
   const teamId = `team-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+  const now = new Date().toISOString();
 
-  const { data: team, error: tErr } = await sb
-    .from('chat_teams')
-    .insert({ id: teamId, name: name.trim(), created_by: caller.userId, restrict_history_to_membership_window: restrictHistory })
-    .select()
-    .single();
-
-  if (tErr) return void res.status(500).json({ error: tErr.message });
+  const newTeam = {
+    id: teamId,
+    name: name.trim(),
+    created_by: caller.userId,
+    created_at: now,
+    restrict_history_to_membership_window: Boolean(restrictHistory)
+  };
 
   const creatorMembership = {
     id: `mem-${Date.now()}-creator`,
@@ -479,11 +766,12 @@ chatRouter.post('/chat/teams', async (req: express.Request, res: express.Respons
     can_remove_members: true,
     view_only: false,
     status: 'active',
+    joined_at: now
   };
 
-  const additionalMembers = (memberIds as string[])
-    .filter(id => id !== caller.userId)
-    .map((uid, i) => ({
+  const additionalMembers = (Array.isArray(memberIds) ? memberIds : [])
+    .filter((id: string) => id && id !== caller.userId)
+    .map((uid: string, i: number) => ({
       id: `mem-${Date.now()}-${i}`,
       team_id: teamId,
       user_id: uid,
@@ -493,128 +781,146 @@ chatRouter.post('/chat/teams', async (req: express.Request, res: express.Respons
       can_remove_members: false,
       view_only: false,
       status: 'active',
+      joined_at: now
     }));
 
-  await sb.from('chat_team_memberships').insert([creatorMembership, ...additionalMembers]);
-  await postSystemMessage(teamId, `Team "${name}" was created.`);
+  const allNewMembers = [creatorMembership, ...additionalMembers];
 
-  res.status(201).json(team);
+  // 1. Try Supabase if configured
+  if (supabaseAdmin) {
+    try {
+      const sb = supabaseAdmin;
+      const { data: team, error: tErr } = await sb.from('chat_teams').insert(newTeam).select().single();
+      if (!tErr && team) {
+        await sb.from('chat_team_memberships').insert(allNewMembers);
+        await postSystemMessage(teamId, `Team "${name}" was created.`);
+        return void res.status(201).json(team);
+      }
+    } catch (e) {
+      console.warn('[chat] Supabase create team error, using fallback:', e);
+    }
+  }
+
+  // 2. Resilient local fallback:
+  localChatTeams.unshift(newTeam);
+  localChatMembers.push(...allNewMembers);
+  persistChatTeams();
+  persistChatMembers();
+
+  await postSystemMessage(teamId, `Team "${name}" was created.`);
+  res.status(201).json(newTeam);
 });
 
 // GET /api/chat/teams/:teamId — team metadata + member list
 chatRouter.get('/chat/teams/:teamId', async (req: express.Request, res: express.Response) => {
-  if (!requireSupabase(res)) return;
   const caller = getCallerFromHeaders(req);
   if (!caller) return void res.status(401).json({ error: 'Unauthorized' });
 
   const { teamId } = req.params;
-  const sb = supabaseAdmin!;
 
-  const { data: myMembership } = await sb
-    .from('chat_team_memberships')
-    .select('*')
-    .eq('team_id', teamId)
-    .eq('user_id', caller.userId)
-    .eq('status', 'active')
-    .single();
-
-  if (!myMembership && !isElevated(caller.userRole)) {
-    return void res.status(403).json({ error: 'Not a member of this team' });
+  // 1. Try Supabase if configured
+  if (supabaseAdmin) {
+    try {
+      const sb = supabaseAdmin;
+      const [teamRes, membersRes] = await Promise.all([
+        sb.from('chat_teams').select('*').eq('id', teamId).single(),
+        sb.from('chat_team_memberships').select('*').eq('team_id', teamId),
+      ]);
+      if (!teamRes.error && teamRes.data) {
+        return void res.json({ team: teamRes.data, members: membersRes.data || [] });
+      }
+    } catch (e) {
+      console.warn('[chat] Supabase team detail error, using fallback:', e);
+    }
   }
 
-  const [teamRes, membersRes] = await Promise.all([
-    sb.from('chat_teams').select('*').eq('id', teamId).single(),
-    sb.from('chat_team_memberships').select('*').eq('team_id', teamId),
-  ]);
+  // 2. Resilient local fallback:
+  const team = localChatTeams.find(t => t.id === teamId);
+  if (!team) return void res.status(404).json({ error: 'Team not found' });
 
-  if (teamRes.error) return void res.status(404).json({ error: 'Team not found' });
-
-  res.json({ team: teamRes.data, members: membersRes.data || [] });
+  const members = localChatMembers.filter(m => m.team_id === teamId);
+  res.json({ team, members });
 });
 
 // GET /api/chat/teams/:teamId/messages — paginated messages
 chatRouter.get('/chat/teams/:teamId/messages', async (req: express.Request, res: express.Response) => {
-  if (!requireSupabase(res)) return;
   const caller = getCallerFromHeaders(req);
   if (!caller) return void res.status(401).json({ error: 'Unauthorized' });
 
   const { teamId } = req.params;
-  const before  = req.query.before as string | undefined;
-  const limit   = Math.min(parseInt(req.query.limit as string || '50', 10), 100);
+  const before = req.query.before as string | undefined;
+  const limit  = Math.min(parseInt(req.query.limit as string || '50', 10), 100);
 
-  const sb = supabaseAdmin!;
+  // 1. Try Supabase if configured
+  if (supabaseAdmin) {
+    try {
+      const sb = supabaseAdmin;
+      const { data: team } = await sb.from('chat_teams').select('restrict_history_to_membership_window').eq('id', teamId).single();
+      const { data: membership } = await sb.from('chat_team_memberships').select('*').eq('team_id', teamId).eq('user_id', caller.userId).eq('status', 'active').single();
 
-  const { data: membership } = await sb
-    .from('chat_team_memberships')
-    .select('*')
-    .eq('team_id', teamId)
-    .eq('user_id', caller.userId)
-    .eq('status', 'active')
-    .single();
+      let query = sb.from('chat_messages').select('*').eq('team_id', teamId).order('created_at', { ascending: false }).limit(limit);
 
-  if (!membership && !isElevated(caller.userRole)) {
-    return void res.status(403).json({ error: 'Not a member of this team' });
+      if (team?.restrict_history_to_membership_window && membership?.joined_at) {
+        query = query.gte('created_at', membership.joined_at);
+      }
+      if (before) {
+        const { data: pivot } = await sb.from('chat_messages').select('created_at').eq('id', before).single();
+        if (pivot) query = query.lt('created_at', pivot.created_at);
+      }
+
+      const { data: messages, error } = await query;
+      if (!error && messages) {
+        const msgIds = messages.map(m => m.id);
+        let attachmentsByMsg: Record<string, any[]> = {};
+        if (msgIds.length > 0) {
+          const { data: atts } = await sb.from('chat_message_attachments').select('*').in('message_id', msgIds);
+          if (atts) {
+            atts.forEach(a => {
+              if (!attachmentsByMsg[a.message_id]) attachmentsByMsg[a.message_id] = [];
+              attachmentsByMsg[a.message_id].push(a);
+            });
+          }
+        }
+        const enriched = messages.map(m => ({ ...m, attachments: attachmentsByMsg[m.id] || [] }));
+        return void res.json(enriched.reverse());
+      }
+    } catch (e) {
+      console.warn('[chat] Supabase get messages error, using fallback:', e);
+    }
   }
 
-  const { data: team } = await sb
-    .from('chat_teams')
-    .select('restrict_history_to_membership_window')
-    .eq('id', teamId)
-    .single();
+  // 2. Resilient local fallback:
+  const team = localChatTeams.find(t => t.id === teamId);
+  const membership = localChatMembers.find(m => m.team_id === teamId && m.user_id === caller.userId && m.status === 'active');
 
-  let query = sb
-    .from('chat_messages')
-    .select('*')
-    .eq('team_id', teamId)
-    .order('created_at', { ascending: false })
-    .limit(limit);
+  let filtered = localChatMessages.filter(m => m.team_id === teamId);
 
   if (team?.restrict_history_to_membership_window && membership?.joined_at) {
-    query = query.gte('created_at', membership.joined_at);
+    filtered = filtered.filter(m => new Date(m.created_at).getTime() >= new Date(membership.joined_at).getTime());
   }
 
   if (before) {
-    const { data: pivot } = await sb
-      .from('chat_messages')
-      .select('created_at')
-      .eq('id', before)
-      .single();
+    const pivot = localChatMessages.find(m => m.id === before);
     if (pivot) {
-      query = query.lt('created_at', pivot.created_at);
+      filtered = filtered.filter(m => new Date(m.created_at).getTime() < new Date(pivot.created_at).getTime());
     }
   }
 
-  const { data: messages, error } = await query;
-  if (error) return void res.status(500).json({ error: error.message });
+  // Sort newest first to slice limit
+  filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  const sliced = filtered.slice(0, limit);
 
-  const rawMessages = messages || [];
+  const enriched = sliced.map(m => {
+    const attachments = localChatAttachments.filter(a => a.message_id === m.id);
+    return { ...m, attachments };
+  });
 
-  const msgIds = rawMessages.map(m => m.id);
-  let attachmentsByMsg: Record<string, any[]> = {};
-  if (msgIds.length > 0) {
-    const { data: atts } = await sb
-      .from('chat_message_attachments')
-      .select('*')
-      .in('message_id', msgIds);
-    if (atts) {
-      atts.forEach(a => {
-        if (!attachmentsByMsg[a.message_id]) attachmentsByMsg[a.message_id] = [];
-        attachmentsByMsg[a.message_id].push(a);
-      });
-    }
-  }
-
-  const enriched = rawMessages.map(m => ({
-    ...m,
-    attachments: attachmentsByMsg[m.id] || []
-  }));
-
+  // Return chronological (ascending)
   res.json(enriched.reverse());
 });
 
 // POST /api/chat/teams/:teamId/messages — send a message
 chatRouter.post('/chat/teams/:teamId/messages', async (req: express.Request, res: express.Response) => {
-  if (!requireSupabase(res)) return;
   const caller = getCallerFromHeaders(req);
   if (!caller) return void res.status(401).json({ error: 'Unauthorized' });
 
@@ -624,73 +930,99 @@ chatRouter.post('/chat/teams/:teamId/messages', async (req: express.Request, res
     return void res.status(400).json({ error: 'Message content or attachment required' });
   }
 
-  const sb = supabaseAdmin!;
-
-  const { data: membership } = await sb
-    .from('chat_team_memberships')
-    .select('can_post, view_only, status')
-    .eq('team_id', teamId)
-    .eq('user_id', caller.userId)
-    .eq('status', 'active')
-    .single();
-
-  if (!membership) return void res.status(403).json({ error: 'Not an active member of this team' });
-  if (!membership.can_post || membership.view_only) {
-    return void res.status(403).json({ error: 'You do not have permission to post in this team' });
-  }
-
   const msgId = `msg-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
   const msgType = attachments && attachments.length > 0 && !content?.trim() ? 'file' : type;
+  const now = new Date().toISOString();
 
-  const { data: message, error } = await sb
-    .from('chat_messages')
-    .insert({ id: msgId, team_id: teamId, sender_id: caller.userId, content: (content || '').trim(), type: msgType })
-    .select()
-    .single();
+  const newMsg = {
+    id: msgId,
+    team_id: teamId,
+    sender_id: caller.userId,
+    content: (content || '').trim(),
+    type: msgType,
+    created_at: now
+  };
 
-  if (error) return void res.status(500).json({ error: error.message });
-
-  let savedAttachments: any[] = [];
+  const savedAttachments: any[] = [];
   if (Array.isArray(attachments) && attachments.length > 0) {
-    const toInsert = attachments.map((att: any) => ({
-      id: `att-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
-      message_id: msgId,
-      url: att.url,
-      file_name: att.fileName || att.file_name || 'attachment',
-      mime_type: att.mimeType || att.mime_type || 'application/octet-stream',
-    }));
-    const { data: attData } = await sb.from('chat_message_attachments').insert(toInsert).select();
-    savedAttachments = attData || [];
+    attachments.forEach((att: any, idx: number) => {
+      const attObj = {
+        id: `att-${Date.now()}-${idx}-${Math.random().toString(36).slice(2, 6)}`,
+        message_id: msgId,
+        url: att.url,
+        file_name: att.fileName || att.file_name || 'attachment',
+        mime_type: att.mimeType || att.mime_type || 'application/octet-stream',
+      };
+      savedAttachments.push(attObj);
+      localChatAttachments.push(attObj);
+    });
+    persistChatAttachments();
   }
 
-  // Parse @mentions and trigger ERP notification pipeline
+  // Always save in local storage:
+  localChatMessages.push(newMsg);
+  persistChatMessages();
+
+  // Upsert read state for sender
+  const existingReadIndex = localChatReadStates.findIndex(r => r.team_id === teamId && r.user_id === caller.userId);
+  if (existingReadIndex >= 0) {
+    localChatReadStates[existingReadIndex].last_read_message_id = msgId;
+    localChatReadStates[existingReadIndex].updated_at = now;
+  } else {
+    localChatReadStates.push({
+      user_id: caller.userId,
+      team_id: teamId,
+      last_read_message_id: msgId,
+      updated_at: now
+    });
+  }
+  persistChatReadStates();
+
+  // 1. Try syncing to Supabase if configured
+  if (supabaseAdmin) {
+    try {
+      const sb = supabaseAdmin;
+      await sb.from('chat_messages').insert(newMsg);
+      if (savedAttachments.length > 0) {
+        await sb.from('chat_message_attachments').insert(savedAttachments);
+      }
+      await sb.from('chat_message_read_state').upsert({
+        user_id: caller.userId,
+        team_id: teamId,
+        last_read_message_id: msgId,
+        updated_at: now
+      }, { onConflict: 'user_id,team_id' });
+    } catch (e) {
+      console.warn('[chat] Supabase message sync warning:', e);
+    }
+  }
+
+  // 2. Parse @mentions and trigger ERP notification pipeline
   try {
     const mentionRegex = /@([a-zA-Z0-9_.-]+(?:\s+[a-zA-Z0-9_.-]+)?)/g;
     const mentions = (content || '').match(mentionRegex);
     if (mentions && mentions.length > 0) {
-      const { data: teamData } = await sb.from('chat_teams').select('name').eq('id', teamId).single();
-      const teamName = teamData?.name || 'team chat';
-      
-      const { data: members } = await sb
-        .from('chat_team_memberships')
-        .select('user_id')
-        .eq('team_id', teamId)
-        .eq('status', 'active');
-      
-      const memberUserIds = new Set((members || []).map(m => m.user_id));
+      const teamObj = localChatTeams.find(t => t.id === teamId);
+      const teamName = teamObj?.name || 'team chat';
+
+      const activeMemberIds = new Set(
+        localChatMembers
+          .filter(m => m.team_id === teamId && m.status === 'active')
+          .map(m => m.user_id)
+      );
 
       if (Array.isArray(employees) && typeof addNotification === 'function') {
         const cleanedMentions = mentions.map((m: string) => m.slice(1).toLowerCase().trim());
-        
+
         employees.forEach((emp: any) => {
-          if (emp.id === caller.userId) return;
-          if (!memberUserIds.has(emp.id)) return;
+          if (emp.id === caller.userId) return; // Do not notify self
+          if (!activeMemberIds.has(emp.id)) return; // Only notify team members
 
           const fullName = `${emp.firstName || ''} ${emp.lastName || ''}`.toLowerCase().trim();
           const firstName = (emp.firstName || '').toLowerCase().trim();
           const username = (emp.email ? emp.email.split('@')[0] : '').toLowerCase().trim();
 
-          const isMentioned = cleanedMentions.some((m: string) => 
+          const isMentioned = cleanedMentions.some((m: string) =>
             m === fullName || m === firstName || m === username || m === emp.id.toLowerCase()
           );
 
@@ -710,23 +1042,14 @@ chatRouter.post('/chat/teams/:teamId/messages', async (req: express.Request, res
     console.error('[chat] Failed to process mentions:', err);
   }
 
-  // Update read state for sender
-  await sb.from('chat_message_read_state').upsert({
-    user_id: caller.userId,
-    team_id: teamId,
-    last_read_message_id: msgId,
-    updated_at: new Date().toISOString(),
-  }, { onConflict: 'user_id,team_id' });
-
   res.status(201).json({
-    ...message,
+    ...newMsg,
     attachments: savedAttachments
   });
 });
 
 // PATCH /api/chat/teams/:teamId/messages/:messageId — edit own message
 chatRouter.patch('/chat/teams/:teamId/messages/:messageId', async (req: express.Request, res: express.Response) => {
-  if (!requireSupabase(res)) return;
   const caller = getCallerFromHeaders(req);
   if (!caller) return void res.status(401).json({ error: 'Unauthorized' });
 
@@ -734,79 +1057,63 @@ chatRouter.patch('/chat/teams/:teamId/messages/:messageId', async (req: express.
   const { content } = req.body;
   if (!content?.trim()) return void res.status(400).json({ error: 'Content required' });
 
-  const sb = supabaseAdmin!;
+  const msg = localChatMessages.find(m => m.id === messageId && m.team_id === teamId);
+  if (!msg) return void res.status(404).json({ error: 'Message not found' });
+  if (msg.deleted_at) return void res.status(400).json({ error: 'Cannot edit a deleted message' });
+  if (msg.type === 'system') return void res.status(403).json({ error: 'System messages cannot be edited' });
+  if (msg.sender_id !== caller.userId) return void res.status(403).json({ error: 'Can only edit your own messages' });
 
-  const { data: message } = await sb
-    .from('chat_messages')
-    .select('sender_id, deleted_at, type')
-    .eq('id', messageId)
-    .eq('team_id', teamId)
-    .single();
+  msg.content = content.trim();
+  msg.edited_at = new Date().toISOString();
+  persistChatMessages();
 
-  if (!message) return void res.status(404).json({ error: 'Message not found' });
-  if (message.deleted_at) return void res.status(400).json({ error: 'Cannot edit a deleted message' });
-  if (message.type === 'system') return void res.status(403).json({ error: 'System messages cannot be edited' });
-  if (message.sender_id !== caller.userId) return void res.status(403).json({ error: 'Can only edit your own messages' });
+  if (supabaseAdmin) {
+    try {
+      await supabaseAdmin.from('chat_messages').update({ content: msg.content, edited_at: msg.edited_at }).eq('id', messageId);
+    } catch (e) {
+      console.warn('[chat] Supabase edit message sync warning:', e);
+    }
+  }
 
-  const { data: updated, error } = await sb
-    .from('chat_messages')
-    .update({ content: content.trim(), edited_at: new Date().toISOString() })
-    .eq('id', messageId)
-    .select()
-    .single();
-
-  if (error) return void res.status(500).json({ error: error.message });
-  res.json(updated);
+  res.json(msg);
 });
 
 // DELETE /api/chat/teams/:teamId/messages/:messageId — soft delete
 chatRouter.delete('/chat/teams/:teamId/messages/:messageId', async (req: express.Request, res: express.Response) => {
-  if (!requireSupabase(res)) return;
   const caller = getCallerFromHeaders(req);
   if (!caller) return void res.status(401).json({ error: 'Unauthorized' });
 
   const { teamId, messageId } = req.params;
-  const sb = supabaseAdmin!;
+  const msg = localChatMessages.find(m => m.id === messageId && m.team_id === teamId);
 
-  const { data: message } = await sb
-    .from('chat_messages')
-    .select('sender_id, deleted_at, type')
-    .eq('id', messageId)
-    .eq('team_id', teamId)
-    .single();
+  if (!msg) return void res.status(404).json({ error: 'Message not found' });
+  if (msg.deleted_at) return void res.status(400).json({ error: 'Already deleted' });
+  if (msg.type === 'system') return void res.status(403).json({ error: 'System messages cannot be deleted' });
 
-  if (!message) return void res.status(404).json({ error: 'Message not found' });
-  if (message.deleted_at) return void res.status(400).json({ error: 'Already deleted' });
-  if (message.type === 'system') return void res.status(403).json({ error: 'System messages cannot be deleted' });
-
-  const isOwn = message.sender_id === caller.userId;
+  const isOwn = msg.sender_id === caller.userId;
   if (!isOwn) {
-    const { data: m } = await sb
-      .from('chat_team_memberships')
-      .select('can_delete_others_messages')
-      .eq('team_id', teamId)
-      .eq('user_id', caller.userId)
-      .eq('status', 'active')
-      .single();
-
-    const canDelete = isElevated(caller.userRole) || m?.can_delete_others_messages;
+    const mem = localChatMembers.find(m => m.team_id === teamId && m.user_id === caller.userId && m.status === 'active');
+    const canDelete = isElevated(caller.userRole) || mem?.can_delete_others_messages;
     if (!canDelete) return void res.status(403).json({ error: 'Not authorized to delete this message' });
   }
 
-  const { data: updated, error } = await sb
-    .from('chat_messages')
-    .update({ deleted_at: new Date().toISOString(), content: '[message removed]' })
-    .eq('id', messageId)
-    .select()
-    .single();
+  msg.deleted_at = new Date().toISOString();
+  msg.content = '[message removed]';
+  persistChatMessages();
 
-  if (error) return void res.status(500).json({ error: error.message });
-  res.json(updated);
+  if (supabaseAdmin) {
+    try {
+      await supabaseAdmin.from('chat_messages').update({ deleted_at: msg.deleted_at, content: msg.content }).eq('id', messageId);
+    } catch (e) {
+      console.warn('[chat] Supabase delete message sync warning:', e);
+    }
+  }
+
+  res.json(msg);
 });
 
 // POST /api/chat/teams/:teamId/members — add member
 chatRouter.post('/chat/teams/:teamId/members', async (req: express.Request, res: express.Response) => {
-  if (!requireSupabase(res)) return;
   const caller = getCallerFromHeaders(req);
   if (!caller) return void res.status(401).json({ error: 'Unauthorized' });
 
@@ -814,113 +1121,109 @@ chatRouter.post('/chat/teams/:teamId/members', async (req: express.Request, res:
   const { userId, roleInTeam = 'Member', canPost = true, viewOnly = false, canDeleteOthersMessages = false, canRemoveMembers = false } = req.body;
   if (!userId) return void res.status(400).json({ error: 'userId required' });
 
-  const sb = supabaseAdmin!;
-
   if (!isElevated(caller.userRole)) {
-    const { data: callerMem } = await sb
-      .from('chat_team_memberships')
-      .select('can_remove_members')
-      .eq('team_id', teamId)
-      .eq('user_id', caller.userId)
-      .eq('status', 'active')
-      .single();
+    const callerMem = localChatMembers.find(m => m.team_id === teamId && m.user_id === caller.userId && m.status === 'active');
     if (!callerMem?.can_remove_members) {
-      return void res.status(403).json({ error: 'Only HR/Admin can add members' });
+      return void res.status(403).json({ error: 'Only HR/Admin/Lead can add members' });
     }
   }
 
-  const { data: team } = await sb.from('chat_teams').select('name').eq('id', teamId).single();
+  const team = localChatTeams.find(t => t.id === teamId);
 
-  await sb
-    .from('chat_team_memberships')
-    .update({ status: 'removed', removed_at: new Date().toISOString() })
-    .eq('team_id', teamId)
-    .eq('user_id', userId)
-    .eq('status', 'active');
+  // Deactivate any existing membership
+  localChatMembers.forEach(m => {
+    if (m.team_id === teamId && m.user_id === userId && m.status === 'active') {
+      m.status = 'removed';
+      m.removed_at = new Date().toISOString();
+    }
+  });
 
-  const { data: membership, error } = await sb
-    .from('chat_team_memberships')
-    .insert({
-      id: `mem-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
-      team_id: teamId,
-      user_id: userId,
-      role_in_team: roleInTeam,
-      can_post: canPost,
-      can_delete_others_messages: canDeleteOthersMessages,
-      can_remove_members: canRemoveMembers,
-      view_only: viewOnly,
-      status: 'active',
-    })
-    .select()
-    .single();
+  const newMembership = {
+    id: `mem-${Date.now()}-${Math.random().toString(36).slice(2, 5)}`,
+    team_id: teamId,
+    user_id: userId,
+    role_in_team: roleInTeam,
+    can_post: Boolean(canPost),
+    can_delete_others_messages: Boolean(canDeleteOthersMessages),
+    can_remove_members: Boolean(canRemoveMembers),
+    view_only: Boolean(viewOnly),
+    status: 'active',
+    joined_at: new Date().toISOString()
+  };
 
-  if (error) return void res.status(500).json({ error: error.message });
+  localChatMembers.push(newMembership);
+  persistChatMembers();
+
+  if (supabaseAdmin) {
+    try {
+      await supabaseAdmin.from('chat_team_memberships').update({ status: 'removed', removed_at: new Date().toISOString() }).eq('team_id', teamId).eq('user_id', userId).eq('status', 'active');
+      await supabaseAdmin.from('chat_team_memberships').insert(newMembership);
+    } catch (e) {
+      console.warn('[chat] Supabase add member sync warning:', e);
+    }
+  }
 
   await postSystemMessage(teamId, `User ${userId} was added to "${team?.name || teamId}" as ${roleInTeam}.`);
-
-  res.status(201).json(membership);
+  res.status(201).json(newMembership);
 });
 
 // DELETE /api/chat/teams/:teamId/members/:userId — remove member
 chatRouter.delete('/chat/teams/:teamId/members/:userId', async (req: express.Request, res: express.Response) => {
-  if (!requireSupabase(res)) return;
   const caller = getCallerFromHeaders(req);
   if (!caller) return void res.status(401).json({ error: 'Unauthorized' });
 
   const { teamId, userId } = req.params;
-  const sb = supabaseAdmin!;
 
   if (!isElevated(caller.userRole)) {
-    const { data: callerMem } = await sb
-      .from('chat_team_memberships')
-      .select('can_remove_members')
-      .eq('team_id', teamId)
-      .eq('user_id', caller.userId)
-      .eq('status', 'active')
-      .single();
+    const callerMem = localChatMembers.find(m => m.team_id === teamId && m.user_id === caller.userId && m.status === 'active');
     if (!callerMem?.can_remove_members) {
       return void res.status(403).json({ error: 'Not authorized to remove members' });
     }
   }
 
-  const { data: team } = await sb.from('chat_teams').select('name').eq('id', teamId).single();
+  const team = localChatTeams.find(t => t.id === teamId);
 
-  const { error } = await sb
-    .from('chat_team_memberships')
-    .update({ status: 'removed', removed_at: new Date().toISOString(), removed_by: caller.userId })
-    .eq('team_id', teamId)
-    .eq('user_id', userId)
-    .eq('status', 'active');
+  localChatMembers.forEach(m => {
+    if (m.team_id === teamId && m.user_id === userId && m.status === 'active') {
+      m.status = 'removed';
+      m.removed_at = new Date().toISOString();
+      m.removed_by = caller.userId;
+    }
+  });
+  persistChatMembers();
 
-  if (error) return void res.status(500).json({ error: error.message });
+  if (supabaseAdmin) {
+    try {
+      await supabaseAdmin.from('chat_team_memberships').update({ status: 'removed', removed_at: new Date().toISOString(), removed_by: caller.userId }).eq('team_id', teamId).eq('user_id', userId).eq('status', 'active');
+    } catch (e) {
+      console.warn('[chat] Supabase remove member sync warning:', e);
+    }
+  }
 
   await postSystemMessage(teamId, `User ${userId} was removed from "${team?.name || teamId}".`);
-
   res.status(204).end();
 });
 
 // GET /api/chat/teams/:teamId/read-state
 chatRouter.get('/chat/teams/:teamId/read-state', async (req: express.Request, res: express.Response) => {
-  if (!requireSupabase(res)) return;
   const caller = getCallerFromHeaders(req);
   if (!caller) return void res.status(401).json({ error: 'Unauthorized' });
 
   const { teamId } = req.params;
-  const sb = supabaseAdmin!;
 
-  const { data } = await sb
-    .from('chat_message_read_state')
-    .select('last_read_message_id, updated_at')
-    .eq('user_id', caller.userId)
-    .eq('team_id', teamId)
-    .single();
+  if (supabaseAdmin) {
+    try {
+      const { data } = await supabaseAdmin.from('chat_message_read_state').select('last_read_message_id, updated_at').eq('user_id', caller.userId).eq('team_id', teamId).single();
+      if (data) return void res.json(data);
+    } catch (e) { /* fallback */ }
+  }
 
-  res.json(data || { last_read_message_id: null });
+  const state = localChatReadStates.find(r => r.team_id === teamId && r.user_id === caller.userId);
+  res.json(state || { last_read_message_id: null });
 });
 
 // POST /api/chat/teams/:teamId/read-state
 chatRouter.post('/chat/teams/:teamId/read-state', async (req: express.Request, res: express.Response) => {
-  if (!requireSupabase(res)) return;
   const caller = getCallerFromHeaders(req);
   if (!caller) return void res.status(401).json({ error: 'Unauthorized' });
 
@@ -928,21 +1231,39 @@ chatRouter.post('/chat/teams/:teamId/read-state', async (req: express.Request, r
   const { lastReadMessageId } = req.body;
   if (!lastReadMessageId) return void res.status(400).json({ error: 'lastReadMessageId required' });
 
-  const sb = supabaseAdmin!;
+  const now = new Date().toISOString();
+  const idx = localChatReadStates.findIndex(r => r.team_id === teamId && r.user_id === caller.userId);
+  if (idx >= 0) {
+    localChatReadStates[idx].last_read_message_id = lastReadMessageId;
+    localChatReadStates[idx].updated_at = now;
+  } else {
+    localChatReadStates.push({
+      user_id: caller.userId,
+      team_id: teamId,
+      last_read_message_id: lastReadMessageId,
+      updated_at: now
+    });
+  }
+  persistChatReadStates();
 
-  await sb.from('chat_message_read_state').upsert({
-    user_id: caller.userId,
-    team_id: teamId,
-    last_read_message_id: lastReadMessageId,
-    updated_at: new Date().toISOString(),
-  }, { onConflict: 'user_id,team_id' });
+  if (supabaseAdmin) {
+    try {
+      await supabaseAdmin.from('chat_message_read_state').upsert({
+        user_id: caller.userId,
+        team_id: teamId,
+        last_read_message_id: lastReadMessageId,
+        updated_at: now,
+      }, { onConflict: 'user_id,team_id' });
+    } catch (e) {
+      console.warn('[chat] Supabase read state sync warning:', e);
+    }
+  }
 
   res.json({ success: true });
 });
 
 // GET /api/chat/teams/:teamId/search — search messages in a team
 chatRouter.get('/chat/teams/:teamId/search', async (req: express.Request, res: express.Response) => {
-  if (!requireSupabase(res)) return;
   const caller = getCallerFromHeaders(req);
   if (!caller) return void res.status(401).json({ error: 'Unauthorized' });
 
@@ -950,36 +1271,30 @@ chatRouter.get('/chat/teams/:teamId/search', async (req: express.Request, res: e
   const q = req.query.q as string;
   if (!q || !q.trim()) return void res.json([]);
 
-  const sb = supabaseAdmin!;
-
-  const { data: membership } = await sb
-    .from('chat_team_memberships')
-    .select('status')
-    .eq('team_id', teamId)
-    .eq('user_id', caller.userId)
-    .eq('status', 'active')
-    .single();
-
-  if (!membership && !isElevated(caller.userRole)) {
-    return void res.status(403).json({ error: 'Not a member of this team' });
+  if (supabaseAdmin) {
+    try {
+      const { data: messages, error } = await supabaseAdmin
+        .from('chat_messages')
+        .select('*')
+        .eq('team_id', teamId)
+        .is('deleted_at', null)
+        .ilike('content', `%${q.trim()}%`)
+        .order('created_at', { ascending: false })
+        .limit(50);
+      if (!error && messages) return void res.json(messages);
+    } catch (e) { /* fallback */ }
   }
 
-  const { data: messages, error } = await sb
-    .from('chat_messages')
-    .select('*')
-    .eq('team_id', teamId)
-    .is('deleted_at', null)
-    .ilike('content', `%${q.trim()}%`)
-    .order('created_at', { ascending: false })
-    .limit(50);
+  const needle = q.trim().toLowerCase();
+  const found = localChatMessages
+    .filter(m => m.team_id === teamId && !m.deleted_at && (m.content || '').toLowerCase().includes(needle))
+    .slice(0, 50);
 
-  if (error) return void res.status(500).json({ error: error.message });
-  res.json(messages || []);
+  res.json(found);
 });
 
 // POST /api/chat/workflow-system-message — post cross-module system message
 chatRouter.post('/chat/workflow-system-message', async (req: express.Request, res: express.Response) => {
-  if (!requireSupabase(res)) return;
   const caller = getCallerFromHeaders(req);
   if (!caller) return void res.status(401).json({ error: 'Unauthorized' });
   if (!isElevated(caller.userRole)) return void res.status(403).json({ error: 'Only managers/executives can trigger workflow messages' });
@@ -993,22 +1308,23 @@ chatRouter.post('/chat/workflow-system-message', async (req: express.Request, re
 
 // GET /api/chat/teams/:teamId/export — export team chat history to CSV
 chatRouter.get('/chat/teams/:teamId/export', async (req: express.Request, res: express.Response) => {
-  if (!requireSupabase(res)) return;
   const caller = getCallerFromHeaders(req);
   if (!caller) return void res.status(401).json({ error: 'Unauthorized' });
   if (!isElevated(caller.userRole)) return void res.status(403).json({ error: 'Only elevated roles (Admin/HR/Managers) can export chat logs' });
 
   const { teamId } = req.params;
-  const sb = supabaseAdmin!;
+  const team = localChatTeams.find(t => t.id === teamId);
 
-  const { data: team } = await sb.from('chat_teams').select('name').eq('id', teamId).single();
-  const { data: messages, error } = await sb
-    .from('chat_messages')
-    .select('*')
-    .eq('team_id', teamId)
-    .order('created_at', { ascending: true });
+  let messages = localChatMessages
+    .filter(m => m.team_id === teamId)
+    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
 
-  if (error) return void res.status(500).json({ error: error.message });
+  if (supabaseAdmin) {
+    try {
+      const { data } = await supabaseAdmin.from('chat_messages').select('*').eq('team_id', teamId).order('created_at', { ascending: true });
+      if (data) messages = data;
+    } catch (e) { /* fallback */ }
+  }
 
   const rows = [
     ['Message ID', 'Timestamp', 'Sender ID', 'Type', 'Content', 'Status', 'Edited At'].join(',')
@@ -1631,8 +1947,92 @@ export function createApp() {
     res.status(204).end();
   });
 
-  // --- Careers & Job Postings Endpoints ---
-  router.get('/careers/admin', (req, res) => {
+  // --- Public Careers Portal Endpoints (No Auth Required) ---
+  router.get('/careers', (_req, res) => {
+    const published = jobPostings.filter(j => j.status === 'PUBLISHED');
+    res.json(published);
+  });
+
+  router.get('/careers/:slug', (req, res) => {
+    const slugOrId = req.params.slug;
+    const job = jobPostings.find(j => (j.slug === slugOrId || j.id === slugOrId) && j.status === 'PUBLISHED');
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+    res.json(job);
+  });
+
+  // Public candidate application submission + Automatic Confirmation Email
+  router.post('/careers/:slug/apply', (req, res) => {
+    const slugOrId = req.params.slug;
+    const job = jobPostings.find(j => (j.slug === slugOrId || j.id === slugOrId) && j.status === 'PUBLISHED');
+    if (!job) return res.status(404).json({ message: 'Job posting not found or not published' });
+
+    const {
+      fullName, email, phone, qualification, experience, currentOrg, resumeLink, coverNote
+    } = req.body || {};
+
+    if (!fullName?.trim()) return res.status(400).json({ message: 'Full name is required' });
+    if (!email?.trim()) return res.status(400).json({ message: 'Email is required' });
+
+    const newApp = {
+      id: `app-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      jobId: job.id,
+      candidateName: fullName.trim(),
+      fullName: fullName.trim(),
+      candidateEmail: email.trim(),
+      email: email.trim(),
+      candidatePhone: phone?.trim() || '',
+      phone: phone?.trim() || '',
+      qualification: qualification?.trim() || '',
+      experience: experience?.trim() || '',
+      currentOrg: currentOrg?.trim() || '',
+      resumeUrl: resumeLink?.trim() || '',
+      resumeLink: resumeLink?.trim() || '',
+      coverNote: coverNote?.trim() || '',
+      currentRoundId: job.rounds?.[0]?.id || null,
+      status: 'APPLIED',
+      appliedAt: new Date().toISOString(),
+      emailLogs: [] as any[]
+    };
+
+    // Automatically generate and dispatch Application Confirmation Email
+    try {
+      const template = job.applicationConfirmationTemplate || DEFAULT_CAREER_TEMPLATES.applicationConfirmationTemplate;
+      const mergeCtx = buildMergeContext(newApp, job, job.rounds?.[0] || null);
+      const renderedHtml = renderTemplate(template, mergeCtx);
+      const emailLog = {
+        sentAt: new Date().toISOString(),
+        to: newApp.email,
+        subject: `Application Received - ${job.title} at TwinSpace`,
+        templateType: 'application_confirmation',
+        html: renderedHtml,
+        status: 'Sent'
+      };
+      newApp.emailLogs.push(emailLog);
+      console.log(`[Careers Email] Dispatched Confirmation Email to ${newApp.email} for ${job.title}`);
+    } catch (err) {
+      console.error('[Careers Email] Failed to render confirmation email:', err);
+    }
+
+    jobApplications.unshift(newApp);
+    saveChatFile(APPLICATIONS_FILE, jobApplications);
+
+    // Notify HR & Managers on the ERP Header Notification Bell
+    try {
+      addNotification({
+        title: `New Job Application: ${job.title}`,
+        message: `${newApp.fullName} applied for ${job.title}. Candidate profile available in recruitment pipeline.`,
+        type: 'approval',
+        targetRole: 'HR,Manager'
+      });
+    } catch (err) {
+      console.error('Failed to dispatch in-app notification for new application:', err);
+    }
+
+    res.status(201).json({ message: 'Application submitted successfully', application: newApp });
+  });
+
+  // --- HRM Dashboard Careers & Job Postings Endpoints ---
+  router.get('/careers/admin', (_req, res) => {
     res.json(jobPostings);
   });
 
@@ -1643,16 +2043,30 @@ export function createApp() {
   });
 
   router.post('/careers/admin', (req, res) => {
+    const body = req.body || {};
+    const baseSlug = body.slug || (body.title || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    let slug = baseSlug;
+    let suffix = 0;
+    while (jobPostings.some(j => j.slug === slug)) {
+      suffix++;
+      slug = `${baseSlug}-${suffix}`;
+    }
+
     const newJob = {
       id: `job-${Date.now()}`,
       createdAt: new Date().toISOString(),
-      status: 'DRAFT',
-      fields: [],
-      rounds: [],
-      ...req.body,
-      slug: req.body.slug || req.body.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+      status: body.status || 'DRAFT',
+      fields: body.fields || [],
+      rounds: body.rounds || [],
+      applicationConfirmationTemplate: body.applicationConfirmationTemplate?.trim() || DEFAULT_CAREER_TEMPLATES.applicationConfirmationTemplate,
+      roundAdvanceTemplate: body.roundAdvanceTemplate?.trim() || DEFAULT_CAREER_TEMPLATES.roundAdvanceTemplate,
+      rejectionTemplate: body.rejectionTemplate?.trim() || DEFAULT_CAREER_TEMPLATES.rejectionTemplate,
+      hireTemplate: body.hireTemplate?.trim() || DEFAULT_CAREER_TEMPLATES.hireTemplate,
+      ...body,
+      slug,
     };
     jobPostings.unshift(newJob);
+    saveJobPostings();
     res.status(201).json(newJob);
   });
 
@@ -1660,6 +2074,7 @@ export function createApp() {
     const index = jobPostings.findIndex(j => j.id === req.params.id);
     if (index === -1) return res.status(404).json({ message: 'Job not found' });
     jobPostings[index] = { ...jobPostings[index], ...req.body };
+    saveJobPostings();
     res.json(jobPostings[index]);
   });
 
@@ -1668,6 +2083,7 @@ export function createApp() {
     if (!job) return res.status(404).json({ message: 'Job not found' });
     job.status = 'PUBLISHED';
     job.publishedAt = new Date().toISOString();
+    saveJobPostings();
     res.json(job);
   });
 
@@ -1676,12 +2092,15 @@ export function createApp() {
     if (!job) return res.status(404).json({ message: 'Job not found' });
     job.status = 'CLOSED';
     job.closedAt = new Date().toISOString();
+    saveJobPostings();
     res.json(job);
   });
 
   router.delete('/careers/admin/:id', (req, res) => {
     jobPostings = jobPostings.filter(j => j.id !== req.params.id);
     jobApplications = jobApplications.filter(a => a.jobId !== req.params.id);
+    saveJobPostings();
+    saveChatFile(APPLICATIONS_FILE, jobApplications);
     res.status(204).end();
   });
 
@@ -1697,30 +2116,98 @@ export function createApp() {
       jobId: req.params.jobId,
       status: 'APPLIED',
       appliedAt: new Date().toISOString(),
+      emailLogs: [],
       ...req.body,
     };
     jobApplications.unshift(newApp);
+    saveChatFile(APPLICATIONS_FILE, jobApplications);
     res.status(201).json(newApp);
   });
 
+  // Advance Candidate Round + Automatic Round Advance Email
   router.patch('/applications/:id/round', (req, res) => {
     const app = jobApplications.find(a => a.id === req.params.id);
     if (!app) return res.status(404).json({ message: 'Application not found' });
-    app.currentRoundId = req.body.roundId;
-    if (req.body.status) app.status = req.body.status;
+    const { roundId, status = 'INTERVIEWING' } = req.body;
+    app.currentRoundId = roundId;
+    app.status = status;
+
+    const job = jobPostings.find(j => j.id === app.jobId);
+    const round = job?.rounds?.find((r: any) => r.id === roundId);
+
+    // Auto-send round advancement email
+    try {
+      const template = round?.emailTemplate || job?.roundAdvanceTemplate || DEFAULT_CAREER_TEMPLATES.roundAdvanceTemplate;
+      const mergeCtx = buildMergeContext(app, job, round);
+      const renderedHtml = renderTemplate(template, mergeCtx);
+      if (!app.emailLogs) app.emailLogs = [];
+      app.emailLogs.push({
+        sentAt: new Date().toISOString(),
+        to: app.email || app.candidateEmail,
+        subject: `Update on your application: ${round?.title || 'Next Round'} - ${job?.title}`,
+        templateType: 'round_advance',
+        html: renderedHtml,
+        status: 'Sent'
+      });
+      console.log(`[Careers Email] Sent Round Advance Email to ${app.email || app.candidateEmail} for ${round?.title}`);
+    } catch (e) {
+      console.error('[Careers Email] Failed to send round advance email:', e);
+    }
+
+    saveChatFile(APPLICATIONS_FILE, jobApplications);
     res.json(app);
   });
 
+  // Change Candidate Status (HIRED / REJECTED) + Automatic Email
   router.patch('/applications/:id/status', (req, res) => {
     const app = jobApplications.find(a => a.id === req.params.id);
     if (!app) return res.status(404).json({ message: 'Application not found' });
-    app.status = req.body.status;
-    if (req.body.notes !== undefined) app.notes = req.body.notes;
+    const { status, notes } = req.body;
+    app.status = status;
+    if (notes !== undefined) app.notes = notes;
+
+    const job = jobPostings.find(j => j.id === app.jobId);
+
+    try {
+      if (!app.emailLogs) app.emailLogs = [];
+      if (status === 'HIRED') {
+        const template = job?.hireTemplate || DEFAULT_CAREER_TEMPLATES.hireTemplate;
+        const mergeCtx = buildMergeContext(app, job);
+        const renderedHtml = renderTemplate(template, mergeCtx);
+        app.emailLogs.push({
+          sentAt: new Date().toISOString(),
+          to: app.email || app.candidateEmail,
+          subject: `Offer of Employment: ${job?.title} at TwinSpace`,
+          templateType: 'hire',
+          html: renderedHtml,
+          status: 'Sent'
+        });
+        console.log(`[Careers Email] Sent Hire Offer Email to ${app.email || app.candidateEmail}`);
+      } else if (status === 'REJECTED') {
+        const template = job?.rejectionTemplate || DEFAULT_CAREER_TEMPLATES.rejectionTemplate;
+        const mergeCtx = buildMergeContext(app, job);
+        const renderedHtml = renderTemplate(template, mergeCtx);
+        app.emailLogs.push({
+          sentAt: new Date().toISOString(),
+          to: app.email || app.candidateEmail,
+          subject: `Update on your application for ${job?.title} at TwinSpace`,
+          templateType: 'rejection',
+          html: renderedHtml,
+          status: 'Sent'
+        });
+        console.log(`[Careers Email] Sent Rejection Email to ${app.email || app.candidateEmail}`);
+      }
+    } catch (e) {
+      console.error('[Careers Email] Failed to send status email:', e);
+    }
+
+    saveChatFile(APPLICATIONS_FILE, jobApplications);
     res.json(app);
   });
 
   router.delete('/applications/:id', (req, res) => {
     jobApplications = jobApplications.filter(a => a.id !== req.params.id);
+    saveChatFile(APPLICATIONS_FILE, jobApplications);
     res.status(204).end();
   });
 

@@ -33,6 +33,8 @@ const ProjectKanban    = lazy(() => import('./pages/projects/ProjectKanban'));
 const ClientsList      = lazy(() => import('./pages/projects/ClientsList'));
 const CareersAdmin     = lazy(() => import('./pages/CareersAdmin'));
 const JobApplications  = lazy(() => import('./pages/JobApplications'));
+const CareersList      = lazy(() => import('./pages/careers/CareersList'));
+const CareersDetail    = lazy(() => import('./pages/careers/CareersDetail'));
 const DocumentsContracts = lazy(() => import('./pages/DocumentsContracts'));
 const UserManagement   = lazy(() => import('./pages/UserManagement'));
 const Lifecycle        = lazy(() => import('./pages/Lifecycle'));
@@ -108,78 +110,96 @@ export default function App() {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
   return (
-    <ErrorBoundary>
-      {!user ? (
-        <Login />
-      ) : (
-        <Router>
-          <div className="flex h-screen w-screen overflow-hidden bg-slate-50 dark:bg-[#0A0C10] text-slate-700 dark:text-slate-300 font-sans relative z-0">
-            <div className="bg-live-mesh fixed inset-0 pointer-events-none">
-              <div className="blob blob-1"></div>
-              <div className="blob blob-2"></div>
-              <div className="blob blob-3"></div>
-              <div className="grid-bg"></div>
-            </div>
-            
-            <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-            <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden z-10 relative">
-              <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
-              <Header onToggleSidebar={() => setSidebarOpen(prev => !prev)} />
-              <main className="flex-1 overflow-y-auto overflow-x-hidden">
-                <Suspense fallback={<PageLoader />}>
-                  <Routes>
-                    <Route path="/" element={<Dashboard />} />
-                    <Route path="/employees" element={<EmployeeList />} />
-                    <Route path="/attendance" element={<Attendance />} />
-                    <Route path="/leaves" element={<LeaveRequests />} />
-                    <Route path="/leave-balance" element={<LeaveBalance />} />
-                    <Route path="/payslips" element={<Payslips />} />
-                    <Route path="/resignations" element={<Resignations />} />
-                    <Route path="/terminations" element={<Terminations />} />
-                    <Route path="/holidays" element={<Holidays />} />
-                    <Route path="/awards" element={<Awards />} />
-                    <Route path="/announcements" element={<Announcements />} />
-                    <Route path="/events" element={<Events />} />
-                    <Route path="/letters" element={<LetterGenerator />} />
-                    <Route path="/analytics" element={<HRMUserAnalytics />} />
-                    <Route path="/settings" element={<Settings />} />
-                    <Route path="/careers" element={<CareersAdmin />} />
-                    <Route path="/careers/:jobId/applications" element={<JobApplications />} />
-                    <Route path="/documents" element={<DocumentsContracts />} />
-                    <Route path="/user-management" element={<UserManagement />} />
-                    <Route path="/lifecycle" element={<Lifecycle />} />
-                    <Route path="/privileges" element={<Privileges />} />
-                    <Route path="/chat" element={<TeamChat />} />
+    <Router>
+      <ErrorBoundary>
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            {/* Public Unauthenticated Careers Portal */}
+            <Route path="/careers" element={<CareersList />} />
+            <Route path="/carriers" element={<CareersList />} />
+            <Route path="/careers/:slug" element={<CareersDetail />} />
+            <Route path="/carriers/:slug" element={<CareersDetail />} />
 
-                    {/* CRM Module Routes */}
-                    <Route path="/crm">
-                      <Route index element={<div className="p-6"><DashboardDispatcher /></div>} />
-                      <Route path="leads" element={<div className="p-6"><LeadsDispatcher /></div>} />
-                      <Route path="upload-leads" element={<div className="p-6"><UploadLeads /></div>} />
-                      <Route path="customers" element={<div className="p-6"><Customers /></div>} />
-                      <Route path="customers/:id" element={<div className="p-6"><CustomerDetails /></div>} />
-                      <Route path="reports" element={<div className="p-6"><Reports /></div>} />
-                      <Route path="sales" element={<div className="p-6"><SalesUsers /></div>} />
-                      <Route path="calls" element={<div className="p-6"><CRMCalls /></div>} />
-                      <Route path="payments" element={<div className="p-6"><CRMPayments /></div>} />
-                      <Route path="distribute-leads" element={<div className="p-6"><DistributeLeads /></div>} />
-                      <Route path="settings" element={<div className="p-6"><CRMSettings /></div>} />
-                    </Route>
+            {/* Authenticated ERP Application Shell */}
+            <Route
+              path="/*"
+              element={
+                !user ? (
+                  <Login />
+                ) : (
+                  <div className="flex h-screen w-screen overflow-hidden bg-slate-50 dark:bg-[#0A0C10] text-slate-700 dark:text-slate-300 font-sans relative z-0">
+                    <div className="bg-live-mesh fixed inset-0 pointer-events-none">
+                      <div className="blob blob-1"></div>
+                      <div className="blob blob-2"></div>
+                      <div className="blob blob-3"></div>
+                      <div className="grid-bg"></div>
+                    </div>
+                    
+                    <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+                    <div className="flex-1 flex flex-col h-full min-w-0 overflow-hidden z-10 relative">
+                      <Toaster position="top-right" toastOptions={{ duration: 5000 }} />
+                      <Header onToggleSidebar={() => setSidebarOpen(prev => !prev)} />
+                      <main className="flex-1 overflow-y-auto overflow-x-hidden">
+                        <Suspense fallback={<PageLoader />}>
+                          <Routes>
+                            <Route path="/" element={<Dashboard />} />
+                            <Route path="/employees" element={<EmployeeList />} />
+                            <Route path="/attendance" element={<Attendance />} />
+                            <Route path="/leaves" element={<LeaveRequests />} />
+                            <Route path="/leave-balance" element={<LeaveBalance />} />
+                            <Route path="/payslips" element={<Payslips />} />
+                            <Route path="/resignations" element={<Resignations />} />
+                            <Route path="/terminations" element={<Terminations />} />
+                            <Route path="/holidays" element={<Holidays />} />
+                            <Route path="/awards" element={<Awards />} />
+                            <Route path="/announcements" element={<Announcements />} />
+                            <Route path="/events" element={<Events />} />
+                            <Route path="/letters" element={<LetterGenerator />} />
+                            <Route path="/analytics" element={<HRMUserAnalytics />} />
+                            <Route path="/settings" element={<Settings />} />
+                            <Route path="/hrm/careers" element={<CareersAdmin />} />
+                            <Route path="/hrm/careers/:jobId/applications" element={<JobApplications />} />
+                            <Route path="/careers/admin" element={<CareersAdmin />} />
+                            <Route path="/careers/admin/:jobId/applications" element={<JobApplications />} />
+                            <Route path="/documents" element={<DocumentsContracts />} />
+                            <Route path="/user-management" element={<UserManagement />} />
+                            <Route path="/lifecycle" element={<Lifecycle />} />
+                            <Route path="/privileges" element={<Privileges />} />
+                            <Route path="/chat" element={<TeamChat />} />
 
-                    {/* Projects Module Routes */}
-                    <Route path="/projects" element={<ProjectsDashboard />} />
-                    <Route path="/projects/all" element={<ProjectsList />} />
-                    <Route path="/projects/:id/board" element={<ProjectKanban />} />
-                    <Route path="/projects/clients" element={<ClientsList />} />
+                            {/* CRM Module Routes */}
+                            <Route path="/crm">
+                              <Route index element={<div className="p-6"><DashboardDispatcher /></div>} />
+                              <Route path="leads" element={<div className="p-6"><LeadsDispatcher /></div>} />
+                              <Route path="upload-leads" element={<div className="p-6"><UploadLeads /></div>} />
+                              <Route path="customers" element={<div className="p-6"><Customers /></div>} />
+                              <Route path="customers/:id" element={<div className="p-6"><CustomerDetails /></div>} />
+                              <Route path="reports" element={<div className="p-6"><Reports /></div>} />
+                              <Route path="sales" element={<div className="p-6"><SalesUsers /></div>} />
+                              <Route path="calls" element={<div className="p-6"><CRMCalls /></div>} />
+                              <Route path="payments" element={<div className="p-6"><CRMPayments /></div>} />
+                              <Route path="distribute-leads" element={<div className="p-6"><DistributeLeads /></div>} />
+                              <Route path="settings" element={<div className="p-6"><CRMSettings /></div>} />
+                            </Route>
 
-                    <Route path="*" element={<Navigate to="/" replace />} />
-                  </Routes>
-                </Suspense>
-              </main>
-            </div>
-          </div>
-        </Router>
-      )}
-    </ErrorBoundary>
+                            {/* Projects Module Routes */}
+                            <Route path="/projects" element={<ProjectsDashboard />} />
+                            <Route path="/projects/all" element={<ProjectsList />} />
+                            <Route path="/projects/:id/board" element={<ProjectKanban />} />
+                            <Route path="/projects/clients" element={<ClientsList />} />
+
+                            <Route path="*" element={<Navigate to="/" replace />} />
+                          </Routes>
+                        </Suspense>
+                      </main>
+                    </div>
+                  </div>
+                )
+              }
+            />
+          </Routes>
+        </Suspense>
+      </ErrorBoundary>
+    </Router>
   );
 }

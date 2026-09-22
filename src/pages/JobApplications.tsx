@@ -166,7 +166,7 @@ export default function JobApplications() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3 sm:gap-4 min-w-0">
           <button
-            onClick={() => navigate('/careers')}
+            onClick={() => navigate('/hrm/careers')}
             className="p-2.5 rounded-xl bg-white/80 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors shadow-sm cursor-pointer shrink-0"
           >
             <ArrowLeft size={18} />

@@ -65,7 +65,7 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
     { name: 'Privileges',       path: '/privileges',     icon: <ShieldCheck size={20} />,     hrOnly: false, adminOnly: true,  moduleKey: null },
     { name: 'User Accounts',    path: '/user-management',icon: <Shield size={20} />,          hrOnly: true,  adminOnly: false, moduleKey: 'user-management' as const },
     { name: 'Employees',        path: '/employees',      icon: <Users size={20} />,           hrOnly: true,  adminOnly: false, moduleKey: 'employees' as const },
-    { name: 'Careers & Jobs',   path: '/careers',        icon: <Briefcase size={20} />,       hrOnly: false, adminOnly: false, moduleKey: 'careers' as const },
+    { name: 'Careers & Jobs',   path: '/hrm/careers',    icon: <Briefcase size={20} />,       hrOnly: false, adminOnly: false, moduleKey: 'careers' as const },
     { name: 'Documents',        path: '/documents',      icon: <FileText size={20} />,        hrOnly: false, adminOnly: false, moduleKey: 'documents' as const },
     { name: 'Lifecycle',        path: '/lifecycle',      icon: <TrendingUp size={20} />,      hrOnly: false, adminOnly: false, moduleKey: 'lifecycle' as const },
     { name: 'Attendances',      path: '/attendance',     icon: <Clock size={20} />,           hrOnly: true,  adminOnly: false, moduleKey: 'attendance' as const },

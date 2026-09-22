@@ -152,13 +152,14 @@ export interface Client {
 
 export interface AppNotification {
   id: string;
-  type: 'approval' | 'alert' | 'policy' | 'overdue_break';
+  type: 'approval' | 'alert' | 'policy' | 'overdue_break' | 'mention';
   title: string;
   message: string;
   time: string;
   timestamp: string;
   read: boolean;
   targetRole?: string;
+  targetUserId?: string;
   employeeId?: string;
   employeeName?: string;
   overdueMinutes?: number;
@@ -193,6 +194,10 @@ export interface JobPosting {
   employmentType?: string;
   fields: JobField[];
   rounds: InterviewRound[];
+  applicationConfirmationTemplate?: string;
+  roundAdvanceTemplate?: string;
+  rejectionTemplate?: string;
+  hireTemplate?: string;
   createdAt: string;
   publishedAt?: string;
   closedAt?: string;
@@ -204,13 +209,22 @@ export interface JobApplication {
   candidateName: string;
   candidateEmail: string;
   candidatePhone?: string;
+  fullName?: string;
+  email?: string;
+  phone?: string;
+  qualification?: string;
+  experience?: string;
+  currentOrg?: string;
   resumeUrl?: string;
+  resumeLink?: string;
   portfolioUrl?: string;
+  coverNote?: string;
   currentRoundId?: string;
-  status: 'APPLIED' | 'IN_REVIEW' | 'INTERVIEWING' | 'HIRED' | 'REJECTED';
+  status: 'APPLIED' | 'IN_REVIEW' | 'INTERVIEWING' | 'HIRED' | 'REJECTED' | 'PENDING';
   appliedAt: string;
   notes?: string;
   rating?: number;
+  emailLogs?: Array<{ sentAt: string; subject: string; templateType: string; to: string }>;
 }
 
 // --- Documents & Contracts Types ---
