@@ -319,7 +319,31 @@ let complaints: any[] = [
 export function createApp() {
   const app = express();
 
-  app.use(express.json());
+  // Vercel Serverless request body compatibility:
+  // If Vercel pre-parsed the body, parse string or keep object; otherwise run express.json()
+  app.use((req: any, _res: any, next: any) => {
+    if (typeof req.body === 'string' && req.body.length > 0) {
+      try {
+        req.body = JSON.parse(req.body);
+      } catch { /* ignore */ }
+    }
+    if (req.body && typeof req.body === 'object') {
+      return next();
+    }
+    express.json({ limit: '10mb' })(req, _res, (err) => {
+      if (err) req.body = {};
+      next();
+    });
+  });
+
+  // Guarantee req.body is always a valid object
+  app.use((req: any, _res: any, next: any) => {
+    if (!req.body || typeof req.body !== 'object') {
+      req.body = {};
+    }
+    next();
+  });
+
   app.use((req, res, next) => { console.log(req.method, req.url); next(); });
 
   // Mount chat router (Supabase-backed, all /api/chat/* routes)
@@ -334,8 +358,11 @@ export function createApp() {
 
   // Auth API
   router.post('/login', (req, res) => {
-    const { email, password } = req.body;
-    let user = employees.find(e => e.email.toLowerCase() === email.toLowerCase());
+    const { email } = req.body || {};
+    let user = null;
+    if (email && typeof email === 'string') {
+      user = employees.find(e => e.email?.toLowerCase() === email.toLowerCase());
+    }
 
     if (!user) {
       user = employees[0];
