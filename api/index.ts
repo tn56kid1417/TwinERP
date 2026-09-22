@@ -2,8 +2,25 @@ import express from 'express';
 import path from 'path';
 import fs from 'fs';
 import { createClient } from '@supabase/supabase-js';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import nodemailer from 'nodemailer';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'twinerp-jwt-secret-key-production-2026';
 
 const ATTENDANCE_FILE = process.env.VERCEL ? '/tmp/erp_attendances.json' : path.join(process.cwd(), '.attendances.json');
+const EMPLOYEES_FILE = process.env.VERCEL ? '/tmp/erp_employees.json' : path.join(process.cwd(), '.employees.json');
+const PRIVILEGES_FILE = process.env.VERCEL ? '/tmp/erp_privileges.json' : path.join(process.cwd(), '.privileges.json');
+const CLIENTS_FILE = process.env.VERCEL ? '/tmp/erp_clients.json' : path.join(process.cwd(), '.clients.json');
+const HOLIDAYS_FILE = process.env.VERCEL ? '/tmp/erp_holidays.json' : path.join(process.cwd(), '.holidays.json');
+const AWARDS_FILE = process.env.VERCEL ? '/tmp/erp_awards.json' : path.join(process.cwd(), '.awards.json');
+const EVENTS_FILE = process.env.VERCEL ? '/tmp/erp_events.json' : path.join(process.cwd(), '.events.json');
+const DOCUMENTS_FILE = process.env.VERCEL ? '/tmp/erp_documents.json' : path.join(process.cwd(), '.documents.json');
+const AGREEMENTS_FILE = process.env.VERCEL ? '/tmp/erp_agreements.json' : path.join(process.cwd(), '.agreements.json');
+const TEMPLATES_FILE = process.env.VERCEL ? '/tmp/erp_templates.json' : path.join(process.cwd(), '.templates.json');
+const DEPARTMENTS_FILE = process.env.VERCEL ? '/tmp/erp_departments.json' : path.join(process.cwd(), '.departments.json');
+const BRANCHES_FILE = process.env.VERCEL ? '/tmp/erp_branches.json' : path.join(process.cwd(), '.branches.json');
+
 
 const loadAttendances = (): any[] => {
   try {
@@ -185,81 +202,204 @@ export const addNotification = (notif: { title: string; message: string; type?: 
   return newNotif;
 };
 
-// --- In-Memory Database ---
-export let employees: any[] = [
-  { id: 'e1', firstName: 'Alice', lastName: 'Smith', email: 'alice@example.com', department: 'Engineering', role: 'Developer', hireDate: '2023-01-15', isActive: true, shift: 'Morning' },
-  { id: 'e2', firstName: 'Bob', lastName: 'Johnson', email: 'bob@example.com', department: 'HR', role: 'Manager', hireDate: '2022-11-01', isActive: true, shift: 'Evening' },
-  { id: 'e3', firstName: 'System', lastName: 'Admin', email: 'admin@example.com', department: 'Administration', role: 'Admin', hireDate: '2023-01-01', isActive: true, shift: 'Morning' },
-  { id: 'e4', firstName: 'John', lastName: 'CEO', email: 'ceo@example.com', department: 'Executive', role: 'CEO', hireDate: '2021-01-01', isActive: true, shift: 'Morning' },
-  { id: 'e5', firstName: 'Jane', lastName: 'CTO', email: 'cto@example.com', department: 'Executive', role: 'CTO', hireDate: '2021-01-01', isActive: true, shift: 'Morning' },
-  { id: 'e6', firstName: 'Charlie', lastName: 'Leader', email: 'leader@example.com', department: 'Engineering', role: 'Team Leader', hireDate: '2022-05-10', isActive: true, shift: 'Morning' },
-  { id: 'e7', firstName: 'David', lastName: 'Developer', email: 'david@example.com', department: 'Engineering', role: 'Developer', hireDate: '2023-03-20', isActive: true, shift: 'Morning' },
-  { id: 'e8', firstName: 'Eve', lastName: 'Engineer', email: 'eve@example.com', department: 'Engineering', role: 'Developer', hireDate: '2023-04-12', isActive: true, shift: 'Evening' },
-  { id: 'e9', firstName: 'Frank', lastName: 'Frontend', email: 'frank@example.com', department: 'Engineering', role: 'Developer', hireDate: '2023-05-05', isActive: true, shift: 'Morning' },
-  { id: 'e10', firstName: 'Sarah', lastName: 'CRM Lead', email: 'sarah@example.com', department: 'Sales', role: 'Team Leader', hireDate: '2022-08-15', isActive: true, shift: 'Morning' },
-  { id: 'e11', firstName: 'Mike', lastName: 'Sales Rep', email: 'mike@example.com', department: 'Sales', role: 'Sales Rep', hireDate: '2023-09-01', isActive: true, shift: 'Morning' },
-  { id: 'e12', firstName: 'Mark', lastName: 'Digital Marketer', email: 'mark@example.com', department: 'Marketing', role: 'Marketing Member', hireDate: '2023-10-01', isActive: true, shift: 'Morning' },
+// ─── Real Email Sender Integration (Tier 2) ──────────────────────────────
+const getMailTransporter = () => {
+  const host = process.env.SMTP_HOST;
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+  const port = Number(process.env.SMTP_PORT || 587);
 
-  { id: 'user-sales-john', firstName: 'John', lastName: 'Doe', email: 'john@acme.com', department: 'Sales', role: 'Sales Rep', designation: 'Senior Account Manager', hireDate: '2015-01-01', isActive: true, shift: 'Morning', teamId: 'team-alpha' },
-  { id: 'user-sales-jane', firstName: 'Jane', lastName: 'Smith', email: 'jane@acme.com', department: 'Sales', role: 'Sales Rep', designation: 'Sales Representative', hireDate: '2016-01-01', isActive: true, shift: 'Morning', teamId: 'team-alpha' },
-  { id: 'user-leader-1', firstName: 'Michael', lastName: 'Scott', email: 'michael@acme.com', department: 'Sales', role: 'Sales Team Leader', designation: 'Regional Manager', hireDate: '2015-05-10', isActive: true, shift: 'Morning', teamId: 'team-alpha' },
-  { id: 'user-leader-2', firstName: 'Jim', lastName: 'Halpert', email: 'jim@acme.com', department: 'Sales', role: 'Sales Team Leader', designation: 'Co-Manager', hireDate: '2016-05-10', isActive: true, shift: 'Morning', teamId: 'team-beta' },
-  { id: 'user-sales-1', firstName: 'Dwight', lastName: 'Schrute', email: 'dwight@acme.com', department: 'Sales', role: 'Sales Rep', designation: 'Assistant to the Regional Manager', hireDate: '2017-03-20', isActive: true, shift: 'Morning', teamId: 'team-alpha' },
-  { id: 'user-sales-2', firstName: 'Stanley', lastName: 'Hudson', email: 'stanley@acme.com', department: 'Sales', role: 'Sales Rep', designation: 'Sales Representative', hireDate: '2018-03-20', isActive: true, shift: 'Morning', teamId: 'team-alpha' },
-  { id: 'user-sales-3', firstName: 'Phyllis', lastName: 'Vance', email: 'phyllis@acme.com', department: 'Sales', role: 'Sales Rep', designation: 'Sales Representative', hireDate: '2019-03-20', isActive: true, shift: 'Morning', teamId: 'team-alpha' },
-  { id: 'user-sales-4', firstName: 'Andy', lastName: 'Bernard', email: 'andy@acme.com', department: 'Sales', role: 'Sales Rep', designation: 'Sales Representative', hireDate: '2020-03-20', isActive: true, shift: 'Morning', teamId: 'team-beta' },
-  { id: 'user-sales-5', firstName: 'Ryan', lastName: 'Howard', email: 'ryan@acme.com', department: 'Sales', role: 'Sales Rep', designation: 'Temp Sales', hireDate: '2021-03-20', isActive: true, shift: 'Morning', teamId: 'team-beta' },
-  { id: 'user-sales-6', firstName: 'Pam', lastName: 'Beesly', email: 'pam@acme.com', department: 'Sales', role: 'Sales Rep', designation: 'Sales Representative', hireDate: '2022-03-20', isActive: true, shift: 'Morning', teamId: 'team-beta' },
-];
+  if (!host || !user) return null;
 
-const seedAttendances = () => {
-  const result: any[] = [];
-  const today = new Date();
-  const year = today.getFullYear();
-  const month = today.getMonth() + 1;
-  const monthStr = month.toString().padStart(2, '0');
-  
-  for (let d = 1; d < today.getDate(); d++) {
-    const dStr = d.toString().padStart(2, '0');
-    const date = `${year}-${monthStr}-${dStr}`;
-    result.push({
-      id: `a_e1_${d}`,
-      employeeId: 'e1',
-      date,
-      clockInTime: `${date}T09:00:00Z`,
-      clockOutTime: `${date}T17:00:00Z`,
-      status: Math.random() > 0.1 ? 'Present' : 'Absent'
-    });
-    result.push({
-      id: `a_e2_${d}`,
-      employeeId: 'e2',
-      date,
-      clockInTime: `${date}T09:00:00Z`,
-      clockOutTime: Math.random() > 0.8 ? `${date}T13:00:00Z` : `${date}T17:00:00Z`,
-      status: Math.random() > 0.8 ? 'Half-Day' : 'Present'
-    });
-  }
-  return result;
+  return nodemailer.createTransport({
+    host,
+    port,
+    secure: process.env.SMTP_SECURE === 'true' || port === 465,
+    auth: { user, pass: pass || '' },
+  });
 };
 
-let attendances: any[] = loadAttendances();
-let leaveRequests: any[] = [];
-let salaryStructures: any[] = [
-  { id: 's1', employeeId: 'e1', baseSalary: 80000, allowances: 5000, deductions: 2000 },
-  { id: 's2', employeeId: 'e2', baseSalary: 90000, allowances: 6000, deductions: 2500 },
+export async function sendEmail(options: { to: string; subject: string; html: string }): Promise<{ status: 'Sent' | 'Failed' | 'Not Configured'; error?: string }> {
+  const transporter = getMailTransporter();
+  if (!transporter) {
+    console.log(`[Mailer] Mailer not configured. To enable real email dispatch, provide environment variables: SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM.`);
+    return { status: 'Not Configured', error: 'SMTP credentials not configured in environment (requires SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM)' };
+  }
+
+  try {
+    const from = process.env.SMTP_FROM || process.env.SMTP_USER || 'no-reply@twinspace.io';
+    const info = await transporter.sendMail({
+      from,
+      to: options.to,
+      subject: options.subject,
+      html: options.html,
+    });
+    console.log(`[Mailer] Email sent successfully to ${options.to}: ${info.messageId}`);
+    return { status: 'Sent' };
+  } catch (err: any) {
+    console.error(`[Mailer] Failed to send email to ${options.to}:`, err);
+    return { status: 'Failed', error: err?.message || 'Unknown email error' };
+  }
+}
+
+// ─── File-backed Persistent Storage Engines (Tier 1, 2 & 4) ─────────────
+const defaultPasswordHash = bcrypt.hashSync('admin123', 10);
+
+const seedEmployees = (): any[] => [
+  { id: 'e1', firstName: 'Alice', lastName: 'Smith', email: 'alice@example.com', passwordHash: defaultPasswordHash, department: 'Engineering', role: 'Developer', hireDate: '2023-01-15', isActive: true, shift: 'Morning' },
+  { id: 'e2', firstName: 'Bob', lastName: 'Johnson', email: 'bob@example.com', passwordHash: defaultPasswordHash, department: 'HR', role: 'Manager', hireDate: '2022-11-01', isActive: true, shift: 'Evening' },
+  { id: 'e3', firstName: 'System', lastName: 'Admin', email: 'admin@example.com', passwordHash: defaultPasswordHash, department: 'Administration', role: 'Admin', hireDate: '2023-01-01', isActive: true, shift: 'Morning' },
+  { id: 'e4', firstName: 'John', lastName: 'CEO', email: 'ceo@example.com', passwordHash: defaultPasswordHash, department: 'Executive', role: 'CEO', hireDate: '2021-01-01', isActive: true, shift: 'Morning' },
+  { id: 'e5', firstName: 'Jane', lastName: 'CTO', email: 'cto@example.com', passwordHash: defaultPasswordHash, department: 'Executive', role: 'CTO', hireDate: '2021-01-01', isActive: true, shift: 'Morning' },
+  { id: 'e6', firstName: 'Charlie', lastName: 'Leader', email: 'leader@example.com', passwordHash: defaultPasswordHash, department: 'Engineering', role: 'Team Leader', hireDate: '2022-05-10', isActive: true, shift: 'Morning' },
+  { id: 'e7', firstName: 'David', lastName: 'Developer', email: 'david@example.com', passwordHash: defaultPasswordHash, department: 'Engineering', role: 'Developer', hireDate: '2023-03-20', isActive: true, shift: 'Morning' },
+  { id: 'e8', firstName: 'Eve', lastName: 'Engineer', email: 'eve@example.com', passwordHash: defaultPasswordHash, department: 'Engineering', role: 'Developer', hireDate: '2023-04-12', isActive: true, shift: 'Evening' },
+  { id: 'e9', firstName: 'Frank', lastName: 'Frontend', email: 'frank@example.com', passwordHash: defaultPasswordHash, department: 'Engineering', role: 'Developer', hireDate: '2023-05-05', isActive: true, shift: 'Morning' },
+  { id: 'e10', firstName: 'Sarah', lastName: 'CRM Lead', email: 'sarah@example.com', passwordHash: defaultPasswordHash, department: 'Sales', role: 'Team Leader', hireDate: '2022-08-15', isActive: true, shift: 'Morning' },
+  { id: 'e11', firstName: 'Mike', lastName: 'Sales Rep', email: 'mike@example.com', passwordHash: defaultPasswordHash, department: 'Sales', role: 'Sales Rep', hireDate: '2023-09-01', isActive: true, shift: 'Morning' },
+  { id: 'e12', firstName: 'Mark', lastName: 'Digital Marketer', email: 'mark@example.com', passwordHash: defaultPasswordHash, department: 'Marketing', role: 'Marketing Member', hireDate: '2023-10-01', isActive: true, shift: 'Morning' },
+
+  { id: 'user-sales-john', firstName: 'John', lastName: 'Doe', email: 'john@acme.com', passwordHash: defaultPasswordHash, department: 'Sales', role: 'Sales Rep', designation: 'Senior Account Manager', hireDate: '2015-01-01', isActive: true, shift: 'Morning', teamId: 'team-alpha' },
+  { id: 'user-sales-jane', firstName: 'Jane', lastName: 'Smith', email: 'jane@acme.com', passwordHash: defaultPasswordHash, department: 'Sales', role: 'Sales Rep', designation: 'Sales Representative', hireDate: '2016-01-01', isActive: true, shift: 'Morning', teamId: 'team-alpha' },
+  { id: 'user-leader-1', firstName: 'Michael', lastName: 'Scott', email: 'michael@acme.com', passwordHash: defaultPasswordHash, department: 'Sales', role: 'Sales Team Leader', designation: 'Regional Manager', hireDate: '2015-05-10', isActive: true, shift: 'Morning', teamId: 'team-alpha' },
+  { id: 'user-leader-2', firstName: 'Jim', lastName: 'Halpert', email: 'jim@acme.com', passwordHash: defaultPasswordHash, department: 'Sales', role: 'Sales Team Leader', designation: 'Co-Manager', hireDate: '2016-05-10', isActive: true, shift: 'Morning', teamId: 'team-beta' },
+  { id: 'user-sales-1', firstName: 'Dwight', lastName: 'Schrute', email: 'dwight@acme.com', passwordHash: defaultPasswordHash, department: 'Sales', role: 'Sales Rep', designation: 'Assistant to the Regional Manager', hireDate: '2017-03-20', isActive: true, shift: 'Morning', teamId: 'team-alpha' },
+  { id: 'user-sales-2', firstName: 'Stanley', lastName: 'Hudson', email: 'stanley@acme.com', passwordHash: defaultPasswordHash, department: 'Sales', role: 'Sales Rep', designation: 'Sales Representative', hireDate: '2018-03-20', isActive: true, shift: 'Morning', teamId: 'team-alpha' },
+  { id: 'user-sales-3', firstName: 'Phyllis', lastName: 'Vance', email: 'phyllis@acme.com', passwordHash: defaultPasswordHash, department: 'Sales', role: 'Sales Rep', designation: 'Sales Representative', hireDate: '2019-03-20', isActive: true, shift: 'Morning', teamId: 'team-alpha' },
+  { id: 'user-sales-4', firstName: 'Andy', lastName: 'Bernard', email: 'andy@acme.com', passwordHash: defaultPasswordHash, department: 'Sales', role: 'Sales Rep', designation: 'Sales Representative', hireDate: '2020-03-20', isActive: true, shift: 'Morning', teamId: 'team-beta' },
+  { id: 'user-sales-5', firstName: 'Ryan', lastName: 'Howard', email: 'ryan@acme.com', passwordHash: defaultPasswordHash, department: 'Sales', role: 'Sales Rep', designation: 'Temp Sales', hireDate: '2021-03-20', isActive: true, shift: 'Morning', teamId: 'team-beta' },
+  { id: 'user-sales-6', firstName: 'Pam', lastName: 'Beesly', email: 'pam@acme.com', passwordHash: defaultPasswordHash, department: 'Sales', role: 'Sales Rep', designation: 'Sales Representative', hireDate: '2022-03-20', isActive: true, shift: 'Morning', teamId: 'team-beta' },
 ];
-let payslips: any[] = [];
-let resignations: any[] = [];
-let terminations: any[] = [];
-let holidays: any[] = [];
-let awards: any[] = [];
-let announcements: any[] = [];
-let events: any[] = [];
-let clients: any[] = [
+
+const loadEmployees = (): any[] => {
+  try {
+    if (fs.existsSync(EMPLOYEES_FILE)) {
+      const data = fs.readFileSync(EMPLOYEES_FILE, 'utf-8');
+      const parsed = JSON.parse(data);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        parsed.forEach(e => {
+          if (!e.passwordHash && !e.password) e.passwordHash = defaultPasswordHash;
+        });
+        return parsed;
+      }
+    }
+  } catch (err) {
+    console.error('Failed to load employees from file:', err);
+  }
+  const seeded = seedEmployees();
+  try { fs.writeFileSync(EMPLOYEES_FILE, JSON.stringify(seeded, null, 2), 'utf-8'); } catch (err) {}
+  return seeded;
+};
+
+export let employees: any[] = loadEmployees();
+
+const saveEmployees = () => {
+  try { fs.writeFileSync(EMPLOYEES_FILE, JSON.stringify(employees, null, 2), 'utf-8'); } catch (err) {}
+  if (supabaseAdmin) {
+    try {
+      supabaseAdmin.from('employees').upsert(employees).then(({ error }) => {
+        if (error) console.warn('[Supabase] Employee sync notice:', error.message);
+      });
+    } catch { /* ignore */ }
+  }
+};
+
+const loadPrivileges = (): Record<string, any> => {
+  try {
+    if (fs.existsSync(PRIVILEGES_FILE)) {
+      const data = fs.readFileSync(PRIVILEGES_FILE, 'utf-8');
+      const parsed = JSON.parse(data);
+      if (parsed && typeof parsed === 'object') return parsed;
+    }
+  } catch (err) {}
+  return {};
+};
+
+let privilegesMap: Record<string, any> = loadPrivileges();
+
+const savePrivileges = () => {
+  try { fs.writeFileSync(PRIVILEGES_FILE, JSON.stringify(privilegesMap, null, 2), 'utf-8'); } catch (err) {}
+  if (supabaseAdmin) {
+    try {
+      supabaseAdmin.from('privileges').upsert({ id: 'privileges_map', map: privilegesMap }).then(({ error }) => {
+        if (error) console.warn('[Supabase] Privileges sync notice:', error.message);
+      });
+    } catch { /* ignore */ }
+  }
+};
+
+const loadGenericArrayFile = (file: string, seed: () => any[]): any[] => {
+  try {
+    if (fs.existsSync(file)) {
+      const data = fs.readFileSync(file, 'utf-8');
+      const parsed = JSON.parse(data);
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch (e) {}
+  return seed();
+};
+
+const saveGenericArrayFile = (file: string, data: any[]) => {
+  try { fs.writeFileSync(file, JSON.stringify(data, null, 2), 'utf-8'); } catch (e) {}
+};
+
+const seedClients = (): any[] => [
   { id: 'c1', name: 'Acme Corp', contactPerson: 'John Doe', email: 'john@acme.com', phone: '123-456-7890', industry: 'Retail', status: 'Active' },
   { id: 'c2', name: 'TechStart', contactPerson: 'Jane Smith', email: 'jane@techstart.io', phone: '987-654-3210', industry: 'Technology', status: 'Active' },
   { id: 'c3', name: 'Global Industries', contactPerson: 'Michael Brown', email: 'mbrown@global.com', phone: '555-019-2837', industry: 'Manufacturing', status: 'Inactive' }
 ];
+
+let clients: any[] = loadGenericArrayFile(CLIENTS_FILE, seedClients);
+const saveClients = () => saveGenericArrayFile(CLIENTS_FILE, clients);
+
+let holidays: any[] = loadGenericArrayFile(HOLIDAYS_FILE, () => []);
+const saveHolidays = () => saveGenericArrayFile(HOLIDAYS_FILE, holidays);
+
+let awards: any[] = loadGenericArrayFile(AWARDS_FILE, () => []);
+const saveAwards = () => saveGenericArrayFile(AWARDS_FILE, awards);
+
+let events: any[] = loadGenericArrayFile(EVENTS_FILE, () => []);
+const saveEvents = () => saveGenericArrayFile(EVENTS_FILE, events);
+
+let hrDocuments: any[] = loadGenericArrayFile(DOCUMENTS_FILE, () => [
+  { id: 'doc-1', name: 'Employee Code of Conduct 2026', category: 'Policy', uploadedAt: '2026-01-10T10:00:00Z', fileUrl: 'https://example.com/docs/code_of_conduct_2026.pdf', fileSize: '1.2 MB' },
+  { id: 'doc-2', name: 'Information Security & Data Protection Policy', category: 'Security', uploadedAt: '2026-01-15T11:30:00Z', fileUrl: 'https://example.com/docs/infosec_policy.pdf', fileSize: '850 KB' },
+  { id: 'doc-3', name: 'Health & Remote Work Guidelines', category: 'HR Guidelines', uploadedAt: '2026-02-01T09:15:00Z', fileUrl: 'https://example.com/docs/remote_work.pdf', fileSize: '520 KB' },
+]);
+const saveHRDocuments = () => saveGenericArrayFile(DOCUMENTS_FILE, hrDocuments);
+
+let agreements: any[] = loadGenericArrayFile(AGREEMENTS_FILE, () => [
+  { id: 'agr-1', employee: 'Alice Smith', duration: 'Permanent / Full-Time', agreementType: 'Employment Contract', startDate: '2023-01-15', endDate: '2028-01-15', fileUrl: 'https://example.com/contracts/alice_employment.pdf', status: 'Active' },
+  { id: 'agr-2', employee: 'Bob Johnson', duration: 'Permanent / Full-Time', agreementType: 'Non-Disclosure Agreement', startDate: '2022-11-01', endDate: '2027-11-01', fileUrl: 'https://example.com/contracts/bob_nda.pdf', status: 'Active' },
+  { id: 'agr-3', employee: 'David Developer', duration: '12 Months', agreementType: 'Consultant & IP Agreement', startDate: '2023-03-20', endDate: '2024-03-20', fileUrl: 'https://example.com/contracts/david_consultant.pdf', status: 'Active' },
+]);
+const saveAgreements = () => saveGenericArrayFile(AGREEMENTS_FILE, agreements);
+
+let documentTemplates: any[] = loadGenericArrayFile(TEMPLATES_FILE, () => [
+  { id: 'tpl-1', name: 'Standard Full-Time Offer Letter', type: 'Offer Letter', fileUrl: 'https://example.com/templates/offer_letter.docx', description: 'Standard compensation and joining formal letter' },
+  { id: 'tpl-2', name: 'Summer & Fall Intern Agreement', type: 'Intern Letter', fileUrl: 'https://example.com/templates/intern_agreement.docx', description: 'Stipend, project scope and internship duration' },
+  { id: 'tpl-3', name: 'Mutual NDA Agreement', type: 'NDA', fileUrl: 'https://example.com/templates/mutual_nda.docx', description: 'Standard company and employee IP & confidentiality pact' },
+  { id: 'tpl-4', name: 'Consulting Scope & Quotation', type: 'Quotation', fileUrl: 'https://example.com/templates/quotation.docx', description: 'External vendor or contractor quotation template' },
+]);
+const saveDocumentTemplates = () => saveGenericArrayFile(TEMPLATES_FILE, documentTemplates);
+
+let departmentsList: any[] = loadGenericArrayFile(DEPARTMENTS_FILE, () => [
+  { id: 'Engineering', name: 'Engineering' },
+  { id: 'Sales', name: 'Sales' },
+  { id: 'Marketing', name: 'Marketing' },
+  { id: 'HR', name: 'HR' },
+  { id: 'Design', name: 'Design' },
+  { id: 'Finance', name: 'Finance' },
+  { id: 'Executive', name: 'Executive' }
+]);
+const saveDepartments = () => saveGenericArrayFile(DEPARTMENTS_FILE, departmentsList);
+
+let branchesList: any[] = loadGenericArrayFile(BRANCHES_FILE, () => [
+  { id: 'hq', name: 'Global HQ' },
+  { id: 'chennai', name: 'Chennai Tech Campus' },
+  { id: 'remote', name: 'Remote Network' }
+]);
+const saveBranches = () => saveGenericArrayFile(BRANCHES_FILE, branchesList);
 let projects: any[] = [
   { id: 'p1', name: 'Website Redesign', client: 'Acme Corp', status: 'In Progress', startDate: '2024-10-01', deadline: '2024-12-01', assignees: ['e6'] },
   { id: 'p2', name: 'Mobile App MVP', client: 'TechStart', status: 'To Do', startDate: '2024-11-01', deadline: '2025-01-15', assignees: [] },
@@ -456,24 +596,7 @@ let jobApplications: any[] = loadChatFile(APPLICATIONS_FILE, () => [
   }
 ]);
 
-let hrDocuments: any[] = [
-  { id: 'doc-1', name: 'Employee Code of Conduct 2026', category: 'Policy', uploadedAt: '2026-01-10T10:00:00Z', fileUrl: 'https://example.com/docs/code_of_conduct_2026.pdf', fileSize: '1.2 MB' },
-  { id: 'doc-2', name: 'Information Security & Data Protection Policy', category: 'Security', uploadedAt: '2026-01-15T11:30:00Z', fileUrl: 'https://example.com/docs/infosec_policy.pdf', fileSize: '850 KB' },
-  { id: 'doc-3', name: 'Health & Remote Work Guidelines', category: 'HR Guidelines', uploadedAt: '2026-02-01T09:15:00Z', fileUrl: 'https://example.com/docs/remote_work.pdf', fileSize: '520 KB' },
-];
 
-let agreements: any[] = [
-  { id: 'agr-1', employee: 'Alice Smith', duration: 'Permanent / Full-Time', agreementType: 'Employment Contract', startDate: '2023-01-15', endDate: '2028-01-15', fileUrl: 'https://example.com/contracts/alice_employment.pdf', status: 'Active' },
-  { id: 'agr-2', employee: 'Bob Johnson', duration: 'Permanent / Full-Time', agreementType: 'Non-Disclosure Agreement', startDate: '2022-11-01', endDate: '2027-11-01', fileUrl: 'https://example.com/contracts/bob_nda.pdf', status: 'Active' },
-  { id: 'agr-3', employee: 'David Developer', duration: '12 Months', agreementType: 'Consultant & IP Agreement', startDate: '2023-03-20', endDate: '2024-03-20', fileUrl: 'https://example.com/contracts/david_consultant.pdf', status: 'Active' },
-];
-
-let documentTemplates: any[] = [
-  { id: 'tpl-1', name: 'Standard Full-Time Offer Letter', type: 'Offer Letter', fileUrl: 'https://example.com/templates/offer_letter.docx', description: 'Standard compensation and joining formal letter' },
-  { id: 'tpl-2', name: 'Summer & Fall Intern Agreement', type: 'Intern Letter', fileUrl: 'https://example.com/templates/intern_agreement.docx', description: 'Stipend, project scope and internship duration' },
-  { id: 'tpl-3', name: 'Mutual NDA Agreement', type: 'NDA', fileUrl: 'https://example.com/templates/mutual_nda.docx', description: 'Standard company and employee IP & confidentiality pact' },
-  { id: 'tpl-4', name: 'Consulting Scope & Quotation', type: 'Quotation', fileUrl: 'https://example.com/templates/quotation.docx', description: 'External vendor or contractor quotation template' },
-];
 
 let promotions: any[] = [
   { id: 'pro-1', employee: 'Alice Smith', oldDepartment: 'Engineering', oldRole: 'Junior Developer', newDepartment: 'Engineering', newRole: 'Senior Developer', effectiveDate: '2025-01-01', approvedBy: 'Jane CTO' },
@@ -648,10 +771,29 @@ const persistChatAttachments = () => saveChatFile(CHAT_ATTS_FILE, localChatAttac
 
 // ─── Chat Auth & Helpers ───────────────────────────────────────────────────
 function getCallerFromHeaders(req: express.Request): { userId: string; userRole: string } | null {
-  const userId   = req.headers['x-user-id']   as string | undefined;
-  const userRole = req.headers['x-user-role'] as string | undefined;
-  if (!userId) return null;
-  return { userId, userRole: userRole || 'Member' };
+  // 1. Check signed JWT Bearer Token first
+  const authHeader = req.headers['authorization'];
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    const token = authHeader.split(' ')[1];
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET) as any;
+      if (decoded && (decoded.userId || decoded.id)) {
+        return {
+          userId: decoded.userId || decoded.id,
+          userRole: decoded.role || 'Member'
+        };
+      }
+    } catch { /* token invalid or expired */ }
+  }
+
+  // 2. Local dev fallback ONLY gated behind explicit environment flag
+  if (process.env.ALLOW_HEADER_AUTH === 'true') {
+    const userId   = req.headers['x-user-id']   as string | undefined;
+    const userRole = req.headers['x-user-role'] as string | undefined;
+    if (userId) return { userId, userRole: userRole || 'Member' };
+  }
+
+  return null;
 }
 
 function isElevated(role: string): boolean {
@@ -1479,39 +1621,134 @@ export function createApp() {
     res.json({ status: 'ok', time: new Date().toISOString() });
   });
 
-  // Auth API
+  // Auth API (Tier 1)
   router.post('/login', (req, res) => {
-    const { email } = req.body || {};
-    let user = null;
-    if (email && typeof email === 'string') {
-      user = employees.find(e => e.email?.toLowerCase() === email.toLowerCase());
+    const { email, password } = req.body || {};
+    if (!email || typeof email !== 'string') {
+      return res.status(400).json({ error: 'Email is required' });
     }
+
+    const user = employees.find(e => e.email?.toLowerCase() === email.trim().toLowerCase() && e.isActive !== false);
 
     if (!user) {
-      user = employees[0];
+      return res.status(401).json({ error: 'Invalid email or password' });
     }
 
+    if (!password) {
+      return res.status(400).json({ error: 'Password is required' });
+    }
+
+    const storedHash = user.passwordHash || user.password;
+    const isMatch = storedHash ? bcrypt.compareSync(password, storedHash) : false;
+    const isMatchPlain = !isMatch && storedHash === password;
+
+    if (!isMatch && !isMatchPlain) {
+      return res.status(401).json({ error: 'Invalid email or password' });
+    }
+
+    if (isMatchPlain) {
+      user.passwordHash = bcrypt.hashSync(password, 10);
+      saveEmployees();
+    }
+
+    const token = jwt.sign(
+      { userId: user.id, email: user.email, role: user.role, department: user.department },
+      JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    const { passwordHash: _ph, password: _pw, ...cleanUser } = user;
+
     res.json({
-      token: 'fake-jwt-token-12345',
-      user
+      token,
+      user: cleanUser
     });
+  });
+
+  // Authentication Middleware — protects all routes below
+  const authenticateToken = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const pathName = req.path || req.url || '';
+    if (
+      pathName === '/health' ||
+      pathName === '/login' ||
+      pathName.startsWith('/careers') ||
+      pathName.startsWith('/apply')
+    ) {
+      return next();
+    }
+
+    const caller = getCallerFromHeaders(req);
+    if (!caller) {
+      return res.status(401).json({ error: 'Unauthorized: Valid authentication token required' });
+    }
+
+    (req as any).user = caller;
+    next();
+  };
+
+  router.use(authenticateToken);
+
+  // --- Privileges Backend Endpoints (Tier 2) ---
+  router.get('/privileges', (req, res) => {
+    const caller = (req as any).user || getCallerFromHeaders(req);
+    if (!caller || !['Admin', 'HR', 'CEO', 'CTO'].includes(caller.userRole)) {
+      return res.status(403).json({ error: 'Forbidden: Admin access required' });
+    }
+    res.json(privilegesMap);
+  });
+
+  router.get('/privileges/:userId', (req, res) => {
+    const { userId } = req.params;
+    res.json(privilegesMap[userId] || { userId, allowedModules: [], canAssignTasks: false });
+  });
+
+  router.put('/privileges/:userId', (req, res) => {
+    const caller = (req as any).user || getCallerFromHeaders(req);
+    if (!caller || !['Admin', 'HR', 'CEO', 'CTO'].includes(caller.userRole)) {
+      return res.status(403).json({ error: 'Forbidden: Admin access required' });
+    }
+    const { userId } = req.params;
+    privilegesMap[userId] = { userId, ...req.body };
+    savePrivileges();
+    res.json(privilegesMap[userId]);
+  });
+
+  router.delete('/privileges/:userId', (req, res) => {
+    const caller = (req as any).user || getCallerFromHeaders(req);
+    if (!caller || !['Admin', 'HR', 'CEO', 'CTO'].includes(caller.userRole)) {
+      return res.status(403).json({ error: 'Forbidden: Admin access required' });
+    }
+    const { userId } = req.params;
+    delete privilegesMap[userId];
+    savePrivileges();
+    res.status(204).end();
   });
 
   // Module A: Core Employee Profile
   router.get('/employees', (req, res) => res.json(employees));
   router.post('/employees', (req, res) => {
-    const newEmp = { ...req.body, id: `e${Date.now()}`, isActive: true };
+    const password = req.body.password || 'admin123';
+    const passwordHash = bcrypt.hashSync(password, 10);
+    const newEmp = { ...req.body, passwordHash, id: `e${Date.now()}`, isActive: true };
     employees.push(newEmp);
-    res.status(201).json(newEmp);
+    saveEmployees();
+    const { passwordHash: _ph, password: _pw, ...cleanEmp } = newEmp;
+    res.status(201).json(cleanEmp);
   });
   router.put('/employees/:id', (req, res) => {
     const index = employees.findIndex(e => e.id === req.params.id);
     if (index === -1) return res.status(404).json({ error: 'Employee not found' });
+    if (req.body.password) {
+      req.body.passwordHash = bcrypt.hashSync(req.body.password, 10);
+    }
     employees[index] = { ...employees[index], ...req.body };
-    res.json(employees[index]);
+    saveEmployees();
+    const { passwordHash: _ph, password: _pw, ...cleanEmp } = employees[index];
+    res.json(cleanEmp);
   });
   router.delete('/employees/:id', (req, res) => {
     employees = employees.filter(e => e.id !== req.params.id);
+    saveEmployees();
     res.status(204).send();
   });
 
@@ -1873,20 +2110,31 @@ export function createApp() {
   // Module G: Holidays
   router.get('/holidays', (req, res) => res.json(holidays));
   
+  // Module G: Holidays (Tier 4: GET/POST/PUT/DELETE, file-backed)
+  // Holidays support full CRUD; editing date/name via PUT updates stored record.
+  router.get('/holidays', (req, res) => res.json(holidays));
   router.post('/holidays', (req, res) => {
     const newHoliday = { id: `h${Date.now()}`, ...req.body };
     holidays.push(newHoliday);
+    saveHolidays();
     res.status(201).json(newHoliday);
   });
-  
+  router.put('/holidays/:id', (req, res) => {
+    const index = holidays.findIndex(h => h.id === req.params.id);
+    if (index === -1) return res.status(404).json({ error: 'Holiday not found' });
+    holidays[index] = { ...holidays[index], ...req.body };
+    saveHolidays();
+    res.json(holidays[index]);
+  });
   router.delete('/holidays/:id', (req, res) => {
     holidays = holidays.filter(h => h.id !== req.params.id);
+    saveHolidays();
     res.status(204).end();
   });
 
-  // Module H: Awards
+  // Module H: Awards (Tier 4: GET/POST/PUT/DELETE, file-backed)
+  // Awards support full CRUD; editing gift/description via PUT updates stored record.
   router.get('/awards', (req, res) => res.json(awards));
-  
   router.post('/awards', (req, res) => {
     const { employeeId, awardType, date, gift, description } = req.body;
     const emp = employees.find(e => e.id === employeeId);
@@ -1901,17 +2149,24 @@ export function createApp() {
       description
     };
     awards.push(newAward);
+    saveAwards();
     res.status(201).json(newAward);
   });
-  
+  router.put('/awards/:id', (req, res) => {
+    const index = awards.findIndex(a => a.id === req.params.id);
+    if (index === -1) return res.status(404).json({ error: 'Award not found' });
+    awards[index] = { ...awards[index], ...req.body };
+    saveAwards();
+    res.json(awards[index]);
+  });
   router.delete('/awards/:id', (req, res) => {
     awards = awards.filter(a => a.id !== req.params.id);
+    saveAwards();
     res.status(204).end();
   });
 
   // Module I: Announcements
   router.get('/announcements', (req, res) => res.json(announcements));
-  
   router.post('/announcements', (req, res) => {
     const newAnnouncement = {
       id: `an${Date.now()}`,
@@ -1921,7 +2176,6 @@ export function createApp() {
     announcements.unshift(newAnnouncement);
     res.status(201).json(newAnnouncement);
   });
-  
   router.put('/announcements/:id', (req, res) => {
     const index = announcements.findIndex(a => a.id === req.params.id);
     if (index !== -1) {
@@ -1931,15 +2185,14 @@ export function createApp() {
       res.status(404).json({ error: 'Announcement not found' });
     }
   });
-
   router.delete('/announcements/:id', (req, res) => {
     announcements = announcements.filter(a => a.id !== req.params.id);
     res.status(204).end();
   });
 
-  // Module J: Events
+  // Module J: Events (Tier 4: GET/POST/PUT/DELETE, file-backed)
+  // Events support full CRUD; editing event details via PUT updates stored record.
   router.get('/events', (req, res) => res.json(events));
-  
   router.post('/events', (req, res) => {
     const newEvent = {
       id: `ev${Date.now()}`,
@@ -1947,29 +2200,46 @@ export function createApp() {
     };
     events.push(newEvent);
     events.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    saveEvents();
     res.status(201).json(newEvent);
   });
-  
+  router.put('/events/:id', (req, res) => {
+    const index = events.findIndex(e => e.id === req.params.id);
+    if (index === -1) return res.status(404).json({ error: 'Event not found' });
+    events[index] = { ...events[index], ...req.body };
+    saveEvents();
+    res.json(events[index]);
+  });
   router.delete('/events/:id', (req, res) => {
     events = events.filter(e => e.id !== req.params.id);
+    saveEvents();
     res.status(204).end();
   });
 
-  // Clients
+  // Clients (Tier 3: GET/POST/PUT/DELETE, file-backed)
   router.get('/clients', (req, res) => res.json(clients));
   router.post('/clients', (req, res) => {
     const newClient = { id: `c${Date.now()}`, ...req.body };
     clients.push(newClient);
+    saveClients();
     res.status(201).json(newClient);
   });
   router.put('/clients/:id', (req, res) => {
     const index = clients.findIndex(c => c.id === req.params.id);
     if (index !== -1) {
       clients[index] = { ...clients[index], ...req.body };
+      saveClients();
       res.json(clients[index]);
     } else {
       res.status(404).json({ error: 'Client not found' });
     }
+  });
+  router.delete('/clients/:id', (req, res) => {
+    const index = clients.findIndex(c => c.id === req.params.id);
+    if (index === -1) return res.status(404).json({ error: 'Client not found' });
+    clients = clients.filter(c => c.id !== req.params.id);
+    saveClients();
+    res.status(204).end();
   });
 
   // Module K: Projects & Tasks
@@ -2043,8 +2313,8 @@ export function createApp() {
     res.json(job);
   });
 
-  // Public candidate application submission + Automatic Confirmation Email
-  router.post('/careers/:slug/apply', (req, res) => {
+  // Public candidate application submission + Automatic Confirmation Email (Tier 2)
+  router.post('/careers/:slug/apply', async (req, res) => {
     const slugOrId = req.params.slug;
     const job = jobPostings.find(j => (j.slug === slugOrId || j.id === slugOrId) && j.status === 'PUBLISHED');
     if (!job) return res.status(404).json({ message: 'Job posting not found or not published' });
@@ -2077,23 +2347,28 @@ export function createApp() {
       emailLogs: [] as any[]
     };
 
-    // Automatically generate and dispatch Application Confirmation Email
+    // Route through real mailer integration
     try {
       const template = job.applicationConfirmationTemplate || DEFAULT_CAREER_TEMPLATES.applicationConfirmationTemplate;
       const mergeCtx = buildMergeContext(newApp, job, job.rounds?.[0] || null);
       const renderedHtml = renderTemplate(template, mergeCtx);
+      const mailResult = await sendEmail({
+        to: newApp.email,
+        subject: `Application Received - ${job.title} at TwinSpace`,
+        html: renderedHtml,
+      });
       const emailLog = {
         sentAt: new Date().toISOString(),
         to: newApp.email,
         subject: `Application Received - ${job.title} at TwinSpace`,
         templateType: 'application_confirmation',
         html: renderedHtml,
-        status: 'Sent'
+        status: mailResult.status,
+        error: mailResult.error
       };
       newApp.emailLogs.push(emailLog);
-      console.log(`[Careers Email] Dispatched Confirmation Email to ${newApp.email} for ${job.title}`);
     } catch (err) {
-      console.error('[Careers Email] Failed to render confirmation email:', err);
+      console.error('[Careers Email] Failed to render/send confirmation email:', err);
     }
 
     jobApplications.unshift(newApp);
@@ -2207,8 +2482,8 @@ export function createApp() {
     res.status(201).json(newApp);
   });
 
-  // Advance Candidate Round + Automatic Round Advance Email
-  router.patch('/applications/:id/round', (req, res) => {
+  // Advance Candidate Round + Real Mailer Integration (Tier 2)
+  router.patch('/applications/:id/round', async (req, res) => {
     const app = jobApplications.find(a => a.id === req.params.id);
     if (!app) return res.status(404).json({ message: 'Application not found' });
     const { roundId, status = 'INTERVIEWING' } = req.body;
@@ -2218,31 +2493,37 @@ export function createApp() {
     const job = jobPostings.find(j => j.id === app.jobId);
     const round = job?.rounds?.find((r: any) => r.id === roundId);
 
-    // Auto-send round advancement email
     try {
       const template = round?.emailTemplate || job?.roundAdvanceTemplate || DEFAULT_CAREER_TEMPLATES.roundAdvanceTemplate;
       const mergeCtx = buildMergeContext(app, job, round);
       const renderedHtml = renderTemplate(template, mergeCtx);
+      const recipient = app.email || app.candidateEmail;
+      const mailResult = await sendEmail({
+        to: recipient,
+        subject: `Update on your application: ${round?.title || 'Next Round'} - ${job?.title}`,
+        html: renderedHtml,
+      });
+
       if (!app.emailLogs) app.emailLogs = [];
       app.emailLogs.push({
         sentAt: new Date().toISOString(),
-        to: app.email || app.candidateEmail,
+        to: recipient,
         subject: `Update on your application: ${round?.title || 'Next Round'} - ${job?.title}`,
         templateType: 'round_advance',
         html: renderedHtml,
-        status: 'Sent'
+        status: mailResult.status,
+        error: mailResult.error
       });
-      console.log(`[Careers Email] Sent Round Advance Email to ${app.email || app.candidateEmail} for ${round?.title}`);
     } catch (e) {
-      console.error('[Careers Email] Failed to send round advance email:', e);
+      console.error('[Careers Email] Failed to process round advance email:', e);
     }
 
     saveChatFile(APPLICATIONS_FILE, jobApplications);
     res.json(app);
   });
 
-  // Change Candidate Status (HIRED / REJECTED) + Automatic Email
-  router.patch('/applications/:id/status', (req, res) => {
+  // Change Candidate Status (HIRED / REJECTED) + Real Mailer Integration (Tier 2)
+  router.patch('/applications/:id/status', async (req, res) => {
     const app = jobApplications.find(a => a.id === req.params.id);
     if (!app) return res.status(404).json({ message: 'Application not found' });
     const { status, notes } = req.body;
@@ -2250,6 +2531,7 @@ export function createApp() {
     if (notes !== undefined) app.notes = notes;
 
     const job = jobPostings.find(j => j.id === app.jobId);
+    const recipient = app.email || app.candidateEmail;
 
     try {
       if (!app.emailLogs) app.emailLogs = [];
@@ -2257,28 +2539,38 @@ export function createApp() {
         const template = job?.hireTemplate || DEFAULT_CAREER_TEMPLATES.hireTemplate;
         const mergeCtx = buildMergeContext(app, job);
         const renderedHtml = renderTemplate(template, mergeCtx);
+        const mailResult = await sendEmail({
+          to: recipient,
+          subject: `Offer of Employment: ${job?.title} at TwinSpace`,
+          html: renderedHtml,
+        });
         app.emailLogs.push({
           sentAt: new Date().toISOString(),
-          to: app.email || app.candidateEmail,
+          to: recipient,
           subject: `Offer of Employment: ${job?.title} at TwinSpace`,
           templateType: 'hire',
           html: renderedHtml,
-          status: 'Sent'
+          status: mailResult.status,
+          error: mailResult.error
         });
-        console.log(`[Careers Email] Sent Hire Offer Email to ${app.email || app.candidateEmail}`);
       } else if (status === 'REJECTED') {
         const template = job?.rejectionTemplate || DEFAULT_CAREER_TEMPLATES.rejectionTemplate;
         const mergeCtx = buildMergeContext(app, job);
         const renderedHtml = renderTemplate(template, mergeCtx);
+        const mailResult = await sendEmail({
+          to: recipient,
+          subject: `Update on your application for ${job?.title} at TwinSpace`,
+          html: renderedHtml,
+        });
         app.emailLogs.push({
           sentAt: new Date().toISOString(),
-          to: app.email || app.candidateEmail,
+          to: recipient,
           subject: `Update on your application for ${job?.title} at TwinSpace`,
           templateType: 'rejection',
           html: renderedHtml,
-          status: 'Sent'
+          status: mailResult.status,
+          error: mailResult.error
         });
-        console.log(`[Careers Email] Sent Rejection Email to ${app.email || app.candidateEmail}`);
       }
     } catch (e) {
       console.error('[Careers Email] Failed to send status email:', e);
@@ -2294,7 +2586,7 @@ export function createApp() {
     res.status(204).end();
   });
 
-  // --- Documents & Contracts Endpoints ---
+  // --- Documents & Contracts Endpoints (Tier 4: GET/POST/PUT/DELETE, file-backed) ---
   router.get('/documents', (req, res) => res.json(hrDocuments));
   router.post('/documents', (req, res) => {
     const newDoc = {
@@ -2303,10 +2595,19 @@ export function createApp() {
       ...req.body
     };
     hrDocuments.unshift(newDoc);
+    saveHRDocuments();
     res.status(201).json(newDoc);
+  });
+  router.put('/documents/:id', (req, res) => {
+    const index = hrDocuments.findIndex(d => d.id === req.params.id);
+    if (index === -1) return res.status(404).json({ error: 'Document not found' });
+    hrDocuments[index] = { ...hrDocuments[index], ...req.body };
+    saveHRDocuments();
+    res.json(hrDocuments[index]);
   });
   router.delete('/documents/:id', (req, res) => {
     hrDocuments = hrDocuments.filter(d => d.id !== req.params.id);
+    saveHRDocuments();
     res.status(204).end();
   });
 
@@ -2318,10 +2619,19 @@ export function createApp() {
       ...req.body
     };
     agreements.unshift(newAgr);
+    saveAgreements();
     res.status(201).json(newAgr);
+  });
+  router.put('/documents/agreements/:id', (req, res) => {
+    const index = agreements.findIndex(a => a.id === req.params.id);
+    if (index === -1) return res.status(404).json({ error: 'Agreement not found' });
+    agreements[index] = { ...agreements[index], ...req.body };
+    saveAgreements();
+    res.json(agreements[index]);
   });
   router.delete('/documents/agreements/:id', (req, res) => {
     agreements = agreements.filter(a => a.id !== req.params.id);
+    saveAgreements();
     res.status(204).end();
   });
 
@@ -2332,14 +2642,23 @@ export function createApp() {
       ...req.body
     };
     documentTemplates.unshift(newTpl);
+    saveDocumentTemplates();
     res.status(201).json(newTpl);
+  });
+  router.put('/documents/templates/:id', (req, res) => {
+    const index = documentTemplates.findIndex(t => t.id === req.params.id);
+    if (index === -1) return res.status(404).json({ error: 'Template not found' });
+    documentTemplates[index] = { ...documentTemplates[index], ...req.body };
+    saveDocumentTemplates();
+    res.json(documentTemplates[index]);
   });
   router.delete('/documents/templates/:id', (req, res) => {
     documentTemplates = documentTemplates.filter(t => t.id !== req.params.id);
+    saveDocumentTemplates();
     res.status(204).end();
   });
 
-  // --- User Management Endpoints ---
+  // --- User Management Endpoints (Tier 1 & Tier 2) ---
   router.get('/users', (req, res) => {
     const { search, role, status, department, page = 1, limit = 50 } = req.query;
     let list = employees.map(e => ({
@@ -2387,15 +2706,17 @@ export function createApp() {
   });
 
   router.post('/users', (req, res) => {
-    const { name, email, role, department, designation, shift, phone } = req.body;
+    const { name, email, role, department, designation, shift, phone, password } = req.body;
     const parts = (name || 'New User').trim().split(' ');
     const firstName = parts[0] || 'New';
     const lastName = parts.slice(1).join(' ') || 'User';
+    const passwordHash = bcrypt.hashSync(password || 'admin123', 10);
     const newEmp = {
       id: `e${Date.now()}`,
       firstName,
       lastName,
       email: email || `user${Date.now()}@example.com`,
+      passwordHash,
       department: department || 'Engineering',
       role: role || 'Developer',
       designation: designation || role || 'Team Member',
@@ -2405,6 +2726,7 @@ export function createApp() {
       phone: phone || ''
     };
     employees.push(newEmp);
+    saveEmployees();
     res.status(201).json({
       id: newEmp.id,
       name: `${newEmp.firstName} ${newEmp.lastName}`,
@@ -2428,6 +2750,8 @@ export function createApp() {
     if (req.body.designation) emp.designation = req.body.designation;
     if (req.body.shift) emp.shift = req.body.shift;
     if (req.body.status) emp.isActive = req.body.status === 'Active';
+    if (req.body.password) emp.passwordHash = bcrypt.hashSync(req.body.password, 10);
+    saveEmployees();
     res.json({
       id: emp.id,
       name: `${emp.firstName} ${emp.lastName}`,
@@ -2439,31 +2763,90 @@ export function createApp() {
   router.delete('/users/:id', (req, res) => {
     const emp = employees.find(e => e.id === req.params.id);
     if (emp) emp.isActive = false;
+    saveEmployees();
     res.status(204).end();
   });
 
-  router.patch('/users/:id/reset-password', (req, res) => {
-    res.json({ success: true, message: 'Password reset successfully' });
+  // Real Password Reset Endpoint (Tier 2)
+  router.patch('/users/:id/reset-password', async (req, res) => {
+    const emp = employees.find(e => e.id === req.params.id);
+    if (!emp) return res.status(404).json({ error: 'User not found' });
+
+    const tempPassword = 'Temp_' + Math.random().toString(36).substring(2, 10);
+    emp.passwordHash = bcrypt.hashSync(tempPassword, 10);
+    saveEmployees();
+
+    const mailResult = await sendEmail({
+      to: emp.email,
+      subject: 'TwinERP — Temporary Password Reset',
+      html: `<p>Hello ${emp.firstName || 'User'},</p><p>Your login password for TwinERP has been reset by an administrator.</p><p><strong>Temporary Password:</strong> <code>${tempPassword}</code></p><p>Please log in with this temporary password and update it in your Settings.</p>`
+    });
+
+    res.json({
+      success: true,
+      message: `Password reset successfully. ${mailResult.status === 'Sent' ? 'Temporary password email dispatched.' : 'Email status: ' + mailResult.status + '.'}`,
+      tempPassword,
+      emailStatus: mailResult.status,
+      emailError: mailResult.error
+    });
   });
 
+  // Org Structure: Departments CRUD (Tier 4)
   router.get('/org-structure/departments', (req, res) => {
-    res.json([
-      { id: 'Engineering', name: 'Engineering' },
-      { id: 'Sales', name: 'Sales' },
-      { id: 'Marketing', name: 'Marketing' },
-      { id: 'HR', name: 'HR' },
-      { id: 'Design', name: 'Design' },
-      { id: 'Finance', name: 'Finance' },
-      { id: 'Executive', name: 'Executive' }
-    ]);
+    res.json(departmentsList);
   });
 
+  router.post('/org-structure/departments', (req, res) => {
+    const { name } = req.body;
+    if (!name?.trim()) return res.status(400).json({ error: 'Department name required' });
+    const id = name.trim().replace(/\s+/g, '_');
+    const newDept = { id, name: name.trim() };
+    departmentsList.push(newDept);
+    saveDepartments();
+    res.status(201).json(newDept);
+  });
+
+  router.put('/org-structure/departments/:id', (req, res) => {
+    const idx = departmentsList.findIndex(d => d.id === req.params.id);
+    if (idx === -1) return res.status(404).json({ error: 'Department not found' });
+    if (req.body.name) departmentsList[idx].name = req.body.name.trim();
+    saveDepartments();
+    res.json(departmentsList[idx]);
+  });
+
+  router.delete('/org-structure/departments/:id', (req, res) => {
+    departmentsList = departmentsList.filter(d => d.id !== req.params.id);
+    saveDepartments();
+    res.status(204).end();
+  });
+
+  // Org Structure: Branches CRUD (Tier 4)
   router.get('/org-structure/branches', (req, res) => {
-    res.json([
-      { id: 'hq', name: 'Global HQ' },
-      { id: 'chennai', name: 'Chennai Tech Campus' },
-      { id: 'remote', name: 'Remote Network' }
-    ]);
+    res.json(branchesList);
+  });
+
+  router.post('/org-structure/branches', (req, res) => {
+    const { name } = req.body;
+    if (!name?.trim()) return res.status(400).json({ error: 'Branch name required' });
+    const id = `b_${Date.now()}`;
+    const newBranch = { id, name: name.trim() };
+    branchesList.push(newBranch);
+    saveBranches();
+    res.status(201).json(newBranch);
+  });
+
+  router.put('/org-structure/branches/:id', (req, res) => {
+    const idx = branchesList.findIndex(b => b.id === req.params.id);
+    if (idx === -1) return res.status(404).json({ error: 'Branch not found' });
+    if (req.body.name) branchesList[idx].name = req.body.name.trim();
+    saveBranches();
+    res.json(branchesList[idx]);
+  });
+
+  router.delete('/org-structure/branches/:id', (req, res) => {
+    branchesList = branchesList.filter(b => b.id !== req.params.id);
+    saveBranches();
+    res.status(204).end();
   });
 
   router.get('/attendance/shifts', (req, res) => {
@@ -2486,6 +2869,7 @@ export function createApp() {
     if (emp) {
       if (req.body.newDepartment) emp.department = req.body.newDepartment;
       if (req.body.newRole) emp.role = req.body.newRole;
+      saveEmployees();
     }
     res.status(201).json(newPromo);
   });
@@ -2530,7 +2914,7 @@ export function createApp() {
     res.json(filtered);
   });
 
-  router.post('/employee-tasks', (req, res) => {
+  router.post('/employee-tasks', async (req, res) => {
     const { title, description, assignedToId, assignedToName, assignedToEmail, assignedById, assignedByName, assignedByRole, priority, dueDate, category } = req.body;
     if (!title || !assignedToId) {
       return res.status(400).json({ error: 'Title and Assignee are required' });
@@ -2543,9 +2927,9 @@ export function createApp() {
       assignedToId,
       assignedToName: assignedToName || 'Employee',
       assignedToEmail: assignedToEmail || '',
-      assignedById: assignedById || req.headers['x-user-id'] || 'system',
+      assignedById: assignedById || (req as any).user?.userId || 'system',
       assignedByName: assignedByName || 'Manager',
-      assignedByRole: assignedByRole || req.headers['x-user-role'] || 'Admin',
+      assignedByRole: assignedByRole || (req as any).user?.userRole || 'Admin',
       priority: priority || 'Medium',
       status: 'Pending',
       dueDate: dueDate || '',
@@ -2557,13 +2941,20 @@ export function createApp() {
     employeeTasks.unshift(newTask);
     saveEmployeeTasks();
 
-    // Send in-app notification to the assigned user
+    // Send in-app notification to assigned user
     addNotification({
       title: 'New Task Assigned',
       message: `${newTask.assignedByName} assigned you: "${newTask.title}" (Priority: ${newTask.priority})`,
       type: 'alert',
       targetUserId: assignedToId
     });
+
+    // Wire postWorkflowSystemMessage into team chat (Tier 3 Item 3)
+    try {
+      await postSystemMessage('team-general', `Task Assigned: "${newTask.title}" was assigned to ${newTask.assignedToName} by ${newTask.assignedByName} (Priority: ${newTask.priority}).`);
+    } catch (e) {
+      console.warn('Failed to post workflow system message to chat:', e);
+    }
 
     res.status(201).json(newTask);
   });

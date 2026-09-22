@@ -1,14 +1,17 @@
 import axios from 'axios';
 import { Employee, Attendance, LeaveRequest, Payslip, SalaryStructure, Resignation, Termination, Holiday, Award, Announcement, AppEvent, AppNotification } from './types';
 
-
 const api = axios.create({
   baseURL: '/api',
 });
 
-// Inject user identity headers for all requests (used by chat API auth)
+// Inject authorization token and user identity headers for all requests
 api.interceptors.request.use(config => {
   try {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
     const stored = localStorage.getItem('user');
     if (stored) {
       const user = JSON.parse(stored);
@@ -19,8 +22,12 @@ api.interceptors.request.use(config => {
   return config;
 });
 
-// Auth
+// Auth & Privileges APIs
 export const login = (email: string, password?: string) => api.post<{token: string, user: Employee}>('/login', { email, password }).then(res => res.data);
+export const getPrivilegesMap = () => api.get<Record<string, any>>('/privileges').then(res => res.data);
+export const getUserPrivileges = (userId: string) => api.get<Record<string, any>>(`/privileges/${userId}`).then(res => res.data);
+export const updateUserPrivileges = (userId: string, privileges: any) => api.put<Record<string, any>>(`/privileges/${userId}`, privileges).then(res => res.data);
+export const deleteUserPrivileges = (userId: string) => api.delete(`/privileges/${userId}`);
 
 // Employee APIs
 export const getEmployees = () => api.get<Employee[]>('/employees').then(res => res.data);
@@ -221,3 +228,12 @@ export const updateEmployeeTask = (id: string, updates: Partial<import('./types'
 
 export const deleteEmployeeTask = (id: string) =>
   api.delete(`/employee-tasks/${id}`).then(res => res.data);
+
+// --- Department & Branch CRUD APIs (Tier 4) ---
+export const createDepartment = (name: string) => api.post<{ id: string; name: string }>('/org-structure/departments', { name }).then(res => res.data);
+export const updateDepartment = (id: string, name: string) => api.put<{ id: string; name: string }>(`/org-structure/departments/${id}`, { name }).then(res => res.data);
+export const deleteDepartment = (id: string) => api.delete(`/org-structure/departments/${id}`);
+
+export const createBranch = (name: string) => api.post<{ id: string; name: string }>('/org-structure/branches', { name }).then(res => res.data);
+export const updateBranch = (id: string, name: string) => api.put<{ id: string; name: string }>(`/org-structure/branches/${id}`, { name }).then(res => res.data);
+export const deleteBranch = (id: string) => api.delete(`/org-structure/branches/${id}`);

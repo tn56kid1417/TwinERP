@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { Employee } from '../types';
 import type { ModuleKey, PrivilegesMap, UserPrivileges } from '../types';
+import { getPrivilegesMap, getUserPrivileges, updateUserPrivileges, deleteUserPrivileges } from '../api';
 
 interface AuthContextType {
   user: Employee | null;
@@ -34,13 +35,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(null);
   const [privilegesMap, setPrivilegesMap] = useState<PrivilegesMap>({});
 
+  // Fetch privileges from backend server on mount / login
+  const fetchPrivilegesFromServer = useCallback(async (currentUser: Employee | null) => {
+    try {
+      if (currentUser && ['Admin', 'HR', 'CEO', 'CTO'].includes(currentUser.role)) {
+        const fullMap = await getPrivilegesMap();
+        if (fullMap && typeof fullMap === 'object') {
+          setPrivilegesMap(fullMap);
+          localStorage.setItem(PRIVILEGES_KEY, JSON.stringify(fullMap));
+        }
+      } else if (currentUser?.id) {
+        const singlePriv = await getUserPrivileges(currentUser.id);
+        if (singlePriv && singlePriv.userId) {
+          setPrivilegesMap(prev => {
+            const next = { ...prev, [currentUser.id]: singlePriv as UserPrivileges };
+            localStorage.setItem(PRIVILEGES_KEY, JSON.stringify(next));
+            return next;
+          });
+        }
+      }
+    } catch (err) {
+      console.warn('[AuthContext] Could not sync privileges from server, using local cache:', err);
+    }
+  }, []);
+
   // Load session + privileges from localStorage on mount
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     const storedToken = localStorage.getItem('token');
+    let parsedUser: Employee | null = null;
     if (storedUser) {
       try {
-        const parsedUser = JSON.parse(storedUser) as Employee;
+        parsedUser = JSON.parse(storedUser) as Employee;
         if (storedToken) {
           setUser(parsedUser);
           setToken(storedToken);
@@ -54,23 +80,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     }
 
-    // Load privileges map
+    // Load local privileges cache initially
     try {
       const storedPrivileges = localStorage.getItem(PRIVILEGES_KEY);
       if (storedPrivileges) {
         setPrivilegesMap(JSON.parse(storedPrivileges) as PrivilegesMap);
       }
     } catch {
-      console.warn('Failed to parse stored privileges. Resetting.');
       localStorage.removeItem(PRIVILEGES_KEY);
     }
-  }, []);
+
+    // Fetch fresh source of truth from backend
+    if (storedToken && parsedUser) {
+      fetchPrivilegesFromServer(parsedUser);
+    }
+  }, [fetchPrivilegesFromServer]);
 
   const login = (userData: Employee, userToken: string) => {
     setUser(userData);
     setToken(userToken);
     localStorage.setItem('user', JSON.stringify(userData));
     localStorage.setItem('token', userToken);
+    fetchPrivilegesFromServer(userData);
   };
 
   const logout = () => {
@@ -81,22 +112,34 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   /** Admin saves updated privileges for one user */
-  const saveUserPrivileges = useCallback((privileges: UserPrivileges) => {
+  const saveUserPrivileges = useCallback(async (privileges: UserPrivileges) => {
     setPrivilegesMap(prev => {
       const next = { ...prev, [privileges.userId]: privileges };
       localStorage.setItem(PRIVILEGES_KEY, JSON.stringify(next));
       return next;
     });
+
+    try {
+      await updateUserPrivileges(privileges.userId, privileges);
+    } catch (err) {
+      console.error('Failed to persist user privileges to server:', err);
+    }
   }, []);
 
   /** Admin clears custom privileges for a user — reverts to role defaults */
-  const clearUserPrivileges = useCallback((userId: string) => {
+  const clearUserPrivileges = useCallback(async (userId: string) => {
     setPrivilegesMap(prev => {
       const next = { ...prev };
       delete next[userId];
       localStorage.setItem(PRIVILEGES_KEY, JSON.stringify(next));
       return next;
     });
+
+    try {
+      await deleteUserPrivileges(userId);
+    } catch (err) {
+      console.error('Failed to clear user privileges on server:', err);
+    }
   }, []);
 
   const isHR = user?.role === 'Manager' || user?.department === 'HR' || user?.role === 'CEO' || user?.role === 'CTO';

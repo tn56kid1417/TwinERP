@@ -1,8 +1,8 @@
 import { useAuth } from '../../context/AuthContext';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Building, Plus, Mail, Phone, MoreVertical, X, Search } from 'lucide-react';
-import { getClients, addClient, updateClient } from '../../api';
+import { Building, Plus, Mail, Phone, Trash2, X, Search } from 'lucide-react';
+import { getClients, addClient, updateClient, deleteClient } from '../../api';
 import { Client } from '../../types';
 
 export default function ClientsList() {
@@ -52,6 +52,16 @@ export default function ClientsList() {
     }
   };
 
+  const handleDeleteClient = async (id: string, name: string) => {
+    if (!window.confirm(`Are you sure you want to remove client "${name}"?`)) return;
+    try {
+      await deleteClient(id);
+      setClients(prev => prev.filter(c => c.id !== id));
+    } catch (error) {
+      console.error('Failed to delete client:', error);
+    }
+  };
+
   const filteredClients = clients.filter(c => 
     c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     c.contactPerson.toLowerCase().includes(searchTerm.toLowerCase())
@@ -98,11 +108,22 @@ export default function ClientsList() {
                 <h3 className="text-xl font-semibold text-slate-900 dark:text-white">{client.name}</h3>
                 <span className="text-xs text-slate-500 dark:text-slate-500">{client.industry}</span>
               </div>
-              <span className={`px-2 py-1 rounded text-xs font-bold uppercase tracking-wider ${
-                client.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-500/10 text-slate-500 dark:text-slate-500 dark:text-slate-400 border border-slate-500/20'
-              }`}>
-                {client.status}
-              </span>
+              <div className="flex items-center gap-2">
+                <span className={`px-2 py-1 rounded text-xs font-bold uppercase tracking-wider ${
+                  client.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-slate-500/10 text-slate-500 dark:text-slate-500 dark:text-slate-400 border border-slate-500/20'
+                }`}>
+                  {client.status}
+                </span>
+                {canEdit && (
+                  <button
+                    onClick={() => handleDeleteClient(client.id, client.name)}
+                    className="p-1 rounded text-slate-400 hover:text-rose-500 hover:bg-rose-500/10 transition-colors cursor-pointer"
+                    title="Delete client"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                )}
+              </div>
             </div>
             
             <div className="space-y-3 mt-6">

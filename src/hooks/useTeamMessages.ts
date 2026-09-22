@@ -16,6 +16,7 @@ import {
   editChatMessage,
   deleteChatMessage,
   updateChatReadState,
+  getChatReadState,
 } from '../api';
 import type { ChatMessage } from '../types';
 
@@ -85,6 +86,8 @@ export function useTeamMessages(teamId: string | null): UseTeamMessagesResult {
     setHasMore(false);
 
     if (!teamId) return;
+    // Fetch initial chat read state baseline (Tier 3 Item 2)
+    getChatReadState(teamId).catch(() => {/* fallback */});
     fetchMessages(false);
   }, [teamId, fetchMessages]);
 
