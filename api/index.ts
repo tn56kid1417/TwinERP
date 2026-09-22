@@ -1,6 +1,7 @@
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
+import chatRouter from './chat';
 
 const ATTENDANCE_FILE = process.env.VERCEL ? '/tmp/erp_attendances.json' : path.join(process.cwd(), '.attendances.json');
 
@@ -306,6 +307,10 @@ export function createApp() {
 
   app.use(express.json());
   app.use((req, res, next) => { console.log(req.method, req.url); next(); });
+
+  // Mount chat router (Supabase-backed, all /api/chat/* routes)
+  app.use('/api', chatRouter);
+  app.use('/', chatRouter);
 
   const router = express.Router();
 
@@ -1173,6 +1178,10 @@ export function createApp() {
     complaints = complaints.filter(c => c.id !== req.params.id);
     res.status(204).end();
   });
+
+  // Mount chat router on both '/api' and '/'
+  app.use('/api', chatRouter);
+  app.use('/', chatRouter);
 
   // Mount on both '/api' and '/' to guarantee routing works regardless of rewrite mode
   app.use('/api', router);

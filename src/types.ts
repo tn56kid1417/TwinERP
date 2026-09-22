@@ -305,7 +305,8 @@ export type ModuleKey =
   | 'analytics'
   | 'settings'
   | 'crm'
-  | 'projects';
+  | 'projects'
+  | 'team-chat';
 
 export interface UserPrivileges {
   userId: string;
@@ -316,3 +317,58 @@ export interface UserPrivileges {
 
 /** Map of userId → UserPrivileges, stored in localStorage under 'erp_privileges' */
 export type PrivilegesMap = Record<string, UserPrivileges>;
+
+// ─── Team Chat Types ─────────────────────────────────────────────────────────
+
+export interface ChatTeam {
+  id: string;
+  name: string;
+  created_by: string;
+  created_at: string;
+  restrict_history_to_membership_window: boolean;
+}
+
+export interface ChatMembership {
+  id: string;
+  team_id: string;
+  user_id: string;
+  role_in_team: string;
+  can_post: boolean;
+  can_delete_others_messages: boolean;
+  can_remove_members: boolean;
+  view_only: boolean;
+  status: 'active' | 'removed';
+  joined_at: string;
+  removed_at?: string | null;
+  removed_by?: string | null;
+}
+
+export interface ChatMessage {
+  id: string;
+  team_id: string;
+  sender_id: string;
+  content: string;
+  type: 'text' | 'file' | 'system';
+  reply_to_id?: string | null;  // Phase 3
+  created_at: string;
+  edited_at?: string | null;
+  deleted_at?: string | null;
+}
+
+export interface ChatReadState {
+  user_id: string;
+  team_id: string;
+  last_read_message_id: string | null;
+  updated_at: string;
+}
+
+/** ChatTeam enriched with membership info + unread count (returned by GET /chat/teams) */
+export interface ChatTeamWithMeta extends ChatTeam {
+  membership: {
+    roleInTeam: string;
+    canPost: boolean;
+    viewOnly: boolean;
+    joinedAt: string;
+  };
+  unreadCount: number;
+}

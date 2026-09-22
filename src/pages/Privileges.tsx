@@ -6,7 +6,7 @@ import {
   LayoutDashboard, UserCog, UserRound, Briefcase, FileText,
   TrendingUp, Clock, Calendar, BarChart2, DollarSign, Award,
   Megaphone, PartyPopper, Mail, UserMinus, UserX, BarChart,
-  Settings, Globe, FolderKanban, Check, Undo2, X
+  Settings, Globe, FolderKanban, Check, Undo2, X, MessageSquare
 } from 'lucide-react';
 import { getUsers } from '../api';
 import { useAuth } from '../context/AuthContext';
@@ -52,6 +52,7 @@ const MODULE_DEFINITIONS: ModuleDef[] = [
   // External Modules
   { key: 'crm',            label: 'CRM Module',       icon: <Globe size={14} />,           group: 'Modules',     defaultForAll: true },
   { key: 'projects',       label: 'Projects Module',  icon: <FolderKanban size={14} />,    group: 'Modules',     defaultForAll: true },
+  { key: 'team-chat',      label: 'Team Chat',        icon: <MessageSquare size={14} />,   group: 'Modules',     defaultForAll: true },
 ];
 
 const MODULE_GROUPS = Array.from(new Set(MODULE_DEFINITIONS.map(m => m.group)));

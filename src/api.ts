@@ -6,6 +6,19 @@ const api = axios.create({
   baseURL: '/api',
 });
 
+// Inject user identity headers for all requests (used by chat API auth)
+api.interceptors.request.use(config => {
+  try {
+    const stored = localStorage.getItem('user');
+    if (stored) {
+      const user = JSON.parse(stored);
+      if (user?.id)   config.headers['x-user-id']   = user.id;
+      if (user?.role) config.headers['x-user-role'] = user.role;
+    }
+  } catch { /* ignore */ }
+  return config;
+});
+
 // Auth
 export const login = (email: string, password?: string) => api.post<{token: string, user: Employee}>('/login', { email, password }).then(res => res.data);
 
@@ -145,3 +158,37 @@ export const getComplaints = () => api.get<import('./types').Complaint[]>('/life
 export const createComplaint = (data: Partial<import('./types').Complaint>) => api.post<import('./types').Complaint>('/lifecycle/complaints', data).then(res => res.data);
 export const updateComplaintStatus = (id: string, status: string) => api.patch<import('./types').Complaint>(`/lifecycle/complaints/${id}/status`, { status }).then(res => res.data);
 export const deleteComplaint = (id: string) => api.delete(`/lifecycle/complaints/${id}`);
+
+// --- Team Chat APIs ---
+export const getChatTeams = () =>
+  api.get<import('./types').ChatTeamWithMeta[]>('/chat/teams').then(res => res.data);
+
+export const createChatTeam = (data: { name: string; memberIds?: string[]; restrictHistory?: boolean }) =>
+  api.post<import('./types').ChatTeam>('/chat/teams', data).then(res => res.data);
+
+export const getChatTeamDetail = (teamId: string) =>
+  api.get<{ team: import('./types').ChatTeam; members: import('./types').ChatMembership[] }>(`/chat/teams/${teamId}`).then(res => res.data);
+
+export const getChatMessages = (teamId: string, params?: { before?: string; limit?: number }) =>
+  api.get<import('./types').ChatMessage[]>(`/chat/teams/${teamId}/messages`, { params }).then(res => res.data);
+
+export const sendChatMessage = (teamId: string, content: string, type: 'text' | 'file' | 'system' = 'text') =>
+  api.post<import('./types').ChatMessage>(`/chat/teams/${teamId}/messages`, { content, type }).then(res => res.data);
+
+export const editChatMessage = (teamId: string, messageId: string, content: string) =>
+  api.patch<import('./types').ChatMessage>(`/chat/teams/${teamId}/messages/${messageId}`, { content }).then(res => res.data);
+
+export const deleteChatMessage = (teamId: string, messageId: string) =>
+  api.delete<import('./types').ChatMessage>(`/chat/teams/${teamId}/messages/${messageId}`).then(res => res.data);
+
+export const addChatMember = (teamId: string, data: { userId: string; roleInTeam?: string; canPost?: boolean; viewOnly?: boolean }) =>
+  api.post(`/chat/teams/${teamId}/members`, data).then(res => res.data);
+
+export const removeChatMember = (teamId: string, userId: string) =>
+  api.delete(`/chat/teams/${teamId}/members/${userId}`);
+
+export const getChatReadState = (teamId: string) =>
+  api.get<{ last_read_message_id: string | null }>(`/chat/teams/${teamId}/read-state`).then(res => res.data);
+
+export const updateChatReadState = (teamId: string, lastReadMessageId: string) =>
+  api.post(`/chat/teams/${teamId}/read-state`, { lastReadMessageId }).then(res => res.data);

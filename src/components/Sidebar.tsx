@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'motion/react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Phone, Users, Clock, Calendar, FileText, LayoutDashboard, BarChart2, UserMinus, UserX, Award, Megaphone, LogOut, Mail, PartyPopper, Briefcase, Building, PieChart, Sun, Moon, UserPlus, Settings as SettingsIcon, CreditCard, UploadCloud, Shuffle, Shield, ShieldCheck, TrendingUp, X } from 'lucide-react';
+import { Phone, Users, Clock, Calendar, FileText, LayoutDashboard, BarChart2, UserMinus, UserX, Award, Megaphone, LogOut, Mail, PartyPopper, Briefcase, Building, PieChart, Sun, Moon, UserPlus, Settings as SettingsIcon, CreditCard, UploadCloud, Shuffle, Shield, ShieldCheck, TrendingUp, X, MessageSquare } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 type Module = 'HRM' | 'CRM' | 'Projects';
@@ -61,6 +61,7 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
 
   const hrmNavItems = [
     { name: 'Dashboard',        path: '/',               icon: <LayoutDashboard size={20} />, hrOnly: false, adminOnly: false, moduleKey: 'dashboard' as const },
+    { name: 'Team Chat',        path: '/chat',           icon: <MessageSquare size={20} />,   hrOnly: false, adminOnly: false, moduleKey: 'team-chat' as const },
     { name: 'Privileges',       path: '/privileges',     icon: <ShieldCheck size={20} />,     hrOnly: false, adminOnly: true,  moduleKey: null },
     { name: 'User Accounts',    path: '/user-management',icon: <Shield size={20} />,          hrOnly: true,  adminOnly: false, moduleKey: 'user-management' as const },
     { name: 'Employees',        path: '/employees',      icon: <Users size={20} />,           hrOnly: true,  adminOnly: false, moduleKey: 'employees' as const },
