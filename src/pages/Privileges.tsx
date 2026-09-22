@@ -6,7 +6,7 @@ import {
   LayoutDashboard, UserCog, UserRound, Briefcase, FileText,
   TrendingUp, Clock, Calendar, BarChart2, DollarSign, Award,
   Megaphone, PartyPopper, Mail, UserMinus, UserX, BarChart,
-  Settings, Globe, FolderKanban, Check, Undo2, X, MessageSquare
+  Settings, Globe, FolderKanban, Check, Undo2, X, MessageSquare, ListTodo
 } from 'lucide-react';
 import { getUsers } from '../api';
 import { useAuth } from '../context/AuthContext';
@@ -24,8 +24,15 @@ interface ModuleDef {
 }
 
 const MODULE_DEFINITIONS: ModuleDef[] = [
+  // Top-Level Navigation Modules (Top of Sidebar)
+  { key: 'hrm',            label: 'HRM Module',       icon: <LayoutDashboard size={14} />, group: 'Top-Level Navigation', defaultForAll: true },
+  { key: 'crm',            label: 'CRM Module',       icon: <Globe size={14} />,           group: 'Top-Level Navigation', defaultForAll: true },
+  { key: 'projects',       label: 'Projects Module',  icon: <FolderKanban size={14} />,    group: 'Top-Level Navigation', defaultForAll: true },
+
   // HRM - Core
   { key: 'dashboard',      label: 'Dashboard',       icon: <LayoutDashboard size={14} />, group: 'HRM Core',    defaultForAll: true },
+  { key: 'tasks',          label: 'Tasks',           icon: <ListTodo size={14} />,        group: 'HRM Core',    defaultForAll: true },
+  { key: 'team-chat',      label: 'Team Chat',        icon: <MessageSquare size={14} />,   group: 'HRM Core',    defaultForAll: true },
   { key: 'user-management',label: 'User Accounts',   icon: <UserCog size={14} />,         group: 'HRM Core',    defaultForAll: false },
   { key: 'employees',      label: 'Employees',        icon: <Users size={14} />,           group: 'HRM Core',    defaultForAll: false },
   { key: 'lifecycle',      label: 'Lifecycle',        icon: <TrendingUp size={14} />,      group: 'HRM Core',    defaultForAll: true },
@@ -49,10 +56,6 @@ const MODULE_DEFINITIONS: ModuleDef[] = [
   { key: 'careers',        label: 'Careers & Jobs',   icon: <Briefcase size={14} />,       group: 'Reports',     defaultForAll: true },
   { key: 'documents',      label: 'Documents',        icon: <FileText size={14} />,        group: 'Reports',     defaultForAll: true },
   { key: 'settings',       label: 'Settings',         icon: <Settings size={14} />,        group: 'Reports',     defaultForAll: true },
-  // External Modules
-  { key: 'crm',            label: 'CRM Module',       icon: <Globe size={14} />,           group: 'Modules',     defaultForAll: true },
-  { key: 'projects',       label: 'Projects Module',  icon: <FolderKanban size={14} />,    group: 'Modules',     defaultForAll: true },
-  { key: 'team-chat',      label: 'Team Chat',        icon: <MessageSquare size={14} />,   group: 'Modules',     defaultForAll: true },
 ];
 
 const MODULE_GROUPS = Array.from(new Set(MODULE_DEFINITIONS.map(m => m.group)));
@@ -88,6 +91,7 @@ export default function Privileges() {
   const [search, setSearch] = useState('');
   const [expandedUserId, setExpandedUserId] = useState<string | null>(null);
   const [draftModules, setDraftModules] = useState<Record<string, Set<ModuleKey>>>({});
+  const [draftTaskAssign, setDraftTaskAssign] = useState<Record<string, boolean>>({});
   const [savingUserId, setSavingUserId] = useState<string | null>(null);
 
   // Redirect non-admins
@@ -121,12 +125,22 @@ export default function Privileges() {
     }
     setExpandedUserId(userId);
 
+    const userObj = users.find(u => u.id === userId);
+    const userRole = (userObj?.role || '').trim().toUpperCase();
+    const defaultCanAssign = ['CEO', 'CTO', 'COO', 'ADMIN'].includes(userRole);
+
     if (!draftModules[userId]) {
       const saved = privilegesMap[userId];
       const initial: Set<ModuleKey> = saved
         ? new Set(saved.allowedModules)
         : new Set(DEFAULT_EMPLOYEE_MODULES);
       setDraftModules(prev => ({ ...prev, [userId]: initial }));
+    }
+
+    if (draftTaskAssign[userId] === undefined) {
+      const saved = privilegesMap[userId];
+      const initialCanAssign = saved?.canAssignTasks !== undefined ? saved.canAssignTasks : defaultCanAssign;
+      setDraftTaskAssign(prev => ({ ...prev, [userId]: initialCanAssign }));
     }
   };
 
@@ -163,7 +177,11 @@ export default function Privileges() {
   };
 
   const resetToDefault = (userId: string) => {
+    const userObj = users.find(u => u.id === userId);
+    const userRole = (userObj?.role || '').trim().toUpperCase();
+    const defaultCanAssign = ['CEO', 'CTO', 'COO', 'ADMIN'].includes(userRole);
     setDraftModules(prev => ({ ...prev, [userId]: new Set(DEFAULT_EMPLOYEE_MODULES) }));
+    setDraftTaskAssign(prev => ({ ...prev, [userId]: defaultCanAssign }));
   };
 
   const handleSave = async (userId: string) => {
@@ -173,9 +191,15 @@ export default function Privileges() {
 
     try {
       setSavingUserId(userId);
+      const userObj = users.find(u => u.id === userId);
+      const userRole = (userObj?.role || '').trim().toUpperCase();
+      const defaultCanAssign = ['CEO', 'CTO', 'COO', 'ADMIN'].includes(userRole);
+      const canAssign = draftTaskAssign[userId] !== undefined ? draftTaskAssign[userId] : defaultCanAssign;
+
       const privileges: UserPrivileges = {
         userId,
         allowedModules: Array.from(modules),
+        canAssignTasks: canAssign,
         grantedBy: adminUser.id,
         updatedAt: new Date().toISOString(),
       };
@@ -188,7 +212,11 @@ export default function Privileges() {
 
   const handleClearPrivileges = (userId: string, name: string) => {
     clearUserPrivileges(userId);
+    const userObj = users.find(u => u.id === userId);
+    const userRole = (userObj?.role || '').trim().toUpperCase();
+    const defaultCanAssign = ['CEO', 'CTO', 'COO', 'ADMIN'].includes(userRole);
     setDraftModules(prev => ({ ...prev, [userId]: new Set(DEFAULT_EMPLOYEE_MODULES) }));
+    setDraftTaskAssign(prev => ({ ...prev, [userId]: defaultCanAssign }));
     toast.success(`Privileges for ${name} reset to role defaults`);
   };
 
@@ -366,6 +394,49 @@ export default function Privileges() {
                             </button>
                           )}
                         </div>
+
+                        {/* Task Assignment Permission Switch */}
+                        {(() => {
+                          const userRole = (u.role || '').trim().toUpperCase();
+                          const defaultCanAssign = ['CEO', 'CTO', 'COO', 'ADMIN'].includes(userRole);
+                          const canAssign = draftTaskAssign[u.id] !== undefined ? draftTaskAssign[u.id] : defaultCanAssign;
+
+                          return (
+                            <div className="bg-indigo-50/70 dark:bg-indigo-950/20 border border-indigo-200/80 dark:border-indigo-800/50 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-2">
+                                  <ListTodo className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+                                  <span className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
+                                    Task Assignment Permission
+                                  </span>
+                                  <span className={`px-2 py-0.5 text-[10px] font-bold rounded-full uppercase tracking-wider ${
+                                    canAssign
+                                      ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
+                                      : 'bg-slate-500/10 text-slate-500 dark:text-slate-400 border border-slate-500/20'
+                                  }`}>
+                                    {canAssign ? 'Can Assign Tasks' : 'Cannot Assign Tasks'}
+                                  </span>
+                                </div>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-xl">
+                                  COO, CTO, and CEO can assign tasks to employees by default. Use this toggle to grant or revoke task creation and assignment privileges for this employee.
+                                </p>
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={() => setDraftTaskAssign(prev => ({ ...prev, [u.id]: !canAssign }))}
+                                className={`flex items-center gap-2 px-3.5 py-2 rounded-xl border text-xs font-bold transition-all shadow-sm shrink-0 cursor-pointer ${
+                                  canAssign
+                                    ? 'bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-500'
+                                    : 'bg-white dark:bg-slate-900 border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-slate-400'
+                                }`}
+                              >
+                                {canAssign ? <ToggleRight size={18} /> : <ToggleLeft size={18} />}
+                                <span>{canAssign ? 'Allowed' : 'Restricted'}</span>
+                              </button>
+                            </div>
+                          );
+                        })()}
 
                         {/* Module Groups */}
                         <div className="space-y-4">

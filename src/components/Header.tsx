@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Bell, X, Check, Clock, AlertTriangle, FileText, UserX, Menu, MessageSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getNotifications, markAllNotificationsRead, markNotificationRead } from '../api';
 import { AppNotification } from '../types';
@@ -12,7 +12,9 @@ interface HeaderProps {
 
 export default function Header({ onToggleSidebar }: HeaderProps) {
   const navigate = useNavigate();
+  const location = useLocation();
   const { user, isHR, isAdmin } = useAuth();
+  const hideBranding = location.pathname.startsWith('/careers');
 
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [notifications, setNotifications] = useState<AppNotification[]>([]);
@@ -167,9 +169,11 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
           >
             <Menu size={22} />
           </button>
-          <div className="lg:hidden flex items-center gap-2">
-            <img src="/logo.png" alt="TwinERP Logo" className="h-6 object-contain invert dark:invert-0" />
-          </div>
+          {!hideBranding && (
+            <div className="lg:hidden flex items-center gap-2">
+              <img src="/logo.png" alt="TwinERP Logo" className="h-6 object-contain invert dark:invert-0" />
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-2 sm:gap-4">
           <button 

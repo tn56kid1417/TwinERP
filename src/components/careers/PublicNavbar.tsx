@@ -17,27 +17,16 @@ export function PublicNavbar() {
       <div className="fixed top-0 left-0 right-0 z-50 pointer-events-none">
         <header
           id="navbar-header"
-          className="relative mx-auto h-[64px] bg-white dark:bg-zinc-950 pointer-events-auto transition-all top-0 w-full max-w-full rounded-none border-b border-line shadow-sm"
+          className="relative mx-auto h-[64px] bg-black dark:bg-white pointer-events-auto transition-all top-0 w-full max-w-full rounded-none border-b border-line shadow-sm"
           style={{ fontFamily: 'Manrope, sans-serif', transitionDuration: '400ms', transitionTimingFunction: 'cubic-bezier(0.25,1,0.5,1)' }}
         >
-          <div className="absolute inset-0 bg-white dark:bg-zinc-950 -z-10 transition-colors duration-300" />
+          <div className="absolute inset-0 bg-black dark:bg-white -z-10 transition-colors duration-300" />
           <div className="w-full max-w-7xl mx-auto h-full flex items-center justify-center lg:justify-start relative px-5 sm:px-6 lg:px-8">
             <a
               className="absolute left-1/2 top-1/2 order-2 flex h-[56px] w-[210px] shrink-0 -translate-x-1/2 -translate-y-1/2 items-center justify-center overflow-hidden lg:static lg:order-1 lg:translate-x-0 lg:translate-y-0"
-              href="https://twinspace.in/"
-              aria-label="TwinSpace — home"
+              href="#"
+              aria-label="Home"
             >
-              <img
-                src="/TwinSpace_nav.png"
-                alt="TwinSpace Logo"
-                loading="lazy"
-                decoding="async"
-                className="h-[220px] w-[220px] max-w-none object-contain"
-                onError={(e) => {
-                  const t = e.target as HTMLImageElement;
-                  if (t.src.endsWith('TwinSpace_nav.png')) t.src = '/logo.png';
-                }}
-              />
             </a>
             <nav className="absolute left-1/2 top-1/2 order-2 hidden h-full -translate-x-1/2 -translate-y-1/2 items-center justify-center gap-4 lg:flex xl:gap-5" aria-hidden="true" />
             <div className="order-3 ml-auto hidden items-center gap-3 lg:flex">

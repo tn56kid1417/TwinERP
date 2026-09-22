@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { motion } from 'motion/react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Phone, Users, Clock, Calendar, FileText, LayoutDashboard, BarChart2, UserMinus, UserX, Award, Megaphone, LogOut, Mail, PartyPopper, Briefcase, Building, PieChart, Sun, Moon, UserPlus, Settings as SettingsIcon, CreditCard, UploadCloud, Shuffle, Shield, ShieldCheck, TrendingUp, X, MessageSquare } from 'lucide-react';
+import { Phone, Users, Clock, Calendar, FileText, LayoutDashboard, BarChart2, UserMinus, UserX, Award, Megaphone, LogOut, Mail, PartyPopper, Briefcase, Building, PieChart, Sun, Moon, UserPlus, Settings as SettingsIcon, CreditCard, UploadCloud, Shuffle, Shield, ShieldCheck, TrendingUp, X, MessageSquare, ListTodo } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 type Module = 'HRM' | 'CRM' | 'Projects';
@@ -17,6 +17,14 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
   const navigate = useNavigate();
   const { user, logout, canViewAll, isAdmin, hasModuleAccess } = useAuth();
   const [activeModule, setActiveModule] = useState<Module>('HRM');
+
+  // Filter top-level modules according to admin privileges
+  const availableModules: Module[] = (['HRM', 'CRM', 'Projects'] as Module[]).filter(mod => {
+    if (mod === 'HRM') return hasModuleAccess('hrm');
+    if (mod === 'CRM') return hasModuleAccess('crm');
+    if (mod === 'Projects') return hasModuleAccess('projects');
+    return true;
+  });
   
   useEffect(() => {
     onClose?.();
@@ -24,13 +32,19 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
 
   useEffect(() => {
     if (location.pathname.startsWith('/crm')) {
-      setActiveModule('CRM');
+      if (hasModuleAccess('crm')) setActiveModule('CRM');
     } else if (location.pathname.startsWith('/projects')) {
-      setActiveModule('Projects');
+      if (hasModuleAccess('projects')) setActiveModule('Projects');
     } else {
-      setActiveModule('HRM');
+      if (hasModuleAccess('hrm')) setActiveModule('HRM');
     }
-  }, [location.pathname]);
+  }, [location.pathname, hasModuleAccess]);
+
+  useEffect(() => {
+    if (availableModules.length > 0 && !availableModules.includes(activeModule)) {
+      setActiveModule(availableModules[0]);
+    }
+  }, [availableModules, activeModule]);
 
   const [isDarkMode, setIsDarkMode] = useState(true);
 
@@ -61,6 +75,7 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
 
   const hrmNavItems = [
     { name: 'Dashboard',        path: '/',               icon: <LayoutDashboard size={20} />, hrOnly: false, adminOnly: false, moduleKey: 'dashboard' as const },
+    { name: 'Tasks',            path: '/tasks',          icon: <ListTodo size={20} />,        hrOnly: false, adminOnly: false, moduleKey: 'tasks' as const },
     { name: 'Team Chat',        path: '/chat',           icon: <MessageSquare size={20} />,   hrOnly: false, adminOnly: false, moduleKey: 'team-chat' as const },
     { name: 'Privileges',       path: '/privileges',     icon: <ShieldCheck size={20} />,     hrOnly: false, adminOnly: true,  moduleKey: null },
     { name: 'User Accounts',    path: '/user-management',icon: <Shield size={20} />,          hrOnly: true,  adminOnly: false, moduleKey: 'user-management' as const },
@@ -160,9 +175,10 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
           </button>
         </div>
 
-        <div className="px-4 my-3 shrink-0">
-          <div className="bg-slate-100/80 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-800 rounded-xl p-1 flex">
-            {(['HRM', 'CRM', 'Projects'] as Module[]).map((mod) => (
+        {availableModules.length > 0 && (
+          <div className="px-4 my-3 shrink-0">
+            <div className="bg-slate-100/80 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-800 rounded-xl p-1 flex">
+              {availableModules.map((mod) => (
               <button
                 key={mod}
                 onClick={() => {
@@ -183,6 +199,7 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
             ))}
           </div>
         </div>
+        )}
         
         <nav className="flex-1 min-h-0 px-4 py-1 pb-6 lg:pb-28 space-y-1 overflow-y-auto scrollbar-thin">
           {navItems.map((item) => {

@@ -208,3 +208,16 @@ export const exportChatHistory = (teamId: string) =>
 
 export const postWorkflowSystemMessage = (teamId: string, text: string) =>
   api.post('/chat/workflow-system-message', { teamId, text }).then(res => res.data);
+
+// ─── Employee Task Management APIs (for HRM Tasks page) ─────────────────────
+export const getEmployeeTasks = (params?: { assignedToId?: string; assignedById?: string; status?: string }) =>
+  api.get<import('./types').EmployeeTask[]>('/employee-tasks', { params }).then(res => res.data);
+
+export const createEmployeeTask = (taskData: Partial<import('./types').EmployeeTask>) =>
+  api.post<import('./types').EmployeeTask>('/employee-tasks', taskData).then(res => res.data);
+
+export const updateEmployeeTask = (id: string, updates: Partial<import('./types').EmployeeTask>) =>
+  api.patch<import('./types').EmployeeTask>(`/employee-tasks/${id}`, updates).then(res => res.data);
+
+export const deleteEmployeeTask = (id: string) =>
+  api.delete(`/employee-tasks/${id}`).then(res => res.data);

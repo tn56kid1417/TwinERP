@@ -11,6 +11,8 @@ interface AuthContextType {
   canEdit: boolean;
   userRoleCategory: string;
   canApprove: (submittedByRole?: string) => boolean;
+  /** Whether this user has permission to assign tasks (COO/CTO/CEO/Admin default, or privilege override) */
+  canAssignTasks: boolean;
   /** Returns true if the current user has access to a given module key */
   hasModuleAccess: (moduleKey: ModuleKey) => boolean;
   /** Admin-only: full privileges map for all users */
@@ -117,6 +119,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return false;
   };
 
+  // Task assignment permissions: COO, CTO, CEO, Admin can assign tasks by default.
+  // Can also be explicitly overridden per user in Privileges.
+  const userRoleNormalized = (user?.role || '').trim().toUpperCase();
+  const isExecutiveAssigner = ['CEO', 'CTO', 'COO', 'ADMIN'].includes(userRoleNormalized);
+  const userPrivilege = user ? privilegesMap[user.id] : undefined;
+  const canAssignTasks = userPrivilege?.canAssignTasks !== undefined
+    ? userPrivilege.canAssignTasks
+    : (isAdmin || isExecutiveAssigner);
+
   /**
    * Check if the current user has access to a specific module.
    * - Admin always has access to everything.
@@ -151,7 +162,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   return (
     <AuthContext.Provider value={{
       user, token, isHR, isAdmin, canViewAll, canEdit,
-      userRoleCategory, canApprove, hasModuleAccess,
+      userRoleCategory, canApprove, canAssignTasks, hasModuleAccess,
       privilegesMap, saveUserPrivileges, clearUserPrivileges,
       login, logout,
     }}>

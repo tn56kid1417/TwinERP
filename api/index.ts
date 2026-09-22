@@ -88,6 +88,89 @@ const saveNotifications = () => {
   }
 };
 
+const EMPLOYEE_TASKS_FILE = process.env.VERCEL ? '/tmp/erp_employee_tasks.json' : path.join(process.cwd(), '.employee_tasks.json');
+
+const seedEmployeeTasks = (): any[] => [
+  {
+    id: 'etask-1',
+    title: 'Q3 Architectural Roadmap Review',
+    description: 'Review system scalability bottlenecks and prepare microservices proposal for leadership.',
+    assignedToId: 'e1',
+    assignedToName: 'Alice Smith',
+    assignedToEmail: 'alice@example.com',
+    assignedById: 'e5',
+    assignedByName: 'Jane CTO',
+    assignedByRole: 'CTO',
+    priority: 'High',
+    status: 'In Progress',
+    dueDate: new Date(Date.now() + 3 * 86400000).toISOString().split('T')[0],
+    category: 'Engineering',
+    createdAt: new Date(Date.now() - 2 * 86400000).toISOString(),
+    updatedAt: new Date(Date.now() - 86400000).toISOString()
+  },
+  {
+    id: 'etask-2',
+    title: 'Audit Employee Onboarding Documentation',
+    description: 'Ensure all newly hired intern and full-time contracts comply with latest state compliance policies.',
+    assignedToId: 'e2',
+    assignedToName: 'Bob Johnson',
+    assignedToEmail: 'bob@example.com',
+    assignedById: 'e4',
+    assignedByName: 'John CEO',
+    assignedByRole: 'CEO',
+    priority: 'Urgent',
+    status: 'Pending',
+    dueDate: new Date(Date.now() + 1 * 86400000).toISOString().split('T')[0],
+    category: 'HR & Compliance',
+    createdAt: new Date(Date.now() - 86400000).toISOString(),
+    updatedAt: new Date(Date.now() - 86400000).toISOString()
+  },
+  {
+    id: 'etask-3',
+    title: 'Finalize Q3 Performance Appraisal Metrics',
+    description: 'Align KPIs with team leads and distribute feedback evaluation rubric.',
+    assignedToId: 'e2',
+    assignedToName: 'Bob Johnson',
+    assignedToEmail: 'bob@example.com',
+    assignedById: 'e3',
+    assignedByName: 'System Admin',
+    assignedByRole: 'Admin',
+    priority: 'Medium',
+    status: 'Done',
+    dueDate: new Date(Date.now() - 1 * 86400000).toISOString().split('T')[0],
+    category: 'Operations',
+    createdAt: new Date(Date.now() - 4 * 86400000).toISOString(),
+    completedAt: new Date(Date.now() - 86400000).toISOString(),
+    updatedAt: new Date(Date.now() - 86400000).toISOString()
+  }
+];
+
+const loadEmployeeTasks = (): any[] => {
+  try {
+    if (fs.existsSync(EMPLOYEE_TASKS_FILE)) {
+      const data = fs.readFileSync(EMPLOYEE_TASKS_FILE, 'utf-8');
+      const parsed = JSON.parse(data);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
+    }
+  } catch (err) {
+    console.error('Failed to load employee tasks from file:', err);
+  }
+  return seedEmployeeTasks();
+};
+
+let employeeTasks: any[] = loadEmployeeTasks();
+
+const saveEmployeeTasks = () => {
+  try {
+    fs.writeFileSync(EMPLOYEE_TASKS_FILE, JSON.stringify(employeeTasks, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('Failed to save employee tasks to file:', err);
+  }
+};
+
+
 export const addNotification = (notif: { title: string; message: string; type?: string; targetRole?: string; targetUserId?: string }) => {
   const newNotif = {
     id: `notif_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
@@ -2428,6 +2511,93 @@ export function createApp() {
 
   router.delete('/lifecycle/complaints/:id', (req, res) => {
     complaints = complaints.filter(c => c.id !== req.params.id);
+    res.status(204).end();
+  });
+
+  // ─── Employee Task Management APIs ────────────────────────────────────────
+  router.get('/employee-tasks', (req, res) => {
+    const { assignedToId, assignedById, status } = req.query;
+    let filtered = [...employeeTasks];
+    if (assignedToId) {
+      filtered = filtered.filter(t => t.assignedToId === assignedToId);
+    }
+    if (assignedById) {
+      filtered = filtered.filter(t => t.assignedById === assignedById);
+    }
+    if (status) {
+      filtered = filtered.filter(t => t.status?.toLowerCase() === (status as string).toLowerCase());
+    }
+    res.json(filtered);
+  });
+
+  router.post('/employee-tasks', (req, res) => {
+    const { title, description, assignedToId, assignedToName, assignedToEmail, assignedById, assignedByName, assignedByRole, priority, dueDate, category } = req.body;
+    if (!title || !assignedToId) {
+      return res.status(400).json({ error: 'Title and Assignee are required' });
+    }
+
+    const newTask = {
+      id: `etask_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
+      title,
+      description: description || '',
+      assignedToId,
+      assignedToName: assignedToName || 'Employee',
+      assignedToEmail: assignedToEmail || '',
+      assignedById: assignedById || req.headers['x-user-id'] || 'system',
+      assignedByName: assignedByName || 'Manager',
+      assignedByRole: assignedByRole || req.headers['x-user-role'] || 'Admin',
+      priority: priority || 'Medium',
+      status: 'Pending',
+      dueDate: dueDate || '',
+      category: category || 'General',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+
+    employeeTasks.unshift(newTask);
+    saveEmployeeTasks();
+
+    // Send in-app notification to the assigned user
+    addNotification({
+      title: 'New Task Assigned',
+      message: `${newTask.assignedByName} assigned you: "${newTask.title}" (Priority: ${newTask.priority})`,
+      type: 'alert',
+      targetUserId: assignedToId
+    });
+
+    res.status(201).json(newTask);
+  });
+
+  router.patch('/employee-tasks/:id', (req, res) => {
+    const task = employeeTasks.find(t => t.id === req.params.id);
+    if (!task) return res.status(404).json({ error: 'Task not found' });
+
+    const { title, description, priority, status, dueDate, category, assignedToId, assignedToName, assignedToEmail } = req.body;
+    if (title !== undefined) task.title = title;
+    if (description !== undefined) task.description = description;
+    if (priority !== undefined) task.priority = priority;
+    if (dueDate !== undefined) task.dueDate = dueDate;
+    if (category !== undefined) task.category = category;
+    if (assignedToId !== undefined) task.assignedToId = assignedToId;
+    if (assignedToName !== undefined) task.assignedToName = assignedToName;
+    if (assignedToEmail !== undefined) task.assignedToEmail = assignedToEmail;
+
+    if (status !== undefined) {
+      task.status = status;
+      if (status === 'Done') {
+        task.completedAt = new Date().toISOString();
+      } else {
+        delete task.completedAt;
+      }
+    }
+    task.updatedAt = new Date().toISOString();
+    saveEmployeeTasks();
+    res.json(task);
+  });
+
+  router.delete('/employee-tasks/:id', (req, res) => {
+    employeeTasks = employeeTasks.filter(t => t.id !== req.params.id);
+    saveEmployeeTasks();
     res.status(204).end();
   });
 

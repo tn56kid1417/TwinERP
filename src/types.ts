@@ -299,6 +299,8 @@ export interface Complaint {
 
 // --- Admin Privileges Types ---
 export type ModuleKey =
+  | 'hrm'
+  | 'tasks'
   | 'dashboard'
   | 'user-management'
   | 'employees'
@@ -325,8 +327,29 @@ export type ModuleKey =
 export interface UserPrivileges {
   userId: string;
   allowedModules: ModuleKey[];
+  canAssignTasks?: boolean; // explicitly grant or revoke task assignment permission
   grantedBy: string; // admin user ID
   updatedAt: string;
+}
+
+// --- Task Management Types ---
+export interface EmployeeTask {
+  id: string;
+  title: string;
+  description?: string;
+  assignedToId: string;
+  assignedToName: string;
+  assignedToEmail?: string;
+  assignedById: string;
+  assignedByName: string;
+  assignedByRole?: string;
+  priority: 'Low' | 'Medium' | 'High' | 'Urgent';
+  status: 'Pending' | 'In Progress' | 'Done';
+  dueDate?: string;
+  category?: string;
+  createdAt: string;
+  updatedAt?: string;
+  completedAt?: string;
 }
 
 /** Map of userId → UserPrivileges, stored in localStorage under 'erp_privileges' */
