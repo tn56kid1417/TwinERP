@@ -2,260 +2,406 @@
 
 @variant dark (&:where(.dark, .dark *));
 
+/* ─── Design Token System ──────────────────────────────────────────────────
+ *
+ * Palette rationale: An internal ERP (payroll, HR, CRM) is used for hours
+ * daily by people doing serious work. Every pixel spent on decoration is
+ * a pixel that taxes focus. The palette below anchors everything in near-
+ * black on near-white — high contrast, low noise — with a single blue
+ * (#2563EB, Tailwind blue-600) reserved exclusively for primary actions,
+ * active navigation states, and interactive links. No gradients, no
+ * indigo/violet accent drift, no warm-to-cool gradient washes.
+ *
+ * Greys lean slightly cool (blue undertone) to harmonise with the blue
+ * accent without feeling clinical. Shadows are used only on overlapping
+ * surfaces (modals, dropdowns, popovers) — not on every card.
+ *
+ * ── Tokens ──────────────────────────────────────────────────────────────
+ *
+ *  --erp-bg          page background     #F9FAFB  (gray-50, near-white)
+ *  --erp-surface     card/panel bg       #FFFFFF  (pure white)
+ *  --erp-surface-2   subtle inset bg     #F3F4F6  (gray-100)
+ *  --erp-border      dividers/borders    #E5E7EB  (gray-200, cool-leaning)
+ *  --erp-border-2    stronger border     #D1D5DB  (gray-300)
+ *
+ *  --erp-text-1      primary text        #111827  (gray-900, near-black)
+ *  --erp-text-2      secondary text      #374151  (gray-700)
+ *  --erp-text-3      muted/caption text  #6B7280  (gray-500)
+ *  --erp-text-inv    text on blue bg     #FFFFFF
+ *
+ *  --erp-blue        accent / primary    #2563EB  (blue-600)
+ *  --erp-blue-hover  accent hover        #1D4ED8  (blue-700)
+ *  --erp-blue-light  tinted bg on blue   #EFF6FF  (blue-50)
+ *  --erp-blue-ring   focus ring          #BFDBFE  (blue-200)
+ *
+ *  --erp-danger      destructive         #DC2626  (red-600)
+ *  --erp-warning     caution             #D97706  (amber-600)
+ *  --erp-success     positive            #16A34A  (green-600)
+ *
+ * ── Spacing scale (all padding/gap/margin values should snap to this) ───
+ *   4px · 8px · 12px · 16px · 20px · 24px · 32px · 40px · 48px · 64px
+ *
+ * ── Type scale ──────────────────────────────────────────────────────────
+ *   page-title   : 22px / 700 / -0.02em / gray-900
+ *   section-head : 15px / 600 / -0.01em / gray-900
+ *   body         : 14px / 400 / 0       / gray-700
+ *   label        : 13px / 500 / 0       / gray-700
+ *   caption      : 12px / 400 / 0       / gray-500
+ *
+ * ── Radius ──────────────────────────────────────────────────────────────
+ *   sm (inputs, tags, badges) : 6px
+ *   md (cards, panels)        : 8px
+ *   lg (modals, dialogs)      : 12px
+ *   full (avatars, dots)      : 9999px
+ *
+ * ── Shadows — overlapping surfaces only ─────────────────────────────────
+ *   panel    : 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04)
+ *   dropdown : 0 4px 12px rgba(0,0,0,.10), 0 1px 4px rgba(0,0,0,.06)
+ *   modal    : 0 16px 48px rgba(0,0,0,.14), 0 4px 16px rgba(0,0,0,.08)
+ * ─────────────────────────────────────────────────────────────────────── */
+
 @theme {
-  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
-  --font-display: 'Outfit', ui-sans-serif, system-ui, sans-serif;
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Inter', ui-sans-serif, system-ui, sans-serif;
 }
 
 @layer base {
   :root {
-    --chart-grid: #e2e8f0;
-    --chart-text: #64748b;
-    --chart-tooltip-bg: #ffffff;
-    --chart-tooltip-border: #e2e8f0;
-    --chart-tooltip-text: #0f172a;
-    --chart-cursor: #f1f5f9;
-  }
-  
-  .dark {
-    --chart-grid: #334155;
-    --chart-text: #94a3b8;
-    --chart-tooltip-bg: #0f172a;
-    --chart-tooltip-border: #1e293b;
-    --chart-tooltip-text: #f8fafc;
-    --chart-cursor: #334155;
-  }
-  
-  body {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    background-color: #f8fafc;
-    color: #334155;
-    transition: background-color 0.3s ease, color 0.3s ease;
-  }
+    /* Core surface */
+    --erp-bg:         #F9FAFB;
+    --erp-surface:    #FFFFFF;
+    --erp-surface-2:  #F3F4F6;
+    --erp-border:     #E5E7EB;
+    --erp-border-2:   #D1D5DB;
 
-  .dark body,
-  :root.dark body,
-  body.dark {
-    background-color: #0A0C10;
-    color: #cbd5e1;
-  }
-  
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-display);
-    letter-spacing: -0.02em;
-  }
-}
+    /* Text */
+    --erp-text-1:     #111827;
+    --erp-text-2:     #374151;
+    --erp-text-3:     #6B7280;
+    --erp-text-inv:   #FFFFFF;
 
-.bg-live-mesh {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -2;
-  overflow: hidden;
-  background: 
-    radial-gradient(at 0% 0%, rgba(241, 245, 249, 0.95) 0, transparent 55%),
-    radial-gradient(at 100% 0%, rgba(224, 231, 255, 0.5) 0, transparent 50%),
-    radial-gradient(at 50% 100%, rgba(243, 244, 246, 0.8) 0, transparent 60%),
-    linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #f8fafc 100%);
-  transition: background 0.4s ease;
-}
+    /* Accent — used ONLY for primary actions, active states, links */
+    --erp-blue:       #2563EB;
+    --erp-blue-hover: #1D4ED8;
+    --erp-blue-light: #EFF6FF;
+    --erp-blue-ring:  #BFDBFE;
 
-.dark .bg-live-mesh {
-  background: #0A0C10;
-}
+    /* Semantic */
+    --erp-danger:     #DC2626;
+    --erp-warning:    #D97706;
+    --erp-success:    #16A34A;
 
-.blob {
-  position: absolute;
-  filter: blur(90px);
-  z-index: -1;
-  border-radius: 50%;
-  opacity: 0.45;
-  animation: float 16s infinite alternate ease-in-out;
-}
+    /* Shadows */
+    --shadow-panel:   0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+    --shadow-dropdown:0 4px 12px rgba(0,0,0,.10), 0 1px 4px rgba(0,0,0,.06);
+    --shadow-modal:   0 16px 48px rgba(0,0,0,.14), 0 4px 16px rgba(0,0,0,.08);
 
-.dark .blob {
-  opacity: 0.6;
-  filter: blur(80px);
-}
-
-.blob-1 {
-  top: -15%;
-  left: -5%;
-  width: 55vw;
-  height: 55vw;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, rgba(99, 102, 241, 0) 70%);
-  animation-delay: 0s;
-}
-
-.dark .blob-1 {
-  background: radial-gradient(circle, rgba(79,70,229,0.35) 0%, rgba(79,70,229,0) 70%);
-}
-
-.blob-2 {
-  bottom: -15%;
-  right: -5%;
-  width: 65vw;
-  height: 65vw;
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.14) 0%, rgba(168, 85, 247, 0) 70%);
-  animation-delay: -5s;
-}
-
-.dark .blob-2 {
-  background: radial-gradient(circle, rgba(147,51,234,0.25) 0%, rgba(147,51,234,0) 70%);
-}
-
-.blob-3 {
-  top: 35%;
-  left: 25%;
-  width: 45vw;
-  height: 45vw;
-  background: radial-gradient(circle, rgba(14, 165, 233, 0.12) 0%, rgba(14, 165, 233, 0) 70%);
-  animation-duration: 20s;
-}
-
-.dark .blob-3 {
-  background: radial-gradient(circle, rgba(16,185,129,0.15) 0%, rgba(16,185,129,0) 70%);
-}
-
-@keyframes float {
-  0% {
-    transform: translate(0, 0) scale(1) rotate(0deg);
-  }
-  33% {
-    transform: translate(8%, 12%) scale(1.1) rotate(10deg);
-  }
-  66% {
-    transform: translate(-5%, 8%) scale(0.9) rotate(-5deg);
-  }
-  100% {
-    transform: translate(0, 0) scale(1) rotate(0deg);
-  }
-}
-
-.grid-bg {
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  z-index: -1;
-  background-image: 
-    linear-gradient(to right, rgba(99, 102, 241, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(99, 102, 241, 0.04) 1px, transparent 1px);
-  background-size: 50px 50px;
-  mask-image: radial-gradient(circle at center, black 30%, transparent 70%);
-  -webkit-mask-image: radial-gradient(circle at center, black 30%, transparent 70%);
-  transform-origin: center;
-  animation: spinGrid 140s linear infinite;
-}
-
-.dark .grid-bg {
-  background-image: 
-    linear-gradient(to right, rgba(79, 70, 229, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(79, 70, 229, 0.05) 1px, transparent 1px);
-}
-
-@keyframes spinGrid {
-  0% {
-    transform: rotate(0deg) translateY(0);
-  }
-  100% {
-    transform: rotate(360deg) translateY(0);
-  }
-}
-
-
-@theme {
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
-  
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
-  
-  --color-success: hsl(var(--success));
-  --color-success-foreground: hsl(var(--success-foreground));
-  --color-warning: hsl(var(--warning));
-  --color-warning-foreground: hsl(var(--warning-foreground));
-  --color-danger: hsl(var(--danger));
-  --color-danger-foreground: hsl(var(--danger-foreground));
-  --color-info: hsl(var(--info));
-  --color-info-foreground: hsl(var(--info-foreground));
-  
-  --color-border: hsl(var(--border));
-  --color-ring: hsl(var(--ring));
-}
-
-@layer base {
-  :root {
-    --background: 210 40% 98%;
-    --foreground: 222.2 47.4% 11.2%;
-    
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 47.4% 11.2%;
-    
-    --primary: 221.2 83.2% 53.3%;
-    --primary-foreground: 210 20% 98%;
-    
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    
-    --success: 142.1 76.2% 36.3%;
-    --success-foreground: 355.6 100% 97.3%;
-    
-    --warning: 38 92% 50%;
-    --warning-foreground: 355.6 100% 97.3%;
-    
-    --danger: 346.8 77.2% 49.8%;
-    --danger-foreground: 355.6 100% 97.3%;
-    
-    --info: 199 89% 48%;
-    --info-foreground: 355.6 100% 97.3%;
-    
-    --border: 214.3 31.8% 91.4%;
-    --ring: 221.2 83.2% 53.3%;
-    --radius: 1rem;
+    /* Chart tokens */
+    --chart-grid:         #E5E7EB;
+    --chart-text:         #6B7280;
+    --chart-tooltip-bg:   #FFFFFF;
+    --chart-tooltip-border: #E5E7EB;
+    --chart-tooltip-text: #111827;
+    --chart-cursor:       #F3F4F6;
   }
 
   .dark {
-    --background: 224 71% 4%;
-    --foreground: 210 20% 98%;
-    
-    --card: 222 35% 8%;
-    --card-foreground: 210 20% 98%;
-    
-    --primary: 238 84% 67%;
-    --primary-foreground: 210 20% 98%;
-    
-    --secondary: 220 25% 13%;
-    --secondary-foreground: 210 20% 98%;
-    
-    --success: 142.1 70% 45%;
-    --success-foreground: 210 20% 98%;
-    
-    --warning: 38 92% 50%;
-    --warning-foreground: 210 20% 98%;
-    
-    --danger: 346.8 77.2% 55%;
-    --danger-foreground: 210 20% 98%;
-    
-    --info: 199 89% 55%;
-    --info-foreground: 210 20% 98%;
-    
-    --border: 217 33% 18%;
-    --ring: 238 84% 67%;
+    --erp-bg:         #0F1117;
+    --erp-surface:    #181C24;
+    --erp-surface-2:  #1E2330;
+    --erp-border:     #2A3040;
+    --erp-border-2:   #3A4258;
+
+    --erp-text-1:     #F9FAFB;
+    --erp-text-2:     #D1D5DB;
+    --erp-text-3:     #9CA3AF;
+    --erp-text-inv:   #FFFFFF;
+
+    --erp-blue:       #3B82F6;
+    --erp-blue-hover: #60A5FA;
+    --erp-blue-light: rgba(59, 130, 246, 0.10);
+    --erp-blue-ring:  rgba(59, 130, 246, 0.30);
+
+    --erp-danger:     #F87171;
+    --erp-warning:    #FBBF24;
+    --erp-success:    #4ADE80;
+
+    --shadow-panel:   0 1px 3px rgba(0,0,0,.30);
+    --shadow-dropdown:0 4px 12px rgba(0,0,0,.45), 0 1px 4px rgba(0,0,0,.30);
+    --shadow-modal:   0 16px 48px rgba(0,0,0,.60), 0 4px 16px rgba(0,0,0,.40);
+
+    --chart-grid:         #2A3040;
+    --chart-text:         #9CA3AF;
+    --chart-tooltip-bg:   #181C24;
+    --chart-tooltip-border: #2A3040;
+    --chart-tooltip-text: #F9FAFB;
+    --chart-cursor:       #1E2330;
+
     color-scheme: dark;
   }
 
+  html {
+    font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    background-color: var(--erp-bg);
+    color: var(--erp-text-2);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-sans);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--erp-text-1);
+    line-height: 1.25;
+  }
+
+  /* Focus visible ring — accessible, deliberate */
+  *:focus-visible {
+    outline: 2px solid var(--erp-blue);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  input, select, textarea {
+    color-scheme: light;
+  }
   .dark input,
   .dark select,
   .dark textarea {
     color-scheme: dark;
   }
+}
+
+/* ─── Tailwind theme bridge ──────────────────────────────────────────── */
+@theme {
+  --color-background:          var(--erp-bg);
+  --color-foreground:          var(--erp-text-1);
+  --color-card:                var(--erp-surface);
+  --color-card-foreground:     var(--erp-text-1);
+  --color-primary:             var(--erp-blue);
+  --color-primary-foreground:  var(--erp-text-inv);
+  --color-secondary:           var(--erp-surface-2);
+  --color-secondary-foreground:var(--erp-text-2);
+  --color-success:             var(--erp-success);
+  --color-success-foreground:  #fff;
+  --color-warning:             var(--erp-warning);
+  --color-warning-foreground:  #fff;
+  --color-danger:              var(--erp-danger);
+  --color-danger-foreground:   #fff;
+  --color-info:                var(--erp-blue);
+  --color-info-foreground:     #fff;
+  --color-border:              var(--erp-border);
+  --color-ring:                var(--erp-blue);
+}
+
+/* ─── Utility classes that pages can reference ──────────────────────── */
+
+/* Page shell */
+.erp-page {
+  padding: 32px;
+  max-width: 1400px;
+}
+
+/* Page title */
+.erp-title {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--erp-text-1);
+  line-height: 1.2;
+}
+
+/* Section heading */
+.erp-section-head {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--erp-text-1);
+}
+
+/* Label (form labels, column headers — sentence-case, never ALL-CAPS) */
+.erp-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--erp-text-2);
+}
+
+/* Caption / meta */
+.erp-caption {
+  font-size: 12px;
+  color: var(--erp-text-3);
+}
+
+/* Card — border only, no shadow on flat-hierarchy cards */
+.erp-card {
+  background: var(--erp-surface);
+  border: 1px solid var(--erp-border);
+  border-radius: 8px;
+}
+
+/* Elevated card — for overlapping surfaces */
+.erp-card-elevated {
+  background: var(--erp-surface);
+  border: 1px solid var(--erp-border);
+  border-radius: 8px;
+  box-shadow: var(--shadow-panel);
+}
+
+/* Stat card — left border accent instead of full gradient background */
+.erp-stat-card {
+  background: var(--erp-surface);
+  border: 1px solid var(--erp-border);
+  border-radius: 8px;
+  border-left: 3px solid var(--erp-blue);
+}
+
+/* Primary button */
+.erp-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--erp-blue);
+  color: var(--erp-text-inv);
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  white-space: nowrap;
+}
+.erp-btn-primary:hover {
+  background: var(--erp-blue-hover);
+}
+.erp-btn-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Secondary / ghost button */
+.erp-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--erp-surface);
+  color: var(--erp-text-2);
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  border: 1px solid var(--erp-border-2);
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.erp-btn-secondary:hover {
+  background: var(--erp-surface-2);
+  border-color: var(--erp-border-2);
+}
+
+/* Danger button */
+.erp-btn-danger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--erp-danger);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+.erp-btn-danger:hover { background: #b91c1c; }
+
+/* Input */
+.erp-input {
+  width: 100%;
+  background: var(--erp-surface);
+  border: 1px solid var(--erp-border-2);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: var(--erp-text-1);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.erp-input:focus {
+  outline: none;
+  border-color: var(--erp-blue);
+  box-shadow: 0 0 0 3px var(--erp-blue-ring);
+}
+
+/* Badge — semantic, not decorative */
+.erp-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 20px;
+}
+.erp-badge-blue    { background: var(--erp-blue-light); color: var(--erp-blue); }
+.erp-badge-green   { background: #F0FDF4; color: #15803D; }
+.erp-badge-yellow  { background: #FFFBEB; color: #92400E; }
+.erp-badge-red     { background: #FEF2F2; color: #991B1B; }
+.erp-badge-neutral { background: var(--erp-surface-2); color: var(--erp-text-2); }
+
+.dark .erp-badge-blue    { background: rgba(59,130,246,0.12); color: #93C5FD; }
+.dark .erp-badge-green   { background: rgba(22,163,74,0.12);  color: #4ADE80; }
+.dark .erp-badge-yellow  { background: rgba(217,119,6,0.12);  color: #FCD34D; }
+.dark .erp-badge-red     { background: rgba(220,38,38,0.12);  color: #FCA5A5; }
+.dark .erp-badge-neutral { background: var(--erp-surface-2);  color: var(--erp-text-3); }
+
+/* Table */
+.erp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.erp-table th {
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--erp-text-3);
+  background: var(--erp-surface-2);
+  border-bottom: 1px solid var(--erp-border);
+  white-space: nowrap;
+}
+.erp-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--erp-border);
+  color: var(--erp-text-2);
+  vertical-align: middle;
+}
+.erp-table tbody tr:last-child td { border-bottom: none; }
+.erp-table tbody tr:hover td { background: var(--erp-surface-2); }
+
+/* Scrollbar */
+.erp-scroll::-webkit-scrollbar        { width: 4px; height: 4px; }
+.erp-scroll::-webkit-scrollbar-track  { background: transparent; }
+.erp-scroll::-webkit-scrollbar-thumb  { background: var(--erp-border-2); border-radius: 999px; }
+.erp-scroll::-webkit-scrollbar-thumb:hover { background: var(--erp-text-3); }
+
+/* Legacy class kept for backwards compat — now transparent */
+.bg-live-mesh {
+  background: var(--erp-bg);
+}
+
+/* Deprecated blobs/grid — strip all animation, invisible */
+.blob, .blob-1, .blob-2, .blob-3,
+.grid-bg {
+  display: none !important;
 }

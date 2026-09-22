@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { login as apiLogin } from '../api';
-
 import { getErrorMessage } from '../utils/error';
 
 const Login = () => {
@@ -12,11 +11,9 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
 
-  // Pre-warm the serverless function in the background as soon as login page loads.
-  // This way, by the time the user fills in credentials and clicks Sign In,
-  // the cold start has already happened and the API responds instantly.
   useEffect(() => {
     loginPageRef.current?.scrollTo({ top: 0, behavior: 'auto' });
+    // Pre-warm serverless function to eliminate cold-start on first login attempt
     fetch('/api/health').catch(() => {});
   }, []);
 
@@ -35,53 +32,101 @@ const Login = () => {
   };
 
   return (
-    <div ref={loginPageRef} className="h-dvh min-h-screen bg-[#f8fafc] dark:bg-[#0A0C10] bg-live-mesh flex flex-col items-center justify-start px-4 py-10 relative overflow-x-hidden overflow-y-auto overscroll-contain">
-      <div className="mb-8 text-center flex flex-col items-center">
-        <img src="/logo.png" alt="TwinERP Logo" className="h-16 object-contain mb-4" loading="eager" />
-        <p className="text-slate-500 mt-2 text-sm">Human Resource Management System</p>
+    <div
+      ref={loginPageRef}
+      className="min-h-screen flex flex-col items-center justify-center px-4 py-12"
+      style={{ background: 'var(--erp-bg)' }}
+    >
+      {/* Logo + product name */}
+      <div className="mb-8 flex flex-col items-center gap-3">
+        <img src="/logo.png" alt="TwinERP" className="h-10 object-contain" loading="eager" />
+        <p className="text-sm" style={{ color: 'var(--erp-text-3)' }}>
+          Human Resource Management System
+        </p>
       </div>
 
-      <div className="shrink-0 bg-white/85 dark:bg-[#0C1017]/95 backdrop-blur-2xl border border-slate-200/90 dark:border-slate-700/60 rounded-2xl w-full max-w-md p-8 shadow-2xl shadow-slate-900/10 dark:shadow-black/80 ring-1 ring-black/5 dark:ring-white/10 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-indigo-500/80 to-transparent" />
-        <h2 className="text-xl font-bold text-slate-900 dark:text-slate-100 mb-6 tracking-tight">Sign In to Your Account</h2>
+      {/* Login card — border only, no shadow + ring + blur simultaneously */}
+      <div
+        className="w-full max-w-sm rounded-lg p-8"
+        style={{
+          background: 'var(--erp-surface)',
+          border: '1px solid var(--erp-border)',
+          boxShadow: 'var(--shadow-panel)',
+        }}
+      >
+        <h1
+          className="text-xl font-semibold mb-6 tracking-tight"
+          style={{ color: 'var(--erp-text-1)', letterSpacing: '-0.02em' }}
+        >
+          Sign in
+        </h1>
 
         {error && (
-          <div className="bg-rose-500/10 border border-rose-500/25 text-rose-500 dark:text-rose-400 p-3.5 rounded-xl text-sm mb-6 flex items-center gap-2">
+          <div
+            className="mb-5 px-4 py-3 rounded-md text-sm"
+            style={{
+              background: 'rgba(220,38,38,0.06)',
+              border: '1px solid rgba(220,38,38,0.25)',
+              color: 'var(--erp-danger)',
+            }}
+          >
             {typeof error === 'string' ? error : (error as any)?.message || 'Failed to login'}
           </div>
         )}
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">Email Address</label>
+            {/* Sentence-case label — never ALL-CAPS */}
+            <label
+              className="block text-sm font-medium mb-1.5"
+              style={{ color: 'var(--erp-text-2)' }}
+            >
+              Email address
+            </label>
             <input
               type="email"
               required
-              className="w-full bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-sm dark:shadow-inner [color-scheme:light] dark:[color-scheme:dark]"
+              className="erp-input"
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="name@company.com"
+              autoComplete="email"
             />
           </div>
+
           <div>
-            <label className="block text-[11px] font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wider mb-1.5">Password</label>
+            <label
+              className="block text-sm font-medium mb-1.5"
+              style={{ color: 'var(--erp-text-2)' }}
+            >
+              Password
+            </label>
             <input
               type="password"
               required
-              className="w-full bg-white/90 dark:bg-[#07090E]/90 border border-slate-200 dark:border-slate-700/60 text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-sm dark:shadow-inner [color-scheme:light] dark:[color-scheme:dark]"
+              className="erp-input"
               value={password}
               onChange={e => setPassword(e.target.value)}
               placeholder="••••••••"
+              autoComplete="current-password"
             />
           </div>
+
+          {/* Primary button — solid blue, no gradient */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 disabled:opacity-60 disabled:cursor-not-allowed text-white py-3 rounded-xl text-xs font-bold uppercase tracking-widest transition-all mt-2 flex items-center justify-center gap-2 shadow-lg shadow-indigo-500/25 cursor-pointer"
+            className="erp-btn-primary w-full justify-center mt-2"
           >
             {loading ? (
-              <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin inline-block" /> Signing in...</>
-            ) : 'Sign In'}
+              <>
+                <span
+                  className="w-4 h-4 border-2 rounded-full animate-spin inline-block"
+                  style={{ borderColor: 'rgba(255,255,255,0.3)', borderTopColor: '#fff' }}
+                />
+                Signing in…
+              </>
+            ) : 'Sign in'}
           </button>
         </form>
       </div>
