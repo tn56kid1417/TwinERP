@@ -51,16 +51,16 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
     }
   }, [availableModules, activeModule]);
 
-  const [isDarkMode, setIsDarkMode] = useState(true);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'light') {
-      document.documentElement.classList.remove('dark');
-      setIsDarkMode(false);
-    } else {
+    if (savedTheme === 'dark') {
       document.documentElement.classList.add('dark');
       setIsDarkMode(true);
+    } else {
+      document.documentElement.classList.remove('dark');
+      setIsDarkMode(false);
     }
   }, []);
 

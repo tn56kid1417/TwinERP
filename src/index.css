@@ -67,20 +67,20 @@
 
 @layer base {
   :root {
-    /* Core surface */
-    --erp-bg:         #F9FAFB;
+    /* Core surface — Primary color is pure White */
+    --erp-bg:         #FFFFFF;
     --erp-surface:    #FFFFFF;
-    --erp-surface-2:  #F3F4F6;
-    --erp-border:     #E5E7EB;
-    --erp-border-2:   #D1D5DB;
+    --erp-surface-2:  #F8FAFC;
+    --erp-border:     #E2E8F0;
+    --erp-border-2:   #CBD5E1;
 
-    /* Text */
-    --erp-text-1:     #111827;
-    --erp-text-2:     #374151;
-    --erp-text-3:     #6B7280;
+    /* Text — Third importance is Black / Dark Charcoal */
+    --erp-text-1:     #0F172A;
+    --erp-text-2:     #334155;
+    --erp-text-3:     #64748B;
     --erp-text-inv:   #FFFFFF;
 
-    /* Accent — used ONLY for primary actions, active states, links */
+    /* Accent — Secondary color is Blue (#2563EB) reserved for primary actions, active nav/tabs, focus */
     --erp-blue:       #2563EB;
     --erp-blue-hover: #1D4ED8;
     --erp-blue-light: #EFF6FF;
@@ -91,53 +91,53 @@
     --erp-warning:    #D97706;
     --erp-success:    #16A34A;
 
-    /* Shadows */
-    --shadow-panel:   0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
-    --shadow-dropdown:0 4px 12px rgba(0,0,0,.10), 0 1px 4px rgba(0,0,0,.06);
-    --shadow-modal:   0 16px 48px rgba(0,0,0,.14), 0 4px 16px rgba(0,0,0,.08);
+    /* Shadows — subtle contrast on pure white */
+    --shadow-panel:   0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
+    --shadow-dropdown:0 4px 12px rgba(0,0,0,.08), 0 1px 4px rgba(0,0,0,.04);
+    --shadow-modal:   0 16px 48px rgba(0,0,0,.12), 0 4px 16px rgba(0,0,0,.06);
 
     /* Chart tokens */
-    --chart-grid:         #E5E7EB;
-    --chart-text:         #6B7280;
+    --chart-grid:         #F1F5F9;
+    --chart-text:         #64748B;
     --chart-tooltip-bg:   #FFFFFF;
-    --chart-tooltip-border: #E5E7EB;
-    --chart-tooltip-text: #111827;
-    --chart-cursor:       #F3F4F6;
+    --chart-tooltip-border: #E2E8F0;
+    --chart-tooltip-text: #0F172A;
+    --chart-cursor:       #F8FAFC;
   }
 
   .dark {
-    --erp-bg:         #0F1117;
-    --erp-surface:    #181C24;
-    --erp-surface-2:  #1E2330;
-    --erp-border:     #2A3040;
-    --erp-border-2:   #3A4258;
+    --erp-bg:         #FFFFFF;
+    --erp-surface:    #FFFFFF;
+    --erp-surface-2:  #F8FAFC;
+    --erp-border:     #E2E8F0;
+    --erp-border-2:   #CBD5E1;
 
-    --erp-text-1:     #F9FAFB;
-    --erp-text-2:     #D1D5DB;
-    --erp-text-3:     #9CA3AF;
+    --erp-text-1:     #0F172A;
+    --erp-text-2:     #334155;
+    --erp-text-3:     #64748B;
     --erp-text-inv:   #FFFFFF;
 
-    --erp-blue:       #3B82F6;
-    --erp-blue-hover: #60A5FA;
-    --erp-blue-light: rgba(59, 130, 246, 0.10);
-    --erp-blue-ring:  rgba(59, 130, 246, 0.30);
+    --erp-blue:       #2563EB;
+    --erp-blue-hover: #1D4ED8;
+    --erp-blue-light: #EFF6FF;
+    --erp-blue-ring:  #BFDBFE;
 
-    --erp-danger:     #F87171;
-    --erp-warning:    #FBBF24;
-    --erp-success:    #4ADE80;
+    --erp-danger:     #DC2626;
+    --erp-warning:    #D97706;
+    --erp-success:    #16A34A;
 
-    --shadow-panel:   0 1px 3px rgba(0,0,0,.30);
-    --shadow-dropdown:0 4px 12px rgba(0,0,0,.45), 0 1px 4px rgba(0,0,0,.30);
-    --shadow-modal:   0 16px 48px rgba(0,0,0,.60), 0 4px 16px rgba(0,0,0,.40);
+    --shadow-panel:   0 1px 3px rgba(0,0,0,.06);
+    --shadow-dropdown:0 4px 12px rgba(0,0,0,.08), 0 1px 4px rgba(0,0,0,.04);
+    --shadow-modal:   0 16px 48px rgba(0,0,0,.12), 0 4px 16px rgba(0,0,0,.06);
 
-    --chart-grid:         #2A3040;
-    --chart-text:         #9CA3AF;
-    --chart-tooltip-bg:   #181C24;
-    --chart-tooltip-border: #2A3040;
-    --chart-tooltip-text: #F9FAFB;
-    --chart-cursor:       #1E2330;
+    --chart-grid:         #F1F5F9;
+    --chart-text:         #64748B;
+    --chart-tooltip-bg:   #FFFFFF;
+    --chart-tooltip-border: #E2E8F0;
+    --chart-tooltip-text: #0F172A;
+    --chart-cursor:       #F8FAFC;
 
-    color-scheme: dark;
+    color-scheme: light;
   }
 
   html {
