@@ -5,40 +5,40 @@ import { SalesUserDashboard } from '../views/sales-user/Dashboard'
 import { SalesLeaderDashboard } from '../views/sales-leader/Dashboard'
 
 class ErrorBoundary extends Component<{children: ReactNode}, {hasError: boolean, error: Error | null}> {
-  public state = { hasError: false, error: null as Error | null };
-  constructor(props: {children: ReactNode}) {
-    super(props);
-  }
-  static getDerivedStateFromError(error: Error) {
-    return { hasError: true, error };
-  }
-  render() {
-    if (this.state.hasError) {
-      return <div className="text-red-500 p-8 text-left bg-white font-mono"><h1>CRM Error</h1><pre>{this.state.error?.toString()}</pre><pre>{this.state.error?.stack}</pre></div>;
-    }
-    return (this as any).props.children;
-  }
+ public state = { hasError: false, error: null as Error | null };
+ constructor(props: {children: ReactNode}) {
+ super(props);
+ }
+ static getDerivedStateFromError(error: Error) {
+ return { hasError: true, error };
+ }
+ render() {
+ if (this.state.hasError) {
+ return <div className="text-red-500 p-8 text-left bg-white font-mono"><h1>CRM Error</h1><pre>{this.state.error?.toString()}</pre><pre>{this.state.error?.stack}</pre></div>;
+ }
+ return (this as any).props.children;
+ }
 }
 
 const DashboardContent: React.FC = () => {
-  const { user } = useAuthStore()
+ const { user } = useAuthStore()
 
-  if (user?.role === 'COMPANY_ADMIN') {
-    return <CompanyAdminDashboard />
-  }
-  if (user?.role === 'SALES_LEADER') {
-    return <SalesLeaderDashboard />
-  }
+ if (user?.role === 'COMPANY_ADMIN') {
+ return <CompanyAdminDashboard />
+ }
+ if (user?.role === 'SALES_LEADER') {
+ return <SalesLeaderDashboard />
+ }
 
-  return <SalesUserDashboard />
+ return <SalesUserDashboard />
 }
 
 export const DashboardDispatcher: React.FC = () => {
-  return (
-    <ErrorBoundary>
-      <DashboardContent />
-    </ErrorBoundary>
-  )
+ return (
+ <ErrorBoundary>
+ <DashboardContent />
+ </ErrorBoundary>
+ )
 }
 
 export default DashboardDispatcher

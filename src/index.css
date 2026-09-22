@@ -405,3 +405,48 @@
 .grid-bg {
   display: none !important;
 }
+
+/* ─── Global Override Layer ─────────────────────────────────────────────
+ *  Catches any AI-generated styling tells that survived the file-level
+ *  cleanup. Higher specificity ensures these win over inline Tailwind.
+ * ──────────────────────────────────────────────────────────────────── */
+
+/* Force all modals/dialogs to solid white, no glass */
+[role="dialog"] {
+  background: #FFFFFF !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  border-radius: 8px !important;
+}
+
+/* Strip colored box-shadows globally — only neutral shadows allowed */
+*[class*="shadow-indigo"],
+*[class*="shadow-blue-"],
+*[class*="shadow-emerald"],
+*[class*="shadow-rose"] {
+  box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04) !important;
+}
+
+/* Force consistent border-radius on form controls */
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea {
+  border-radius: 6px !important;
+}
+
+/* Force consistent border-radius on buttons */
+button, [role="button"], a[class*="btn"] {
+  border-radius: 6px;
+}
+
+/* Kill remaining backdrop-blur on non-overlay surfaces */
+main *, aside *, nav * {
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+}
+
+/* Ensure all .dark overrides point to white in light-only mode */
+.dark {
+  color-scheme: light !important;
+}
+

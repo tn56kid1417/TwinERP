@@ -26,45 +26,45 @@ import Reports from '../views/company-admin/Reports'
 import Settings from '../views/shared/Settings'
 
 export const AppRouter: React.FC = () => {
-  return (
-    <BrowserRouter>
-      <Routes>
-        
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/register" element={<RegisterCompany />} />
+ return (
+ <BrowserRouter>
+ <Routes>
+ 
+ <Route path="/"element={<Navigate to="/login"replace />} />
+ <Route path="/register"element={<RegisterCompany />} />
 
-        {/* AUTH SHELL (Centered cards) */}
-        <Route element={<AuthLayout />}>
-          <Route path="/login" element={<Login />} />
-        </Route>
+ {/* AUTH SHELL (Centered cards) */}
+ <Route element={<AuthLayout />}>
+ <Route path="/login"element={<Login />} />
+ </Route>
 
-        {/* PROTECTED WORKSPACE PORTAL (Sidebar layout) */}
-        <Route element={<ProtectedRoute allowedRoles={['COMPANY_ADMIN', 'SALES_USER', 'MARKETING', 'SALES_LEADER']} />}>
-          <Route element={<DashboardLayout />}>
-            
-            {/* Common routes for both admin & sales reps */}
-            <Route path="/dashboard" element={<DashboardDispatcher />} />
-            <Route path="/leads" element={<LeadsDispatcher />} />
-            <Route path="/distribute-leads" element={<DistributeLeads />} />
-            <Route path="/upload-leads" element={<UploadLeads />} />
-            <Route path="/customers" element={<Customers />} />
-            <Route path="/customers/:id" element={<CustomerDetails />} />
-            <Route path="/reports" element={<Reports />} />
-            <Route path="/settings" element={<Settings />} />
+ {/* PROTECTED WORKSPACE PORTAL (Sidebar layout) */}
+ <Route element={<ProtectedRoute allowedRoles={['COMPANY_ADMIN', 'SALES_USER', 'MARKETING', 'SALES_LEADER']} />}>
+ <Route element={<DashboardLayout />}>
+ 
+ {/* Common routes for both admin & sales reps */}
+ <Route path="/dashboard"element={<DashboardDispatcher />} />
+ <Route path="/leads"element={<LeadsDispatcher />} />
+ <Route path="/distribute-leads"element={<DistributeLeads />} />
+ <Route path="/upload-leads"element={<UploadLeads />} />
+ <Route path="/customers"element={<Customers />} />
+ <Route path="/customers/:id"element={<CustomerDetails />} />
+ <Route path="/reports"element={<Reports />} />
+ <Route path="/settings"element={<Settings />} />
 
-            {/* Admin-only routes */}
-            <Route element={<ProtectedRoute allowedRoles={['COMPANY_ADMIN']} />}>
-              <Route path="/sales" element={<SalesUsers />} />
-            </Route>
+ {/* Admin-only routes */}
+ <Route element={<ProtectedRoute allowedRoles={['COMPANY_ADMIN']} />}>
+ <Route path="/sales"element={<SalesUsers />} />
+ </Route>
 
-          </Route>
-        </Route>
+ </Route>
+ </Route>
 
-        {/* FALLBACK REDIRECTS */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+ {/* FALLBACK REDIRECTS */}
+ <Route path="*"element={<Navigate to="/"replace />} />
 
-      </Routes>
-    </BrowserRouter>
-  )
+ </Routes>
+ </BrowserRouter>
+ )
 }
 export default AppRouter

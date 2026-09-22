@@ -5,14 +5,14 @@ import { twMerge } from 'tailwind-merge';
 export interface LabelProps extends React.LabelHTMLAttributes<HTMLLabelElement> {}
 
 export const Label = React.forwardRef<HTMLLabelElement, LabelProps>(
-  ({ className, ...props }, ref) => (
-    <label
-      ref={ref}
-      className={twMerge(
-        clsx("text-sm font-medium leading-none text-gray-700 dark:text-gray-300 peer-disabled:cursor-not-allowed peer-disabled:opacity-70", className)
-      )}
-      {...props}
-    />
-  )
+ ({ className, ...props }, ref) => (
+ <label
+ ref={ref}
+ className={twMerge(
+ clsx("text-sm font-medium leading-none text-gray-700 dark:text-gray-300 peer-disabled:cursor-not-allowed peer-disabled:opacity-70", className)
+ )}
+ {...props}
+ />
+ )
 );
 Label.displayName = 'Label';

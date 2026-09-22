@@ -12,174 +12,173 @@ import { Button } from '../../components/ui/Button'
 
 // Login validation schema
 const loginSchema = z.object({
-  workspaceName: z.string().min(1, 'Workspace is required'),
-  email: z.string().min(1, 'Email is required').email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+ workspaceName: z.string().min(1, 'Workspace is required'),
+ email: z.string().min(1, 'Email is required').email('Invalid email address'),
+ password: z.string().min(6, 'Password must be at least 6 characters'),
 })
 
 type LoginFormValues = z.infer<typeof loginSchema>
 
 export const Login: React.FC = () => {
-  const navigate = useNavigate()
-  const location = useLocation()
-  const { login, isLoading } = useAuthStore()
+ const navigate = useNavigate()
+ const location = useLocation()
+ const { login, isLoading } = useAuthStore()
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    formState: { errors },
-  } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
-    defaultValues: {
-      workspaceName: '',
-      email: '',
-      password: '',
-    },
-  })
+ const {
+ register,
+ handleSubmit,
+ setValue,
+ formState: { errors },
+ } = useForm<LoginFormValues>({
+ resolver: zodResolver(loginSchema),
+ defaultValues: {
+ workspaceName: '',
+ email: '',
+ password: '',
+ },
+ })
 
-  // Prefill workspace if redirected from registration
-  useEffect(() => {
-    const state = location.state as { prefilledWorkspace?: string } | null
-    if (state?.prefilledWorkspace) {
-      setValue('workspaceName', state.prefilledWorkspace)
-    }
-  }, [location, setValue])
+ // Prefill workspace if redirected from registration
+ useEffect(() => {
+ const state = location.state as { prefilledWorkspace?: string } | null
+ if (state?.prefilledWorkspace) {
+ setValue('workspaceName', state.prefilledWorkspace)
+ }
+ }, [location, setValue])
 
-  const onSubmit = async (data: LoginFormValues) => {
-    try {
-      const user = await login(data.workspaceName, data.email, data.password)
-      toast.success(`Welcome back, ${user.name}!`)
-      
-      // Redirect to the unified dashboard dispatcher
-      navigate('/crm')
-    } catch (err: any) {
-      toast.error(err.message || 'Authentication failed. Please verify credentials.')
-    }
-  }
+ const onSubmit = async (data: LoginFormValues) => {
+ try {
+ const user = await login(data.workspaceName, data.email, data.password)
+ toast.success(`Welcome back, ${user.name}!`)
+ 
+ // Redirect to the unified dashboard dispatcher
+ navigate('/crm')
+ } catch (err: any) {
+ toast.error(err.message || 'Authentication failed. Please verify credentials.')
+ }
+ }
 
-  // Quick login helper for demo purposes
-  const handleQuickLogin = (role: 'admin' | 'sales' | 'stark' | 'leader1' | 'leader2') => {
-    if (role === 'admin') {
-      setValue('workspaceName', 'acme')
-      setValue('email', 'admin@acme.com')
-      setValue('password', 'password')
-    } else if (role === 'sales') {
-      setValue('workspaceName', 'acme')
-      setValue('email', 'john@acme.com')
-      setValue('password', 'password')
-    } else if (role === 'stark') {
-      setValue('workspaceName', 'stark')
-      setValue('email', 'pepper@stark.com')
-      setValue('password', 'password')
-    } else if (role === 'leader1') {
-      setValue('workspaceName', 'acme')
-      setValue('email', 'michael@acme.com')
-      setValue('password', 'password')
-    } else if (role === 'leader2') {
-      setValue('workspaceName', 'acme')
-      setValue('email', 'jim@acme.com')
-      setValue('password', 'password')
-    }
-  }
+ // Quick login helper for demo purposes
+ const handleQuickLogin = (role: 'admin' | 'sales' | 'stark' | 'leader1' | 'leader2') => {
+ if (role === 'admin') {
+ setValue('workspaceName', 'acme')
+ setValue('email', 'admin@acme.com')
+ setValue('password', 'password')
+ } else if (role === 'sales') {
+ setValue('workspaceName', 'acme')
+ setValue('email', 'john@acme.com')
+ setValue('password', 'password')
+ } else if (role === 'stark') {
+ setValue('workspaceName', 'stark')
+ setValue('email', 'pepper@stark.com')
+ setValue('password', 'password')
+ } else if (role === 'leader1') {
+ setValue('workspaceName', 'acme')
+ setValue('email', 'michael@acme.com')
+ setValue('password', 'password')
+ } else if (role === 'leader2') {
+ setValue('workspaceName', 'acme')
+ setValue('email', 'jim@acme.com')
+ setValue('password', 'password')
+ }
+ }
 
-  return (
-    <Card className="w-full bg-white/90 dark:bg-[#0C1017]/95 border-slate-200/90 dark:border-slate-700/60 shadow-2xl shadow-slate-900/10 dark:shadow-black/80 ring-1 ring-black/5 dark:ring-white/10 relative overflow-hidden">
-      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-indigo-500/80 to-transparent" />
-      <CardHeader className="text-center pb-2 border-b border-slate-100 dark:border-slate-800/80">
-        <CardTitle className="text-xl font-bold flex items-center justify-center gap-2 text-slate-900 dark:text-slate-100">
-          Workspace Login
-        </CardTitle>
-      </CardHeader>
-      
-      <CardContent className="space-y-4">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 text-left">
-          
-          <Input
-            type="text"
-            label="Workspace Name"
-            placeholder="acme"
-            error={errors.workspaceName?.message}
-            leftIcon={<Globe size={16} />}
-            {...register('workspaceName')}
-          />
+ return (
+ <Card className="w-full bg-white border-slate-200 shadow-lg shadow-slate-900/10 dark:shadow-black/80 relative overflow-hidden">
+ <CardHeader className="text-center pb-2 border-b border-slate-100">
+ <CardTitle className="text-xl font-bold flex items-center justify-center gap-2 text-slate-900">
+ Workspace Login
+ </CardTitle>
+ </CardHeader>
+ 
+ <CardContent className="space-y-4">
+ <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 text-left">
+ 
+ <Input
+ type="text"
+ label="Workspace Name"
+ placeholder="acme"
+ error={errors.workspaceName?.message}
+ leftIcon={<Globe size={16} />}
+ {...register('workspaceName')}
+ />
 
-          <Input
-            type="email"
-            label="Email Address"
-            placeholder="admin@acme.com"
-            error={errors.email?.message}
-            leftIcon={<Mail size={16} />}
-            {...register('email')}
-          />
+ <Input
+ type="email"
+ label="Email Address"
+ placeholder="admin@acme.com"
+ error={errors.email?.message}
+ leftIcon={<Mail size={16} />}
+ {...register('email')}
+ />
 
-          <Input
-            type="password"
-            label="Password"
-            placeholder="••••••••"
-            error={errors.password?.message}
-            leftIcon={<Lock size={16} />}
-            {...register('password')}
-          />
+ <Input
+ type="password"
+ label="Password"
+ placeholder="••••••••"
+ error={errors.password?.message}
+ leftIcon={<Lock size={16} />}
+ {...register('password')}
+ />
 
-          <Button type="submit" fullWidth isLoading={isLoading} className="mt-2 cursor-pointer shadow-lg shadow-indigo-500/25">
-            Sign In
-          </Button>
-        </form>
+ <Button type="submit"fullWidth isLoading={isLoading} className="mt-2 cursor-pointer shadow-sm">
+ Sign In
+ </Button>
+ </form>
 
-        {/* Quick Demo Pre-fill Links */}
-        <div className="border-t border-slate-100 dark:border-slate-800/80 pt-4 text-left">
-          <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400 flex items-center gap-1 mb-2.5 uppercase tracking-wider">
-            <ShieldCheck size={12} className="text-indigo-600 dark:text-indigo-400" /> Pre-fill testing credentials
-          </span>
-          <div className="grid grid-cols-2 gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => handleQuickLogin('admin')}
-              className="text-[10px] px-1 font-bold h-8 cursor-pointer bg-slate-50 dark:bg-[#07090E]/80 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-700 dark:text-slate-300"
-            >
-              Acme Admin
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => handleQuickLogin('sales')}
-              className="text-[10px] px-1 font-bold h-8 cursor-pointer bg-slate-50 dark:bg-[#07090E]/80 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-700 dark:text-slate-300"
-            >
-              Acme Sales
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => handleQuickLogin('leader1')}
-              className="text-[10px] px-1 font-bold h-8 cursor-pointer bg-slate-50 dark:bg-[#07090E]/80 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-700 dark:text-slate-300"
-            >
-              Acme Leader 1
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => handleQuickLogin('leader2')}
-              className="text-[10px] px-1 font-bold h-8 cursor-pointer bg-slate-50 dark:bg-[#07090E]/80 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-slate-700 dark:text-slate-300"
-            >
-              Acme Leader 2
-            </Button>
-          </div>
-        </div>
+ {/* Quick Demo Pre-fill Links */}
+ <div className="border-t border-slate-100 pt-4 text-left">
+ <span className="text-[11px] font-medium text-slate-600 flex items-center gap-1 mb-2.5 ">
+ <ShieldCheck size={12} className="text-blue-600 dark:text-blue-600"/> Pre-fill testing credentials
+ </span>
+ <div className="grid grid-cols-2 gap-2">
+ <Button
+ type="button"
+ variant="outline"
+ size="sm"
+ onClick={() => handleQuickLogin('admin')}
+ className="text-[10px] px-1 font-bold h-8 cursor-pointer bg-slate-50/80 border-slate-200 hover:border-slate-300 dark:hover:border-slate-700 text-slate-700"
+ >
+ Acme Admin
+ </Button>
+ <Button
+ type="button"
+ variant="outline"
+ size="sm"
+ onClick={() => handleQuickLogin('sales')}
+ className="text-[10px] px-1 font-bold h-8 cursor-pointer bg-slate-50/80 border-slate-200 hover:border-slate-300 dark:hover:border-slate-700 text-slate-700"
+ >
+ Acme Sales
+ </Button>
+ <Button
+ type="button"
+ variant="outline"
+ size="sm"
+ onClick={() => handleQuickLogin('leader1')}
+ className="text-[10px] px-1 font-bold h-8 cursor-pointer bg-slate-50/80 border-slate-200 hover:border-slate-300 dark:hover:border-slate-700 text-slate-700"
+ >
+ Acme Leader 1
+ </Button>
+ <Button
+ type="button"
+ variant="outline"
+ size="sm"
+ onClick={() => handleQuickLogin('leader2')}
+ className="text-[10px] px-1 font-bold h-8 cursor-pointer bg-slate-50/80 border-slate-200 hover:border-slate-300 dark:hover:border-slate-700 text-slate-700"
+ >
+ Acme Leader 2
+ </Button>
+ </div>
+ </div>
 
-        <p className="text-xs text-slate-400 text-center pt-2">
-          New company?{' '}
-          <Link to="/register" className="text-primary font-bold hover:underline">
-            Register Workspace
-          </Link>
-        </p>
-      </CardContent>
-    </Card>
-  )
+ <p className="text-xs text-slate-400 text-center pt-2">
+ New company?{' '}
+ <Link to="/register"className="text-primary font-bold hover:underline">
+ Register Workspace
+ </Link>
+ </p>
+ </CardContent>
+ </Card>
+ )
 }
 export default Login
