@@ -20,7 +20,32 @@ const AGREEMENTS_FILE = process.env.VERCEL ? '/tmp/erp_agreements.json' : path.j
 const TEMPLATES_FILE = process.env.VERCEL ? '/tmp/erp_templates.json' : path.join(process.cwd(), '.templates.json');
 const DEPARTMENTS_FILE = process.env.VERCEL ? '/tmp/erp_departments.json' : path.join(process.cwd(), '.departments.json');
 const BRANCHES_FILE = process.env.VERCEL ? '/tmp/erp_branches.json' : path.join(process.cwd(), '.branches.json');
+const LEAVES_FILE = process.env.VERCEL ? '/tmp/erp_leaves.json' : path.join(process.cwd(), '.leaves.json');
+const SALARY_STRUCTURES_FILE = process.env.VERCEL ? '/tmp/erp_salary_structures.json' : path.join(process.cwd(), '.salary_structures.json');
+const PAYSLIPS_FILE = process.env.VERCEL ? '/tmp/erp_payslips.json' : path.join(process.cwd(), '.payslips.json');
+const RESIGNATIONS_FILE = process.env.VERCEL ? '/tmp/erp_resignations.json' : path.join(process.cwd(), '.resignations.json');
+const TERMINATIONS_FILE = process.env.VERCEL ? '/tmp/erp_terminations.json' : path.join(process.cwd(), '.terminations.json');
+const ANNOUNCEMENTS_FILE = process.env.VERCEL ? '/tmp/erp_announcements.json' : path.join(process.cwd(), '.announcements.json');
 
+
+const seedAttendances = (): any[] => [
+  {
+    id: 'a1',
+    employeeId: 'e1',
+    date: new Date().toISOString().split('T')[0],
+    clockInTime: new Date(Date.now() - 4 * 3600000).toISOString(),
+    clockOutTime: null,
+    status: 'Present'
+  },
+  {
+    id: 'a2',
+    employeeId: 'e2',
+    date: new Date().toISOString().split('T')[0],
+    clockInTime: new Date(Date.now() - 5 * 3600000).toISOString(),
+    clockOutTime: null,
+    status: 'Present'
+  }
+];
 
 const loadAttendances = (): any[] => {
   try {
@@ -36,6 +61,8 @@ const loadAttendances = (): any[] => {
   }
   return seedAttendances();
 };
+
+let attendances: any[] = loadAttendances();
 
 const saveAttendances = () => {
   try {
@@ -400,6 +427,24 @@ let branchesList: any[] = loadGenericArrayFile(BRANCHES_FILE, () => [
   { id: 'remote', name: 'Remote Network' }
 ]);
 const saveBranches = () => saveGenericArrayFile(BRANCHES_FILE, branchesList);
+
+let leaveRequests: any[] = loadGenericArrayFile(LEAVES_FILE, () => []);
+const saveLeaveRequests = () => saveGenericArrayFile(LEAVES_FILE, leaveRequests);
+
+let salaryStructures: any[] = loadGenericArrayFile(SALARY_STRUCTURES_FILE, () => []);
+const saveSalaryStructures = () => saveGenericArrayFile(SALARY_STRUCTURES_FILE, salaryStructures);
+
+let payslips: any[] = loadGenericArrayFile(PAYSLIPS_FILE, () => []);
+const savePayslips = () => saveGenericArrayFile(PAYSLIPS_FILE, payslips);
+
+let resignations: any[] = loadGenericArrayFile(RESIGNATIONS_FILE, () => []);
+const saveResignations = () => saveGenericArrayFile(RESIGNATIONS_FILE, resignations);
+
+let terminations: any[] = loadGenericArrayFile(TERMINATIONS_FILE, () => []);
+const saveTerminations = () => saveGenericArrayFile(TERMINATIONS_FILE, terminations);
+
+let announcements: any[] = loadGenericArrayFile(ANNOUNCEMENTS_FILE, () => []);
+const saveAnnouncements = () => saveGenericArrayFile(ANNOUNCEMENTS_FILE, announcements);
 let projects: any[] = [
   { id: 'p1', name: 'Website Redesign', client: 'Acme Corp', status: 'In Progress', startDate: '2024-10-01', deadline: '2024-12-01', assignees: ['e6'] },
   { id: 'p2', name: 'Mobile App MVP', client: 'TechStart', status: 'To Do', startDate: '2024-11-01', deadline: '2025-01-15', assignees: [] },
@@ -1993,6 +2038,7 @@ export function createApp() {
       employeeId, leaveType, startDate, endDate, status: 'Pending', submittedByRole
     };
     leaveRequests.push(leave);
+    saveLeaveRequests();
     res.status(201).json(leave);
   });
 
@@ -2005,6 +2051,7 @@ export function createApp() {
     
     leave.status = status;
     if (approvedBy) leave.approvedBy = approvedBy;
+    saveLeaveRequests();
     
     res.json(leave);
   });
@@ -2025,6 +2072,7 @@ export function createApp() {
       };
       salaryStructures.push(structure);
     }
+    saveSalaryStructures();
     res.json(structure);
   });
 
@@ -2045,6 +2093,7 @@ export function createApp() {
       netPay
     };
     payslips.push(payslip);
+    savePayslips();
     res.status(201).json(payslip);
   });
 
@@ -2074,6 +2123,7 @@ export function createApp() {
       submittedByRole
     };
     resignations.push(newResignation);
+    saveResignations();
     res.status(201).json(newResignation);
   });
   
@@ -2084,6 +2134,7 @@ export function createApp() {
     
     resignation.status = status;
     if (approvedBy) resignation.approvedBy = approvedBy;
+    saveResignations();
     
     res.json(resignation);
   });
@@ -2109,6 +2160,7 @@ export function createApp() {
       submittedByRole
     };
     terminations.push(newTermination);
+    saveTerminations();
     res.status(201).json(newTermination);
   });
   
@@ -2119,15 +2171,12 @@ export function createApp() {
     
     termination.status = status;
     if (approvedBy) termination.approvedBy = approvedBy;
+    saveTerminations();
     
     res.json(termination);
   });
 
   // Module G: Holidays
-  router.get('/holidays', (req, res) => res.json(holidays));
-  
-  // Module G: Holidays (Tier 4: GET/POST/PUT/DELETE, file-backed)
-  // Holidays support full CRUD; editing date/name via PUT updates stored record.
   router.get('/holidays', (req, res) => res.json(holidays));
   router.post('/holidays', (req, res) => {
     const newHoliday = { id: `h${Date.now()}`, ...req.body };
@@ -2190,12 +2239,14 @@ export function createApp() {
       ...req.body
     };
     announcements.unshift(newAnnouncement);
+    saveAnnouncements();
     res.status(201).json(newAnnouncement);
   });
   router.put('/announcements/:id', (req, res) => {
     const index = announcements.findIndex(a => a.id === req.params.id);
     if (index !== -1) {
       announcements[index] = { ...announcements[index], ...req.body };
+      saveAnnouncements();
       res.json(announcements[index]);
     } else {
       res.status(404).json({ error: 'Announcement not found' });
@@ -2203,6 +2254,7 @@ export function createApp() {
   });
   router.delete('/announcements/:id', (req, res) => {
     announcements = announcements.filter(a => a.id !== req.params.id);
+    saveAnnouncements();
     res.status(204).end();
   });
 
