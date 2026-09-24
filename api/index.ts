@@ -2539,7 +2539,88 @@ export function createApp() {
     res.status(204).end();
   });
 
-  // --- Applications & Candidate Pipeline ---
+  
+  // --- Fields Management ---
+  router.post('/careers/admin/:id/fields', (req, res) => {
+    const job = jobPostings.find(j => j.id === req.params.id);
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+    const newField = { id: 'f-' + Date.now(), ...req.body };
+    if (!job.fields) job.fields = [];
+    job.fields.push(newField);
+    saveJobPostings();
+    res.status(201).json(newField);
+  });
+
+  router.patch('/careers/admin/:id/fields/reorder', (req, res) => {
+    const job = jobPostings.find(j => j.id === req.params.id);
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+    const { fields } = req.body;
+    if (Array.isArray(fields)) {
+      job.fields = fields;
+      saveJobPostings();
+    }
+    res.json(job.fields);
+  });
+
+  router.patch('/careers/admin/:id/fields/:fieldId', (req, res) => {
+    const job = jobPostings.find(j => j.id === req.params.id);
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+    const fieldIndex = job.fields.findIndex((f: any) => f.id === req.params.fieldId);
+    if (fieldIndex === -1) return res.status(404).json({ message: 'Field not found' });
+    job.fields[fieldIndex] = { ...job.fields[fieldIndex], ...req.body };
+    saveJobPostings();
+    res.json(job.fields[fieldIndex]);
+  });
+
+  router.delete('/careers/admin/:id/fields/:fieldId', (req, res) => {
+    const job = jobPostings.find(j => j.id === req.params.id);
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+    job.fields = job.fields.filter((f: any) => f.id !== req.params.fieldId);
+    saveJobPostings();
+    res.status(204).end();
+  });
+
+  // --- Rounds Management ---
+  router.post('/careers/admin/:id/rounds', (req, res) => {
+    const job = jobPostings.find(j => j.id === req.params.id);
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+    const newRound = { id: 'r-' + Date.now(), ...req.body };
+    if (!job.rounds) job.rounds = [];
+    job.rounds.push(newRound);
+    saveJobPostings();
+    res.status(201).json(newRound);
+  });
+
+  router.patch('/careers/admin/:id/rounds/reorder', (req, res) => {
+    const job = jobPostings.find(j => j.id === req.params.id);
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+    const { rounds } = req.body;
+    if (Array.isArray(rounds)) {
+      job.rounds = rounds;
+      saveJobPostings();
+    }
+    res.json(job.rounds);
+  });
+
+  router.patch('/careers/admin/:id/rounds/:roundId', (req, res) => {
+    const job = jobPostings.find(j => j.id === req.params.id);
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+    const roundIndex = job.rounds.findIndex((r: any) => r.id === req.params.roundId);
+    if (roundIndex === -1) return res.status(404).json({ message: 'Round not found' });
+    job.rounds[roundIndex] = { ...job.rounds[roundIndex], ...req.body };
+    saveJobPostings();
+    res.json(job.rounds[roundIndex]);
+  });
+
+  router.delete('/careers/admin/:id/rounds/:roundId', (req, res) => {
+    const job = jobPostings.find(j => j.id === req.params.id);
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+    job.rounds = job.rounds.filter((r: any) => r.id !== req.params.roundId);
+    saveJobPostings();
+    res.status(204).end();
+  });
+
+// --- Applications & Candidate Pipeline ---
   router.get('/careers/:jobId/applications', (req, res) => {
     const apps = jobApplications.filter(a => a.jobId === req.params.jobId);
     res.json(apps);
@@ -2593,6 +2674,91 @@ export function createApp() {
       });
     } catch (e) {
       console.error('[Careers Email] Failed to process round advance email:', e);
+    }
+
+    saveChatFile(APPLICATIONS_FILE, jobApplications);
+    res.json(app);
+  });
+
+  
+  // --- Decide Application ---
+  router.patch('/careers/admin/applications/:id/decide', async (req, res) => {
+    const app = jobApplications.find(a => a.id === req.params.id);
+    if (!app) return res.status(404).json({ message: 'Application not found' });
+    
+    if (app.status === 'REJECTED' || app.status === 'HIRED') {
+      return res.status(400).json({ message: 'Application is already finalized' });
+    }
+
+    const { decision } = req.body;
+    const job = jobPostings.find(j => j.id === app.jobId);
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+
+    const rounds = job.rounds || [];
+    const currentIndex = rounds.findIndex((r: any) => r.id === app.currentRoundId);
+    const recipient = app.email || app.candidateEmail;
+    
+    try {
+      if (!app.emailLogs) app.emailLogs = [];
+      
+      if (decision === 'REJECT') {
+        app.status = 'REJECTED';
+        const template = job.rejectionTemplate || DEFAULT_CAREER_TEMPLATES.rejectionTemplate;
+        const mergeCtx = buildMergeContext(app, job, null);
+        const renderedHtml = renderTemplate(template, mergeCtx);
+        const mailResult = await sendEmail({
+          to: recipient,
+          subject: `Update on your application for ${job.title} at TwinSpace`,
+          html: renderedHtml,
+        });
+        app.emailLogs.push({
+          sentAt: new Date().toISOString(),
+          to: recipient,
+          subject: `Update on your application for ${job.title} at TwinSpace`,
+          templateType: 'rejection',
+          status: mailResult.status
+        });
+      } else if (decision === 'ACCEPT') {
+        const nextRound = currentIndex === -1 ? rounds[0] : rounds[currentIndex + 1];
+        if (nextRound) {
+          app.status = 'IN_PROGRESS';
+          app.currentRoundId = nextRound.id;
+          const template = nextRound.emailTemplate || job.roundAdvanceTemplate || DEFAULT_CAREER_TEMPLATES.roundAdvanceTemplate;
+          const mergeCtx = buildMergeContext(app, job, nextRound);
+          const renderedHtml = renderTemplate(template, mergeCtx);
+          const mailResult = await sendEmail({
+            to: recipient,
+            subject: `Update on your application: ${nextRound.title} - ${job.title}`,
+            html: renderedHtml,
+          });
+          app.emailLogs.push({
+            sentAt: new Date().toISOString(),
+            to: recipient,
+            subject: `Update on your application: ${nextRound.title} - ${job.title}`,
+            templateType: 'round_advance',
+            status: mailResult.status
+          });
+        } else {
+          app.status = 'HIRED';
+          const template = job.hireTemplate || DEFAULT_CAREER_TEMPLATES.hireTemplate;
+          const mergeCtx = buildMergeContext(app, job, null);
+          const renderedHtml = renderTemplate(template, mergeCtx);
+          const mailResult = await sendEmail({
+            to: recipient,
+            subject: `Offer of Employment: ${job.title} at TwinSpace`,
+            html: renderedHtml,
+          });
+          app.emailLogs.push({
+            sentAt: new Date().toISOString(),
+            to: recipient,
+            subject: `Offer of Employment: ${job.title} at TwinSpace`,
+            templateType: 'hire',
+            status: mailResult.status
+          });
+        }
+      }
+    } catch (e) {
+      console.error('[Careers Email] Failed to process decision email:', e);
     }
 
     saveChatFile(APPLICATIONS_FILE, jobApplications);
