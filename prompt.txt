@@ -1,0 +1,125 @@
+<USER_REQUEST>
+TwinSpace Careers Page. Do NOT be creative. Follow every measurement, color, font, spacing, radius, shadow, hover and responsive rule below exactly. Use existing images at /TwinSpace_nav.png (fallback /TwinSpace_Logo.png) and /TwinSpace_Logo.png — do NOT replace images, only recreate styling.
+
+TECH STACK: React, TailwindCSS, shadcn/ui (Card, CardContent, Button, Badge, Input, Select, SelectContent/Item/Trigger/Value, Dialog, DialogContent/Header/Title/Description, Label, Textarea), lucide-react icons, react-router-dom. Tailwind config from frontend/tailwind.config.js:1 + global CSS from frontend/src/index.css:1.
+
+===== GLOBAL DESIGN SYSTEM =====
+Fonts: Load @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&family=Figtree:wght@400;500;600;700;800&display=swap'); Body font-family: 'Figtree, Inter, sans-serif' on careers page, 'Manrope, sans-serif' on navbar header. Body antialiased, letter-spacing -0.011em, headings -0.02em.
+Colors (exact hex):
+--brand #0099d6, --brand-dark #082654, --ink #082654, --line #08265424 (border-line), --bg #fff, dark bg #082654, --muted #082654ad, --muted-2 #0826547a, --surface #fff
+Slate: slate-800 #1e293b, slate-700 #334155, slate-900 hover #0f172a
+Grays: gray-50 #f8fafc / #f9fafb, gray-100 #f3f4f6, gray-200 #e5e7eb, gray-300 #d1d5db, gray-400 #9ca3af, gray-500 #6b7280, gray-900 #111827
+State colors: yellow-100 #fef9c3 / text yellow-800 #854d0e border yellow-200, blue-50 #eff6ff text blue-700 #1d4ed8 border blue-200, blue-600 #2563eb, emerald-600, purple-600 etc.
+Radius: --radius 0.5rem, Card rounded-lg / rounded-xl / rounded-2xl (JobCard variant), pills rounded-full, search bar rounded-lg, buttons rounded-full (detail cards) / default. Shadows: search shadow-lg, Card shadow-sm, hover:shadow-md, JobCard hover:shadow-[0_8px_30px_rgba(8,38,84,0.12)] + hover:border-[#0099d6]/20 + hover:-translate-y-1 transition-all duration-200. Scrollbar 8px bg-background thumb bg-border rounded-full.
+
+ROUTES: /careers -> CareersList, /careers/:slug -> CareersDetail, alias /carriers also works. Data from GET {VITE_API_URL || /api}/careers and /careers/:slug.
+
+===== 1. PUBLIC NAVBAR (FIXED) =====
+Shell: div.fixed top-0 left-0 right-0 z-50 pointer-events-none > header#navbar-header relative mx-auto h-[64px] w-full max-w-full bg-white dark:bg-zinc-950 pointer-events-auto border-b border-line ( #08265424 ) shadow-sm transition-all duration-400ms cubic-bezier(0.25,1,0.5,1) font Manrope. Inside absolute inset-0 bg-white dark:bg-zinc-950 -z-10 transition-colors duration-300.
+Inner: w-full max-w-7xl mx-auto h-full flex items-center justify-center lg:justify-start relative px-5 sm:px-6 lg:px-8
+Logo: a[href="https://twinspace.in/"] aria-label TwinSpace — home class absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 lg:static lg:translate-x-0 lg:translate-y-0 order-2 lg:order-1 flex h-[56px] w-[210px] shrink-0 items-center justify-center overflow-hidden > img src="/TwinSpace_nav.png" alt TwinSpace Logo class h-[220px] w-[220px] max-w-none object-contain loading lazy decoding async onError fallback to /TwinSpace_Logo.png
+Center nav placeholder: nav absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden lg:flex h-full items-center justify-center gap-4 xl:gap-5 aria-hidden true (empty)
+Right desktop: div order-3 ml-auto hidden lg:flex items-center gap-3 > a[href="tel:6383436383"] class text-[15px] font-semibold text-ink hover:text-brand flex items-center gap-2 px-3 py-2 > lucide Phone size-4 + text Contact
+Mobile left hamburger: div absolute left-5 top-1/2 -translate-y-1/2 flex lg:hidden > button type button onClick toggle open size-10 text-ink hover:text-brand aria-label Open/Close menu aria-haspopup dialog aria-expanded > Menu icon (3 lines) when closed, X icon when open size-5
+Mobile right contact: a absolute right-5 top-1/2 -translate-y-1/2 lg:hidden inline-flex items-center gap-1.5 text-[14px] font-semibold text-ink hover:text-brand href tel:6383436383 > Phone size-5 + span hidden sm:inline Contact
+Spacer below header: div h-[64px] aria-hidden true
+Mobile Sheet when open: div fixed inset-0 z-40 lg:hidden role dialog aria-modal true > button absolute inset-0 bg-[#082654]/40 backdrop-blur-sm aria-label Close menu onClick close + div absolute left-0 right-0 top-[64px] mx-auto w-full max-w-[1280px] border-t border-line bg-white dark:bg-zinc-950 shadow-[0_24px_64px_rgba(8,38,84,0.18)] font Manrope > nav flex flex-col p-3 > a href tel:6383436383 inline-flex items-center gap-2 rounded-full bg-brand (#0099d6) px-5 py-3 text-[14px] font-bold text-white shadow-sm > Phone size-4 + Contact — 6383436383
+
+===== 2. CAREERS LIST HERO BANNER =====
+Wrapper: div bg-slate-800 (#1e293b) text-white > div max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center
+h2: text-4xl font-bold mb-4 "Join Our Amazing Team"
+p: text-xl mb-8 text-slate-300 (#cbd5e1) "Discover exciting career opportunities and grow with us"
+Search bar container: div max-w-2xl mx-auto bg-white rounded-lg p-2 shadow-lg > div flex items-center space-x-2
+Left input wrapper: div flex-1 relative > Search lucide absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5 + Input component placeholder "Search jobs, skills, or keywords..." value k onChange setK class pl-10 border-0 focus:ring-0 text-gray-900 placeholder:text-gray-400 h-10
+Right button: Button bg-slate-700 (#334155) hover:bg-slate-800 text-white px-6 shrink-0 h-10 type button tabIndex -1 "Search Jobs" (visual only, actual filtering is live on typing)
+
+===== 3. MAIN LAYOUT BELOW HERO =====
+Wrapper: div max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 > div flex flex-col lg:flex-row gap-8
+
+--- LEFT SIDEBAR FILTERS (lg:w-1/4) ---
+Card: border shadow-sm sticky top-4 > CardContent p-6
+Title: h3 text-lg font-semibold mb-4 text-gray-900 "Filter Jobs"
+Job Category: div mb-6 > label block text-sm font-medium text-gray-700 mb-2 "Job Category" > div flex flex-wrap gap-2 > 3 Buttons size sm text-xs variant default if selected else outline : "All" (x==='All'), "Featured Job" (x==='Featured Job' -> filter fields.length>1), "Saved Job" (x==='Saved Job' -> saved includes id, saved persisted localStorage key savedJobs_twinspace)
+Dynamic Filters: Built from PRIMARY fields only. Map jobs fields where section==='PRIMARY' by normalized label (trim lowerCase). Show each group sorted alphabetically if options>0. For each group: div mb-6 > label block text-sm font-medium text-gray-700 mb-2 truncate title label text > Select value dynamicFilters[norm]||'all' onValueChange setFieldFilter > SelectTrigger > SelectValue placeholder "All {label}" > SelectContent > SelectItem value all "All {label}" + each option sorted. If no groups: div mb-6 rounded-lg bg-gray-50 border border-dashed p-3 text-xs text-gray-500 "No filterable PRIMARY fields stored yet."
+Sort By: div > label block text-sm font-medium text-gray-700 mb-2 "Sort By" > Select value A onValueChange setA > SelectTrigger > SelectValue > SelectContent > SelectItem value newest "Newest First" (default, sorted by publishedAt desc) and value title "Job Title A-Z"
+Clear filters: if hasActiveFilters (k!=='' or x!=='All' or any dynamicFilters !=='all') show Button variant ghost size sm w-full mt-4 text-gray-600 "Clear filters" onClick reset k, x, dynamicFilters.
+Filtering logic: haystack = title + fields label+value lowerCase includes k. For each dynamic group if selected !==all require job has PRIMARY field with that label and exact value match. Then Category filter. Finally sort.
+
+--- RIGHT CONTENT (lg:w-3/4) ---
+Header: div flex items-center justify-between mb-6 > h3 text-2xl font-bold text-gray-900 "All Positions" + span text-sm text-gray-500 "{filtered.length} jobs found"
+States:
+• Loading: div space-y-6 > 3x Card border shadow-sm animate-pulse > CardContent p-6 > div h-6 bg-gray-100 rounded w-1/3 mb-4 + div h-4 bg-gray-100 rounded w-full mb-2
+• Error: Card border shadow-sm > CardContent p-8 text-center > p text-sm text-gray-700 error + Button mt-4 bg-slate-700 hover:bg-slate-800 onClick reload "Retry"
+• Empty: div text-center py-12 > Briefcase h-16 w-16 text-gray-400 mx-auto mb-4 + h3 text-lg font-semibold text-gray-900 "No jobs found" + p text-gray-600 "Try adjusting your search criteria or filters" + if hasActiveFilters Button variant outline mt-4 Clear filters
+• Grid: div grid gap-4 sm:grid-cols-2 >
+For each job Card key id class border border-gray-200 shadow-sm hover:shadow-md hover:border-slate-300 rounded-xl overflow-hidden bg-white flex flex-col transition-all duration-200 > CardContent p-4 flex flex-col flex-1 gap-3
+Row1: div flex items-start justify-between gap-2 > h4 text-[15px] font-semibold text-gray-900 leading-tight line-clamp-2 flex-1 job.title + if isFeatured (fields.length>1) Badge bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-100 shrink-0 px-2 py-0 text-[10px] h-5 > Star h-3 w-3 mr-1 Featured
+Row2: div flex items-center text-gray-500 gap-1.5 -mt-1 > Briefcase h-3.5 w-3.5 text-slate-400 + span text-xs "{fields.length} fields · {formatDate(publishedAt)}" where formatDate is toLocaleDateString or —
+Primary preview: if primary fields (section PRIMARY sorted order) length>0: div grid gap-2 > primary.slice(0,3).map ff => div flex items-center bg-gray-50 rounded-lg px-2.5 py-2 gap-2 > span text-[11px] font-medium text-gray-500 truncate max-w-[70px] title label ff.label + span flex-1 + if LINK render a href value target _blank text-blue-600 hover:underline truncate max-w-[120px] else span font-medium text-xs text-gray-900 truncate max-w-[120px] title value ff.value . If >3 show p text-[11px] text-gray-400 "+{n} more" else if no primary: div rounded-lg bg-gray-50 border border-dashed px-3 py-2 text-xs text-gray-500 text-center "No PRIMARY fields"
+Skills: getSkills = all TAG fields split comma + any label /skill/i split comma unique => if >0 div flex flex-wrap gap-1.5 > skills.slice(0,4).map s => Badge variant outline bg-blue-50 text-blue-700 border-blue-200 px-2 py-0 text-[11px] h-5 s + if >4 span text-[11px] text-gray-400 "+{remaining}"
+Footer: div pt-3 border-t border-gray-100 mt-auto flex justify-end > Button size sm bg-slate-800 hover:bg-slate-900 text-white h-8 text-xs px-4 rounded-full "View Details" onClick navigate(`/careers/${slug}`)
+
+===== 4. CAREERS DETAIL PAGE (/careers/:slug) =====
+Shell: div min-h-screen bg-white flex flex-col font Figtree > PublicNavbar + div max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 w-full > div flex flex-col lg:flex-row gap-5
+Left column lg:w-2/3:
+Card1 mb-5 overflow-hidden border shadow-sm > CardContent p-4
+- Top bar: div flex items-center justify-between mb-1 > Button variant ghost size sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 -ml-2 h-7 text-xs onClick navigate('/careers') > ArrowLeft h-3.5 w-3.5 mr-1.5 Back to Jobs
+- Title row: div flex justify-between items-start mb-4 > div flex-1 > div flex flex-wrap items-center gap-2 mb-3 > h1 text-xl font-bold text-gray-900 break-words leading-tight job.title + div flex gap-2 shrink-0 > if Featured Badge yellow same + small save not shown but logic keeps saved state
+- PRIMARY pills row: if primary.length>0 div flex flex-wrap gap-2 mb-3 > primary.map f => div inline-flex items-center gap-1.5 bg-gray-50 border rounded-full px-3 py-1.5 > span text-[11px] font-medium text-gray-500 whitespace-nowrap "label:" + if LINK a text-xs font-medium text-blue-600 hover:underline max-w-[160px] truncate else span text-xs font-medium text-gray-900 max-w-[160px] truncate title value . else div mb-3 rounded-full bg-gray-50 border border-dashed px-3 py-1.5 text-xs text-gray-500 inline-flex "No PRIMARY fields"
+Card2 Job Description (only if descriptionField exists where TEXTAREA value.length>30 or label /desc/i): Card mb-5 border shadow-sm > CardContent p-4 > h2 text-sm font-semibold text-gray-900 mb-3 "Job Description" + p text-sm text-gray-600 leading-relaxed whitespace-pre-wrap value
+Card3 Additional Information: if secondary.length>0 Card mb-5 border shadow-sm > CardContent p-4 > h2 text-sm font-semibold mb-3 "Additional Information" > div flex flex-wrap gap-2 > secondary.map same pill style as primary. else Card mb-5 border border-dashed shadow-none > CardContent p-4 text-center > p text-xs text-gray-500 "No SECONDARY fields stored."
+Card4 Benefits (if benefitsField label /benefit|perk/i): Card mb-5 border shadow-sm > CardContent p-4 > h2 text-sm font-semibold mb-3 "Benefits" + p text-sm text-gray-600 whitespace-pre-wrap break-words value
+Right column lg:w-1/3:
+Card sticky mb-4 border shadow-sm > CardContent p-4 > div text-center mb-4 > h3 text-base font-semibold text-gray-900 mb-1 "Ready to Apply?" + p text-xs text-gray-500 "Join our team and make a difference" + Button w-full bg-slate-700 hover:bg-slate-800 text-white h-9 text-sm "Apply for This Position" onClick setShowApply true + div border-t border-gray-100 my-4 + div flex justify-between gap-2 text-xs > span text-gray-500 "Posted" + span font-medium formatDate(publishedAt)
+Loading state: div min-h-screen bg-white flex items-center justify-center font Figtree > div flex items-center gap-2 text-sm text-gray-500 > Clock h-4 w-4 animate-spin Loading...
+Error state: div min-h-screen bg-white flex flex-col font Figtree > PublicNavbar + div flex-1 max-w-3xl mx-auto px-6 py-16 text-center w-full > p text-sm text-gray-700 error + Link to /careers Button bg-slate-700 hover:bg-slate-800 Back to Jobs + PublicFooter
+
+===== 5. APPLICATION FORM DIALOG =====
+Dialog open onOpenChange > DialogContent max-w-2xl max-h-[90vh] overflow-auto bg-white
+DialogHeader > DialogTitle "Apply for this role" + DialogDescription "Fill in your details. We will email you with updates. All fields marked * are required."
+Success view (after POST): div py-8 text-center space-y-3 > div mx-auto h-12 w-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-xl "?" + h3 text-lg font-semibold text-[#082654] "Application received" + p text-sm text-muted-foreground "We will email you with updates. Keep an eye on your inbox." + Button mt-4 bg-[#0099d6] hover:bg-[#082654] "Done" close and reset form
+Form view: form onSubmit space-y-4 > div grid grid-cols-1 sm:grid-cols-2 gap-4 >
+- Full Name * Input placeholder "e.g. Your name" required
+- Email * type email placeholder you@example.com required
+- Phone * Input required
+- Highest Qualification * Input required
+- Experience * Input required
+- Current Company / Institution (optional) Input
+> div space-y-1.5 > Label "Resume / Portfolio Link *" + Input required + p text-[11px] text-muted-foreground "Must be a valid http(s) URL."
+> div space-y-1.5 > Label "Short Cover Note (optional)" + Textarea placeholder "Why this role? (max 2000 chars)" rows 3 maxLength 2000
+> if error div rounded border border-destructive/20 bg-destructive/10 px-3 py-2 text-sm text-destructive error
+> div flex justify-end gap-2 pt-2 > Button type button variant outline Cancel disabled submitting onClick close + Button type submit disabled submitting bg-[#0099d6] hover:bg-[#082654] "Submitting..." / "Submit Application"
+Validation: all * required, email regex /^[^\s@]+@[^\s@]+\.[^\s@]+$/, resumeLink must be valid URL with http: or https:. Payload POST to {VITE_API_URL}/careers/{slug}/apply fallback client.post . On cancel or close reset if success.
+
+===== 6. JOB CARD ALTERNATIVE COMPONENT (JobCard.tsx:45) =====
+If used elsewhere: Card group flex flex-col overflow-hidden bg-white border-[#E5E7EB] rounded-2xl shadow-sm hover:shadow-[0_8px_30px_rgba(8,38,84,0.12)] hover:border-[#0099d6]/20 hover:-translate-y-1 > top accent h-[3px] w-full bg-gradient-to-r from-[#0099d6] via-[#082654] to-[#0099d6] opacity-0 group-hover:opacity-100 transition-opacity > div p-5 sm:p-6 flex flex-col flex-1 gap-4 > header flex gap-3.5 > icon h-10 w-10 rounded-xl bg-[#F1F5F9] border-[#E2E8F0] group-hover:bg-[#082654] > title 16px font-semibold #0F172A group-hover:text-[#0099d6] line-clamp-2 + meta MapPin locationField value + Badge type + Clock date + primary JobFieldValue + expand More Info button rounded-full border #E2E8F0 bg #F8FAFC + secondary boxed bg #F8FAFC border #E2E8F0 p-3.5 + footer View Details ghost + Apply Now bg #082654 hover #0099d6 rounded-full + mono slug /careers/{slug} text-[11px] #94A3B8
+
+JobFieldValue component rules by fieldType:
+TAG: flex gap-2 text-sm > label text-[11px] font-mono tracking-[0.15em] uppercase text-[#0826547a] + Badge rounded-full bg-[#0099d6]/10 text-[#0099d6] border-[#0099d6]/20 gap-1 Tag icon value
+LINK: same label + if valid URL a inline-flex gap-1 text-[#0099d6] hover:text-[#082654] hover:underline LinkIcon + value else span #082654
+DATE: CalendarDays h-3.5 text-[#0826547a] + label same + span text-sm #082654 formatted date
+NUMBER: Hash h-3.5 text-[#0826547a] + label + span text-sm font-medium #082654 tabular-nums
+TEXT/TEXTAREA default: flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2 > label same + span text-sm #082654 leading-relaxed
+
+===== 7. PUBLIC FOOTER =====
+footer bg-white border-t border-gray-200 font Figtree > div max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 > div flex items-center justify-center sm:justify-between gap-4 > div flex items-center gap-3 > img src="/TwinSpace_Logo.png" alt TwinSpace h-6 w-auto object-contain onError hide + span text-sm font-semibold text-gray-900 "TwinSpace" + span hidden sm:inline text-gray-300 "|" + span text-xs text-gray-500 "© 2026 TwinSpace Technologies Pvt. Ltd."
+
+===== FINAL INSTRUCTIONS =====
+Output complete React code for both pages with all imports (axios, client, lucide). Use Tailwind classes EXACTLY as written. Do not add extra sections or change copy. Make fully responsive (mobile single column, sm 2-col grid, lg 1/4+3/4). Keep fixed navbar overlay and spacer. Preserve all hover, focus, transition effects. Ensure accessibility aria labels.
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-09-24T19:54:18+05:30.
+
+The user's current state is as follows:
+Active Document: c:\Users\VIPIN G\ERP\TwinERP\vercel.json (LANGUAGE_JSON)
+Cursor is on line: 1
+Other open documents:
+- c:\Users\VIPIN G\ERP\TwinERP\vite.config.ts (LANGUAGE_TYPESCRIPT)
+- c:\Users\VIPIN G\ERP\TwinERP\src\pages\Privileges.tsx (LANGUAGE_TSX)
+- c:\Users\VIPIN G\ERP\TwinERP\src\pages\Resignations.tsx (LANGUAGE_TSX)
+- c:\Users\VIPIN G\ERP\TwinERP\src\pages\Login.tsx (LANGUAGE_TSX)
+- c:\Users\VIPIN G\ERP\TwinERP\.env.example (LANGUAGE_UNSPECIFIED)
+</ADDITIONAL_METADATA>
+<USER_SETTINGS_CHANGE>
+The user changed setting `Model Selection` from Gemini 3.6 Flash (Medium) to Gemini 3.1 Pro (Low). No need to comment on this change if the user doesn't ask about it. If reporting what model you are, please use a human readable name instead of the exact string.
+</USER_SETTINGS_CHANGE>

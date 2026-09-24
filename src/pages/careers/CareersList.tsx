@@ -1,347 +1,323 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { Search, Briefcase, Star } from 'lucide-react';
+
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, MapPin, Star, Briefcase, Clock, Bookmark, Tag, Hash, Link2, CalendarDays, Type, AlignLeft } from 'lucide-react';
 import { PublicNavbar } from '@/components/careers/PublicNavbar';
 import { PublicFooter } from '@/components/careers/PublicFooter';
-import { ApplicationForm } from '@/components/careers/ApplicationForm';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-
-interface JobField {
- id: string;
- label: string;
- value: string;
- fieldType: string;
- section: string;
- order: number;
-}
-
-interface JobPosting {
- id: string;
- title: string;
- slug: string;
- status: string;
- fields: JobField[];
- publishedAt?: string;
-}
-
-const formatDate = (d?: string) => {
- if (!d) return '—';
- try { return new Date(d).toLocaleDateString(); } catch { return d; }
-};
-
-const fieldIconMap: Record<string, React.ElementType> = {
- TEXT: Type,
- TEXTAREA: AlignLeft,
- NUMBER: Hash,
- DATE: CalendarDays,
- TAG: Tag,
- LINK: Link2,
-};
-
-const fieldColorMap: Record<string, string> = {
- TEXT: 'text-blue-600',
- TEXTAREA: 'text-slate-600',
- NUMBER: 'text-emerald-600',
- DATE: 'text-purple-600',
- TAG: 'text-amber-600',
- LINK: 'text-sky-600',
-};
 
 export function CareersList() {
- const navigate = useNavigate();
- const [jobs, setJobs] = useState<JobPosting[]>([]);
- const [loading, setLoading] = useState(true);
- const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
+  const [jobs, setJobs] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
- const [k, setK] = useState('');
- const [x, setX] = useState('All');
- const [A, setA] = useState('newest');
- const [saved, setSaved] = useState<string[]>(() => {
- try { const raw = localStorage.getItem('savedJobs_twinspace'); return raw ? JSON.parse(raw) : []; } catch { return []; }
- });
- const [applySlug, setApplySlug] = useState<string | null>(null);
- const [dynamicFilters, setDynamicFilters] = useState<Record<string, string>>({});
+  const [k, setK] = useState('');
+  const [x, setX] = useState('All');
+  const [dynamicFilters, setDynamicFilters] = useState<Record<string, string>>({});
+  const [A, setA] = useState('newest');
 
- useEffect(() => {
- let cancelled = false;
- const fetch = async () => {
- try {
- setLoading(true);
- setError(null);
- const base = (import.meta as any).env.VITE_API_URL || '/api';
- const url = `${base.replace(/\/$/, '')}/careers`;
- const res = await axios.get(url);
- if (!cancelled) setJobs(Array.isArray(res.data) ? res.data : []);
- } catch (err: any) {
- if (!cancelled) setError(err?.response?.data?.message || err?.message || 'Failed to load');
- } finally { if (!cancelled) setLoading(false); }
- };
- fetch();
- return () => { cancelled = true; };
- }, []);
+  const savedJobs = JSON.parse(localStorage.getItem('savedJobs_twinspace') || '[]');
 
- useEffect(() => { localStorage.setItem('savedJobs_twinspace', JSON.stringify(saved)); }, [saved]);
+  const loadJobs = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const url = import.meta.env.VITE_API_URL || '/api';
+      const res = await axios.get(`${url}/careers`);
+      setJobs(res.data || []);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load jobs');
+    } finally {
+      setLoading(false);
+    }
+  };
 
- const toggleSave = (id: string) => {
- setSaved((prev) => prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id]);
- };
+  useEffect(() => {
+    loadJobs();
+  }, []);
 
- // Only fields stored in table rows — build filter groups from actual PRIMARY fields
- const fieldGroups = useMemo(() => {
- const map = new Map<string, { label: string; values: Set<string>; fieldType: string }>();
- jobs.forEach((job) => {
- (job.fields || []).filter(f => f.section === 'PRIMARY').forEach((ff) => {
- const norm = ff.label?.trim().toLowerCase();
- if (!norm) return;
- if (!map.has(norm)) map.set(norm, { label: ff.label.trim(), values: new Set(), fieldType: ff.fieldType });
- if (ff.value?.trim()) map.get(norm)!.values.add(ff.value.trim());
- });
- });
- return Array.from(map.values())
- .map(g => ({ label: g.label, norm: g.label.trim().toLowerCase(), options: Array.from(g.values).sort(), fieldType: g.fieldType }))
- .filter(g => g.options.length > 0)
- .sort((a, b) => a.label.localeCompare(b.label));
- }, [jobs]);
+  const primaryFieldsMap = new Map<string, Set<string>>();
+  jobs.forEach(job => {
+    (job.fields || []).forEach((f: any) => {
+      if (f.section === 'PRIMARY') {
+        const norm = (f.label || '').trim().toLowerCase();
+        if (!primaryFieldsMap.has(norm)) {
+          primaryFieldsMap.set(norm, new Set());
+        }
+        primaryFieldsMap.get(norm)!.add(f.value);
+      }
+    });
+  });
 
- const filtered = useMemo(() => {
- return jobs.filter((job) => {
- const l = k.toLowerCase();
- const hay = [job.title, ...(job.fields || []).map(f => `${f.label} ${f.value}`)].join(' ').toLowerCase();
- const matchesSearch = k.trim() === '' || hay.includes(l);
- if (!matchesSearch) return false;
+  const dynamicGroups = Array.from(primaryFieldsMap.entries())
+    .map(([norm, valuesSet]) => {
+      const originalLabel = jobs.find(j => (j.fields || []).find((f: any) => f.section === 'PRIMARY' && (f.label || '').trim().toLowerCase() === norm))?.fields?.find((f: any) => f.section === 'PRIMARY' && (f.label || '').trim().toLowerCase() === norm)?.label || norm;
+      return {
+        norm,
+        label: originalLabel,
+        options: Array.from(valuesSet).sort()
+      };
+    })
+    .filter(g => g.options.length > 0)
+    .sort((a, b) => a.label.localeCompare(b.label));
 
- // Dynamic field filters — only stored fields
- for (const g of fieldGroups) {
- const selected = dynamicFilters[g.norm];
- if (!selected || selected === 'all') continue;
- const field = (job.fields || []).find(ff => ff.section === 'PRIMARY' && ff.label?.trim().toLowerCase() === g.norm);
- if (!field || field.value?.trim() !== selected) return false;
- }
+  const hasActiveFilters = k !== '' || x !== 'All' || Object.values(dynamicFilters).some(v => v !== 'all');
 
- if (x === 'Featured Job') {
- const isFeatured = (job.fields || []).length > 1;
- if (!isFeatured) return false;
- } else if (x === 'Saved Job') {
- if (!saved.includes(job.id)) return false;
- }
- return true;
- }).sort((a, b) => {
- switch (A) {
- case 'title':
- return a.title.localeCompare(b.title);
- case 'newest':
- default:
- return new Date(b.publishedAt || 0).getTime() - new Date(a.publishedAt || 0).getTime();
- }
- });
- }, [jobs, k, x, A, saved, dynamicFilters, fieldGroups]);
+  const resetFilters = () => {
+    setK('');
+    setX('All');
+    setDynamicFilters({});
+  };
 
- const getSkills = (job: JobPosting): string[] => {
- const tags: string[] = [];
- (job.fields || []).forEach((ff) => {
- if (ff.fieldType === 'TAG') ff.value.split(',').map(s => s.trim()).filter(Boolean).forEach(v => tags.push(v));
- if (/skill/i.test(ff.label) && ff.fieldType !== 'TAG') ff.value.split(',').map(s => s.trim()).filter(Boolean).forEach(v => tags.push(v));
- });
- return Array.from(new Set(tags));
- };
+  const filteredJobs = jobs.filter(job => {
+    const haystack = (job.title + ' ' + (job.fields || []).map((f: any) => `${f.label} ${f.value}`).join(' ')).toLowerCase();
+    if (k && !haystack.includes(k.toLowerCase())) return false;
 
- const setFieldFilter = (norm: string, value: string) => {
- setDynamicFilters(prev => ({ ...prev, [norm]: value }));
- };
+    if (x === 'Featured Job' && (!job.fields || job.fields.length <= 1)) return false;
+    if (x === 'Saved Job' && !savedJobs.includes(job.id)) return false;
 
- const hasActiveFilters = k.trim() !== '' || x !== 'All' || Object.values(dynamicFilters).some(v => v && v !== 'all');
+    for (const [norm, val] of Object.entries(dynamicFilters)) {
+      if (val !== 'all') {
+        const fieldMatch = (job.fields || []).find((f: any) => f.section === 'PRIMARY' && (f.label || '').trim().toLowerCase() === norm && f.value === val);
+        if (!fieldMatch) return false;
+      }
+    }
+    return true;
+  }).sort((a, b) => {
+    if (A === 'newest') {
+      return new Date(b.publishedAt || 0).getTime() - new Date(a.publishedAt || 0).getTime();
+    }
+    return (a.title || '').localeCompare(b.title || '');
+  });
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 flex flex-col" style={{ fontFamily: 'Figtree, Inter, sans-serif' }}>
+    <div className="min-h-screen bg-white flex flex-col font-['Figtree',_sans-serif]">
       <PublicNavbar />
 
-      {/* Hero Section */}
-      <div className="bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-900 text-white relative overflow-hidden border-b border-indigo-900/30">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-600/15 via-transparent to-transparent pointer-events-none" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 relative z-10">
-          <div className="text-center max-w-3xl mx-auto">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-400/25 mb-4">
-              ✨ Explore Opportunities
-            </span>
-            <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4 text-white">
-              Join Our Amazing Team
-            </h1>
-            <p className="text-base sm:text-lg text-slate-300 mb-8 max-w-2xl mx-auto font-normal">
-              Discover exciting career opportunities and build your future with TwinSpace.
-            </p>
-            <div className="max-w-2xl mx-auto bg-white rounded-2xl p-2 shadow-2xl border border-gray-100">
-              <div className="flex items-center gap-2">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                  <Input
-                    placeholder="Search jobs, skills, or keywords..."
-                    value={k}
-                    onChange={(e) => setK(e.target.value)}
-                    className="pl-11 border-0 focus-visible:ring-0 text-gray-900 placeholder:text-gray-400 text-sm h-11 bg-transparent"
-                  />
-                </div>
-                <Button className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 h-11 rounded-xl shrink-0 transition-all shadow-md" type="button" tabIndex={-1}>
-                  Search Jobs
-                </Button>
+      <div className="bg-slate-800 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+          <h2 className="text-4xl font-bold mb-4">Join Our Amazing Team</h2>
+          <p className="text-xl mb-8 text-slate-300">Discover exciting career opportunities and grow with us</p>
+          <div className="max-w-2xl mx-auto bg-white rounded-lg p-2 shadow-lg">
+            <div className="flex items-center space-x-2">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-5 w-5" />
+                <Input
+                  placeholder="Search jobs, skills, or keywords..."
+                  value={k}
+                  onChange={(e) => setK(e.target.value)}
+                  className="pl-10 border-0 focus:ring-0 text-gray-900 placeholder:text-gray-400 h-10"
+                />
               </div>
+              <Button className="bg-slate-700 hover:bg-slate-800 text-white px-6 shrink-0 h-10" type="button" tabIndex={-1}>
+                Search Jobs
+              </Button>
             </div>
           </div>
         </div>
       </div>
 
- <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
- <div className="flex flex-col lg:flex-row gap-8">
- <div className="lg:w-1/4">
- <Card className="sticky top-4 border shadow-sm">
- <CardContent className="p-6">
- <h3 className="text-lg font-semibold mb-4 text-gray-900">Filter Jobs</h3>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full flex-1">
+        <div className="flex flex-col lg:flex-row gap-8">
+          
+          {/* Left Sidebar */}
+          <div className="lg:w-1/4">
+            <Card className="border shadow-sm sticky top-4">
+              <CardContent className="p-6">
+                <h3 className="text-lg font-semibold mb-4 text-gray-900">Filter Jobs</h3>
+                
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Job Category</label>
+                  <div className="flex flex-wrap gap-2">
+                    {['All', 'Featured Job', 'Saved Job'].map(cat => (
+                      <Button
+                        key={cat}
+                        size="sm"
+                        variant={x === cat ? 'default' : 'outline'}
+                        className="text-xs"
+                        onClick={() => setX(cat)}
+                      >
+                        {cat}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
 
- <div className="mb-6">
- <label className="block text-sm font-medium text-gray-700 mb-2">Job Category</label>
- <div className="flex flex-wrap gap-2">
- <Button variant={x === 'All' ? 'default' : 'outline'} size="sm"onClick={() => setX('All')} className="text-xs">All</Button>
- <Button variant={x === 'Featured Job' ? 'default' : 'outline'} size="sm"onClick={() => setX('Featured Job')} className="text-xs">Featured Job</Button>
- <Button variant={x === 'Saved Job' ? 'default' : 'outline'} size="sm"onClick={() => setX('Saved Job')} className="text-xs">Saved Job</Button>
- </div>
- </div>
+                {dynamicGroups.length > 0 ? (
+                  dynamicGroups.map(g => (
+                    <div key={g.norm} className="mb-6">
+                      <label className="block text-sm font-medium text-gray-700 mb-2 truncate" title={g.label}>
+                        {g.label}
+                      </label>
+                      <Select
+                        value={dynamicFilters[g.norm] || 'all'}
+                        onValueChange={(val) => setDynamicFilters(prev => ({ ...prev, [g.norm]: val }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder={`All ${g.label}`} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All {g.label}</SelectItem>
+                          {g.options.map(opt => (
+                            <SelectItem key={opt} value={opt}>{opt}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  ))
+                ) : (
+                  <div className="mb-6 rounded-lg bg-gray-50 border border-dashed p-3 text-xs text-gray-500">
+                    No filterable PRIMARY fields stored yet.
+                  </div>
+                )}
 
- {/* Dynamic filters — only fields stored in table rows */}
- {fieldGroups.length === 0 ? (
- <div className="mb-6 rounded-lg bg-gray-50 border border-dashed p-3 text-xs text-gray-500">No filterable PRIMARY fields stored yet.</div>
- ) : (
- fieldGroups.map((g) => (
- <div key={g.norm} className="mb-6">
- <label className="block text-sm font-medium text-gray-700 mb-2 truncate"title={g.label}>{g.label}</label>
- <Select value={dynamicFilters[g.norm] || 'all'} onValueChange={(v) => setFieldFilter(g.norm, v)}>
- <SelectTrigger><SelectValue placeholder={`All ${g.label}`} /></SelectTrigger>
- <SelectContent>
- <SelectItem value="all">All {g.label}</SelectItem>
- {g.options.map((opt) => (
- <SelectItem key={opt} value={opt}>{opt}</SelectItem>
- ))}
- </SelectContent>
- </Select>
- </div>
- ))
- )}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+                  <Select value={A} onValueChange={setA}>
+                    <SelectTrigger>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="newest">Newest First</SelectItem>
+                      <SelectItem value="title">Job Title A-Z</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
- <div>
- <label className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
- <Select value={A} onValueChange={setA}>
- <SelectTrigger><SelectValue /></SelectTrigger>
- <SelectContent>
- <SelectItem value="newest">Newest First</SelectItem>
- <SelectItem value="title">Job Title A-Z</SelectItem>
- </SelectContent>
- </Select>
- </div>
+                {hasActiveFilters && (
+                  <Button variant="ghost" size="sm" className="w-full mt-4 text-gray-600" onClick={resetFilters}>
+                    Clear filters
+                  </Button>
+                )}
+              </CardContent>
+            </Card>
+          </div>
 
- {hasActiveFilters && (
- <Button variant="ghost"size="sm"className="w-full mt-4 text-gray-600"onClick={() => { setK(''); setX('All'); setDynamicFilters({}); }}>
- Clear filters
- </Button>
- )}
- </CardContent>
- </Card>
- </div>
+          {/* Right Content */}
+          <div className="lg:w-3/4">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-2xl font-bold text-gray-900">All Positions</h3>
+              <span className="text-sm text-gray-500">{filteredJobs.length} jobs found</span>
+            </div>
 
- <div className="lg:w-3/4">
- <div className="flex items-center justify-between mb-6">
- <h3 className="text-2xl font-bold text-gray-900">All Positions</h3>
- <span className="text-sm text-gray-500">{filtered.length} jobs found</span>
- </div>
+            {loading ? (
+              <div className="space-y-6">
+                {[1, 2, 3].map(i => (
+                  <Card key={i} className="border shadow-sm animate-pulse">
+                    <CardContent className="p-6">
+                      <div className="h-6 bg-gray-100 rounded w-1/3 mb-4"></div>
+                      <div className="h-4 bg-gray-100 rounded w-full mb-2"></div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : error ? (
+              <Card className="border shadow-sm">
+                <CardContent className="p-8 text-center">
+                  <p className="text-sm text-gray-700">{error}</p>
+                  <Button className="mt-4 bg-slate-700 hover:bg-slate-800" onClick={loadJobs}>Retry</Button>
+                </CardContent>
+              </Card>
+            ) : filteredJobs.length === 0 ? (
+              <div className="text-center py-12">
+                <Briefcase className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-900">No jobs found</h3>
+                <p className="text-gray-600">Try adjusting your search criteria or filters</p>
+                {hasActiveFilters && (
+                  <Button variant="outline" className="mt-4" onClick={resetFilters}>Clear filters</Button>
+                )}
+              </div>
+            ) : (
+              <div className="grid gap-4 sm:grid-cols-2">
+                {filteredJobs.map(job => {
+                  const isFeatured = (job.fields || []).length > 1;
+                  const primaryFields = (job.fields || []).filter((f: any) => f.section === 'PRIMARY');
+                  
+                  let skills: string[] = [];
+                  (job.fields || []).forEach((f: any) => {
+                    if (f.fieldType === 'TAG' || /skill/i.test(f.label)) {
+                      f.value.split(',').forEach((s: string) => {
+                        const t = s.trim();
+                        if (t && !skills.includes(t)) skills.push(t);
+                      });
+                    }
+                  });
 
- {loading ? (
- <div className="space-y-6">
- {[...Array(3)].map((_, i) => (
- <Card key={i} className="border shadow-sm animate-pulse"><CardContent className="p-6"><div className="h-6 bg-gray-100 rounded w-1/3 mb-4"/><div className="h-4 bg-gray-100 rounded w-full mb-2"/></CardContent></Card>
- ))}
- </div>
- ) : error ? (
- <Card className="border shadow-sm"><CardContent className="p-8 text-center"><p className="text-sm text-gray-700">{error}</p><Button className="mt-4 bg-slate-700 hover:bg-slate-800"onClick={() => window.location.reload()}>Retry</Button></CardContent></Card>
- ) : filtered.length === 0 ? (
- <div className="text-center py-12">
- <Briefcase className="h-16 w-16 text-gray-400 mx-auto mb-4"/>
- <h3 className="text-lg font-semibold text-gray-900 mb-2">No jobs found</h3>
- <p className="text-gray-600">Try adjusting your search criteria or filters</p>
- {hasActiveFilters && <Button variant="outline"className="mt-4"onClick={() => { setK(''); setX('All'); setDynamicFilters({}); }}>Clear filters</Button>}
- </div>
- ) : (
- <div className="grid gap-4 sm:grid-cols-2">
- {filtered.map((job) => {
- const isFeatured = (job.fields || []).length > 1;
- const skills = getSkills(job);
- const primary = (job.fields || []).filter(ff => ff.section === 'PRIMARY').sort((a,b)=>a.order-b.order);
- return (
- <Card key={job.id} className="border border-gray-200 shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-200 rounded-xl overflow-hidden bg-white flex flex-col">
- <CardContent className="p-4 flex flex-col flex-1 gap-3">
- <div className="flex items-start justify-between gap-2">
- <h4 className="text-[15px] font-semibold text-gray-900 leading-tight line-clamp-2 flex-1">{job.title}</h4>
- {isFeatured && (
- <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-100 shrink-0 px-2 py-0 text-[10px] h-5">
- <Star className="h-3 w-3 mr-1"/>Featured
- </Badge>
- )}
- </div>
- <div className="flex items-center text-gray-500 gap-1.5 -mt-1">
- <Briefcase className="h-3.5 w-3.5 text-slate-400"/>
- <span className="text-xs">{(job.fields || []).length} fields · {formatDate(job.publishedAt)}</span>
- </div>
+                  return (
+                    <Card key={job.id} className="border border-gray-200 shadow-sm hover:shadow-md hover:border-slate-300 rounded-xl overflow-hidden bg-white flex flex-col transition-all duration-200">
+                      <CardContent className="p-4 flex flex-col flex-1 gap-3">
+                        <div className="flex items-start justify-between gap-2">
+                          <h4 className="text-[15px] font-semibold text-gray-900 leading-tight line-clamp-2 flex-1">{job.title}</h4>
+                          {isFeatured && (
+                            <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-100 shrink-0 px-2 py-0 text-[10px] h-5">
+                              <Star className="h-3 w-3 mr-1" /> Featured
+                            </Badge>
+                          )}
+                        </div>
+                        <div className="flex items-center text-gray-500 gap-1.5 -mt-1">
+                          <Briefcase className="h-3.5 w-3.5 text-slate-400" />
+                          <span className="text-xs">{(job.fields || []).length} fields · {job.publishedAt ? new Date(job.publishedAt).toLocaleDateString() : '—'}</span>
+                        </div>
+                        
+                        {primaryFields.length > 0 ? (
+                          <div className="grid gap-2">
+                            {primaryFields.slice(0, 3).map((ff: any, i: number) => (
+                              <div key={i} className="flex items-center bg-gray-50 rounded-lg px-2.5 py-2 gap-2">
+                                <span className="text-[11px] font-medium text-gray-500 truncate max-w-[70px]" title={ff.label}>{ff.label}</span>
+                                <span className="flex-1"></span>
+                                {ff.fieldType === 'LINK' ? (
+                                  <a href={ff.value} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline truncate max-w-[120px]" title={ff.value}>{ff.value}</a>
+                                ) : (
+                                  <span className="font-medium text-xs text-gray-900 truncate max-w-[120px]" title={ff.value}>{ff.value}</span>
+                                )}
+                              </div>
+                            ))}
+                            {primaryFields.length > 3 && (
+                              <p className="text-[11px] text-gray-400">+{primaryFields.length - 3} more</p>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="rounded-lg bg-gray-50 border border-dashed px-3 py-2 text-xs text-gray-500 text-center">
+                            No PRIMARY fields
+                          </div>
+                        )}
 
- {primary.length > 0 ? (
- <div className="grid gap-2">
- {primary.slice(0, 3).map((ff) => {
- const isLink = ff.fieldType === 'LINK';
- return (
- <div key={ff.id} className="flex items-center bg-gray-50 rounded-lg px-2.5 py-2 gap-2">
- <span className="text-[11px] font-medium text-gray-500 truncate max-w-[70px]"title={ff.label}>{ff.label}</span>
- <span className="flex-1"/>
- {isLink ? (
- <a href={ff.value} target="_blank"rel="noopener noreferrer"className="font-medium text-xs text-blue-600 hover:underline truncate max-w-[120px]">{ff.value}</a>
- ) : (
- <span className="font-medium text-xs text-gray-900 truncate max-w-[120px]"title={ff.value}>{ff.value}</span>
- )}
- </div>
- );
- })}
- {primary.length > 3 && <p className="text-[11px] text-gray-400">+{primary.length - 3} more</p>}
- </div>
- ) : (
- <div className="rounded-lg bg-gray-50 border border-dashed px-3 py-2 text-xs text-gray-500 text-center">No PRIMARY fields</div>
- )}
+                        {skills.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5">
+                            {skills.slice(0, 4).map((s, i) => (
+                              <Badge key={i} variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 px-2 py-0 text-[11px] h-5">
+                                {s}
+                              </Badge>
+                            ))}
+                            {skills.length > 4 && (
+                              <span className="text-[11px] text-gray-400">+{skills.length - 4}</span>
+                            )}
+                          </div>
+                        )}
 
- {skills.length > 0 && (
- <div className="flex flex-wrap gap-1.5">
- {skills.slice(0, 4).map((s) => (
- <Badge key={s} variant="outline"className="bg-blue-50 text-blue-700 border-blue-200 px-2 py-0 text-[11px] h-5">{s}</Badge>
- ))}
- {skills.length > 4 && <span className="text-[11px] text-gray-400">+{skills.length - 4}</span>}
- </div>
- )}
+                        <div className="pt-3 border-t border-gray-100 mt-auto flex justify-end">
+                          <Button size="sm" className="bg-slate-800 hover:bg-slate-900 text-white h-8 text-xs px-4 rounded-full" onClick={() => navigate(`/careers/${job.slug}`)}>
+                            View Details
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </div>
 
- <div className="pt-3 border-t border-gray-100 mt-auto flex justify-end">
- <Button size="sm"className="bg-slate-800 hover:bg-slate-900 text-white h-8 text-xs px-4 rounded-full"onClick={() => navigate(`/careers/${job.slug}`)}>View Details</Button>
- </div>
- </CardContent>
- </Card>
- );
- })}
- </div>
- )}
- </div>
- </div>
- </div>
-
- {applySlug && <ApplicationForm slug={applySlug} open={!!applySlug} onOpenChange={(o) => !o && setApplySlug(null)} />}
-
- <PublicFooter />
- </div>
- );
+        </div>
+      </div>
+      
+      <PublicFooter />
+    </div>
+  );
 }
-
-export default CareersList;
