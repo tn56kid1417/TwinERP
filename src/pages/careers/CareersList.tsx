@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { PublicNavbar } from '@/components/careers/PublicNavbar';
 import { PublicFooter } from '@/components/careers/PublicFooter';
 
-export function CareersList() {
+export default function CareersList() {
   const navigate = useNavigate();
   const [jobs, setJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);

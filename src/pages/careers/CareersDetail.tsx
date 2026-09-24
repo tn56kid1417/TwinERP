@@ -10,7 +10,7 @@ import { PublicNavbar } from '@/components/careers/PublicNavbar';
 import { PublicFooter } from '@/components/careers/PublicFooter';
 import { ApplicationForm } from '@/components/careers/ApplicationForm';
 
-export function CareersDetail() {
+export default function CareersDetail() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
 
