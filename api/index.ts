@@ -1628,6 +1628,15 @@ chatRouter.get('/chat/teams/:teamId/export', async (req: express.Request, res: e
 
 export function createApp() {
   const app = express();
+  app.set('etag', false);
+
+  // Disable caching on API endpoints so client requests always get fresh responses instead of 304
+  app.use((_req, res, next) => {
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    next();
+  });
 
   // Vercel Serverless request body compatibility:
   // If Vercel pre-parsed the body, parse string or keep object; otherwise run express.json()

@@ -156,34 +156,43 @@ export function CareersList() {
 
  const hasActiveFilters = k.trim() !== '' || x !== 'All' || Object.values(dynamicFilters).some(v => v && v !== 'all');
 
- return (
- <div className="min-h-screen bg-white"style={{ fontFamily: 'Figtree, Inter, sans-serif' }}>
- <PublicNavbar />
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-zinc-950 flex flex-col" style={{ fontFamily: 'Figtree, Inter, sans-serif' }}>
+      <PublicNavbar />
 
- <div className="bg-slate-800 text-white">
- <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
- <div className="text-center">
- <h2 className="text-4xl font-bold mb-4">Join Our Amazing Team</h2>
- <p className="text-xl mb-8 text-slate-300">Discover exciting career opportunities and grow with us</p>
- <div className="max-w-2xl mx-auto bg-white rounded-lg p-2 shadow-lg">
- <div className="flex items-center space-x-2">
- <div className="flex-1 relative">
- <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5"/>
- <Input
- placeholder="Search jobs, skills, or keywords..."
- value={k}
- onChange={(e) => setK(e.target.value)}
- className="pl-10 border-0 focus:ring-0 text-gray-900 placeholder:text-gray-400 h-10"
- />
- </div>
- <Button className="bg-slate-700 hover:bg-slate-800 text-white px-6 shrink-0"type="button"tabIndex={-1}>
- Search Jobs
- </Button>
- </div>
- </div>
- </div>
- </div>
- </div>
+      {/* Hero Section */}
+      <div className="bg-gradient-to-r from-slate-950 via-indigo-950 to-slate-900 text-white relative overflow-hidden border-b border-indigo-900/30">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-600/15 via-transparent to-transparent pointer-events-none" />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 relative z-10">
+          <div className="text-center max-w-3xl mx-auto">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-400/25 mb-4">
+              ✨ Explore Opportunities
+            </span>
+            <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4 text-white">
+              Join Our Amazing Team
+            </h1>
+            <p className="text-base sm:text-lg text-slate-300 mb-8 max-w-2xl mx-auto font-normal">
+              Discover exciting career opportunities and build your future with TwinSpace.
+            </p>
+            <div className="max-w-2xl mx-auto bg-white rounded-2xl p-2 shadow-2xl border border-gray-100">
+              <div className="flex items-center gap-2">
+                <div className="flex-1 relative">
+                  <Search className="absolute left-3.5 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                  <Input
+                    placeholder="Search jobs, skills, or keywords..."
+                    value={k}
+                    onChange={(e) => setK(e.target.value)}
+                    className="pl-11 border-0 focus-visible:ring-0 text-gray-900 placeholder:text-gray-400 text-sm h-11 bg-transparent"
+                  />
+                </div>
+                <Button className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 h-11 rounded-xl shrink-0 transition-all shadow-md" type="button" tabIndex={-1}>
+                  Search Jobs
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
  <div className="flex flex-col lg:flex-row gap-8">
