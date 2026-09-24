@@ -102,7 +102,7 @@ export default function CareersList() {
 
       <div className="bg-slate-800 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
-          <h2 className="text-4xl font-bold mb-4">Join Our Amazing Team</h2>
+          <h2 className="text-4xl font-bold mb-4 text-white">Join Our Amazing Team</h2>
           <p className="text-xl mb-8 text-slate-300">Discover exciting career opportunities and grow with us</p>
           <div className="max-w-2xl mx-auto bg-white rounded-lg p-2 shadow-lg">
             <div className="flex items-center space-x-2">
@@ -112,7 +112,7 @@ export default function CareersList() {
                   placeholder="Search jobs, skills, or keywords..."
                   value={k}
                   onChange={(e) => setK(e.target.value)}
-                  className="pl-10 border-0 focus:ring-0 text-gray-900 placeholder:text-gray-400 h-10"
+                  className="pl-10 border-0 focus:ring-0 bg-white text-slate-900 placeholder:text-slate-500 h-10"
                 />
               </div>
               <Button className="bg-slate-700 hover:bg-slate-800 text-white px-6 shrink-0 h-10" type="button" tabIndex={-1}>
@@ -139,8 +139,8 @@ export default function CareersList() {
                       <Button
                         key={cat}
                         size="sm"
-                        variant={x === cat ? 'default' : 'outline'}
-                        className="text-xs"
+                        variant="outline"
+                        className={x === cat ? "text-xs bg-black text-white hover:bg-gray-800 border-black" : "text-xs bg-white text-slate-800 border-gray-300 hover:bg-gray-50"}
                         onClick={() => setX(cat)}
                       >
                         {cat}
@@ -159,10 +159,10 @@ export default function CareersList() {
                         value={dynamicFilters[g.norm] || 'all'}
                         onValueChange={(val) => setDynamicFilters(prev => ({ ...prev, [g.norm]: val }))}
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className="bg-white text-slate-900 border-slate-300">
                           <SelectValue placeholder={`All ${g.label}`} />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-white text-slate-900 border-slate-200">
                           <SelectItem value="all">All {g.label}</SelectItem>
                           {g.options.map(opt => (
                             <SelectItem key={opt} value={opt}>{opt}</SelectItem>
@@ -180,10 +180,10 @@ export default function CareersList() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
                   <Select value={A} onValueChange={setA}>
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-white text-slate-900 border-slate-300">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white text-slate-900 border-slate-200">
                       <SelectItem value="newest">Newest First</SelectItem>
                       <SelectItem value="title">Job Title A-Z</SelectItem>
                     </SelectContent>
@@ -268,13 +268,13 @@ export default function CareersList() {
                         {primaryFields.length > 0 ? (
                           <div className="grid gap-2">
                             {primaryFields.slice(0, 3).map((ff: any, i: number) => (
-                              <div key={i} className="flex items-center bg-gray-50 rounded-lg px-2.5 py-2 gap-2">
-                                <span className="text-[11px] font-medium text-gray-500 truncate max-w-[70px]" title={ff.label}>{ff.label}</span>
+                              <div key={i} className="flex items-center bg-blue-50 border border-blue-100 rounded-lg px-2.5 py-2 gap-2">
+                                <span className="text-[11px] font-medium text-slate-600 truncate max-w-[70px]" title={ff.label}>{ff.label}</span>
                                 <span className="flex-1"></span>
                                 {ff.fieldType === 'LINK' ? (
                                   <a href={ff.value} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline truncate max-w-[120px]" title={ff.value}>{ff.value}</a>
                                 ) : (
-                                  <span className="font-medium text-xs text-gray-900 truncate max-w-[120px]" title={ff.value}>{ff.value}</span>
+                                  <span className="font-medium text-xs text-blue-900 font-semibold truncate max-w-[120px]" title={ff.value}>{ff.value}</span>
                                 )}
                               </div>
                             ))}
@@ -291,7 +291,7 @@ export default function CareersList() {
                         {skills.length > 0 && (
                           <div className="flex flex-wrap gap-1.5">
                             {skills.slice(0, 4).map((s, i) => (
-                              <Badge key={i} variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 px-2 py-0 text-[11px] h-5">
+                              <Badge key={i} variant="outline" className="bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200 px-2 py-0 text-[11px] h-5">
                                 {s}
                               </Badge>
                             ))}

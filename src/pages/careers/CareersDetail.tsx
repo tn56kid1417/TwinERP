@@ -74,8 +74,8 @@ export default function CareersDetail() {
   const benefitsField = (job.fields || []).find((f: any) => /benefit|perk/i.test(f.label));
 
   const renderPill = (f: any, i: number) => (
-    <div key={i} className="inline-flex items-center gap-1.5 bg-gray-50 border rounded-full px-3 py-1.5">
-      <span className="text-[11px] font-medium text-gray-500 whitespace-nowrap">{f.label}:</span>
+    <div key={i} className="inline-flex items-center gap-1.5 bg-blue-50 border-blue-100 rounded-full px-3 py-1.5">
+      <span className="text-[11px] font-medium text-slate-600 whitespace-nowrap">{f.label}:</span>
       {f.fieldType === 'LINK' ? (
         <a href={f.value} target="_blank" rel="noreferrer" className="text-xs font-medium text-blue-600 hover:underline max-w-[160px] truncate" title={f.value}>{f.value}</a>
       ) : (
