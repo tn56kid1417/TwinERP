@@ -15,7 +15,7 @@ export function PublicNavbar() {
           <div className="absolute inset-0 bg-white dark:bg-white -z-10 transition-colors duration-300" />
           <div className="w-full max-w-7xl mx-auto h-full flex items-center justify-center lg:justify-start relative px-5 sm:px-6 lg:px-8">
             <a
-              href="https://twinspace.in/"
+              href="https://twincord.in/"
               aria-label="TwinSpace — home"
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 lg:static lg:translate-x-0 lg:translate-y-0 order-2 lg:order-1 flex h-[56px] w-[210px] shrink-0 items-center justify-center overflow-hidden"
             >

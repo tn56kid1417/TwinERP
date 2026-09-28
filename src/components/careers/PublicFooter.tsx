@@ -12,9 +12,8 @@ export function PublicFooter() {
               className="h-6 w-auto object-contain"
               onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
             />
-            <span className="text-sm font-semibold text-gray-900">TwinSpace</span>
             <span className="hidden sm:inline text-gray-300">|</span>
-            <span className="text-xs text-gray-500">© 2026 TwinSpace Technologies Pvt. Ltd.</span>
+            <span className="text-xs text-gray-500">© 2026 Twincord Technologies Pvt. Ltd.</span>
           </div>
         </div>
       </div>
