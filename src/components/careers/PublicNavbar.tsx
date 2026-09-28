@@ -9,10 +9,10 @@ export function PublicNavbar() {
       <div className="fixed top-0 left-0 right-0 z-50 pointer-events-none">
         <header
           id="navbar-header"
-          className="relative mx-auto h-[64px] w-full max-w-full bg-white dark:bg-zinc-950 pointer-events-auto border-b border-[#08265424] shadow-sm transition-all duration-[400ms]"
+          className="relative mx-auto h-[64px] w-full max-w-full bg-white dark:bg-white pointer-events-auto border-b border-[#08265424] shadow-sm transition-all duration-[400ms]"
           style={{ fontFamily: 'Manrope, sans-serif', transitionTimingFunction: 'cubic-bezier(0.25,1,0.5,1)' }}
         >
-          <div className="absolute inset-0 bg-white dark:bg-zinc-950 -z-10 transition-colors duration-300" />
+          <div className="absolute inset-0 bg-white dark:bg-white -z-10 transition-colors duration-300" />
           <div className="w-full max-w-7xl mx-auto h-full flex items-center justify-center lg:justify-start relative px-5 sm:px-6 lg:px-8">
             <a
               href="https://twinspace.in/"
@@ -73,7 +73,7 @@ export function PublicNavbar() {
             className="absolute inset-0 bg-[#082654]/40 backdrop-blur-sm"
           />
           <div
-            className="absolute left-0 right-0 top-[64px] mx-auto w-full max-w-[1280px] border-t border-[#08265424] bg-white dark:bg-zinc-950 shadow-[0_24px_64px_rgba(8,38,84,0.18)]"
+            className="absolute left-0 right-0 top-[64px] mx-auto w-full max-w-[1280px] border-t border-[#08265424] bg-white dark:bg-white shadow-[0_24px_64px_rgba(8,38,84,0.18)]"
             style={{ fontFamily: 'Manrope, sans-serif' }}
           >
             <nav className="flex flex-col p-3">
