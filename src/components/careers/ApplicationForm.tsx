@@ -71,7 +71,7 @@ export function ApplicationForm({ open, onOpenChange, slug }: ApplicationFormPro
 
   return (
     <Dialog open={open} onOpenChange={(val) => { if (!val) handleClose(); else onOpenChange(val); }}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-auto bg-white">
+      <DialogContent className="!text-slate-900 max-w-2xl max-h-[90vh] overflow-auto bg-white">
         {success ? (
           <div className="py-8 text-center space-y-3">
             <div className="mx-auto h-12 w-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 text-xl">
