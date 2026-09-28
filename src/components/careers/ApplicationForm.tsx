@@ -94,39 +94,39 @@ export function ApplicationForm({ open, onOpenChange, slug }: ApplicationFormPro
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label>Full Name *</Label>
-                  <Input name="fullName" placeholder="e.g. Your name" required value={formData.fullName} onChange={handleChange} />
+                  <Input className="!bg-white !text-slate-900 border-slate-200" name="fullName" placeholder="e.g. Your name" required value={formData.fullName} onChange={handleChange} />
                 </div>
                 <div>
                   <Label>Email *</Label>
-                  <Input type="email" name="email" placeholder="you@example.com" required value={formData.email} onChange={handleChange} />
+                  <Input className="!bg-white !text-slate-900 border-slate-200" type="email" name="email" placeholder="you@example.com" required value={formData.email} onChange={handleChange} />
                 </div>
                 <div>
                   <Label>Phone *</Label>
-                  <Input name="phone" required value={formData.phone} onChange={handleChange} />
+                  <Input className="!bg-white !text-slate-900 border-slate-200" name="phone" required value={formData.phone} onChange={handleChange} />
                 </div>
                 <div>
                   <Label>Highest Qualification *</Label>
-                  <Input name="highestQualification" required value={formData.highestQualification} onChange={handleChange} />
+                  <Input className="!bg-white !text-slate-900 border-slate-200" name="highestQualification" required value={formData.highestQualification} onChange={handleChange} />
                 </div>
                 <div>
                   <Label>Experience *</Label>
-                  <Input name="experience" required value={formData.experience} onChange={handleChange} />
+                  <Input className="!bg-white !text-slate-900 border-slate-200" name="experience" required value={formData.experience} onChange={handleChange} />
                 </div>
                 <div>
                   <Label>Current Company / Institution (optional)</Label>
-                  <Input name="currentCompany" value={formData.currentCompany} onChange={handleChange} />
+                  <Input className="!bg-white !text-slate-900 border-slate-200" name="currentCompany" value={formData.currentCompany} onChange={handleChange} />
                 </div>
               </div>
 
               <div className="space-y-1.5">
                 <Label>Resume / Portfolio Link *</Label>
-                <Input name="resumeLink" required value={formData.resumeLink} onChange={handleChange} />
+                <Input className="!bg-white !text-slate-900 border-slate-200" name="resumeLink" required value={formData.resumeLink} onChange={handleChange} />
                 <p className="text-[11px] text-muted-foreground">Must be a valid http(s) URL.</p>
               </div>
 
               <div className="space-y-1.5">
                 <Label>Short Cover Note (optional)</Label>
-                <Textarea name="coverNote" placeholder="Why this role? (max 2000 chars)" rows={3} maxLength={2000} value={formData.coverNote} onChange={handleChange} />
+                <Textarea className="!bg-white !text-slate-900 border-slate-200" name="coverNote" placeholder="Why this role? (max 2000 chars)" rows={3} maxLength={2000} value={formData.coverNote} onChange={handleChange} />
               </div>
 
               {error && (
