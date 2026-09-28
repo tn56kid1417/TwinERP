@@ -80,9 +80,9 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
 
  const hrmNavItems = [
  { name: 'Dashboard', path: '/', icon: <LayoutDashboard size={16} />, hrOnly: false, adminOnly: false, moduleKey: 'dashboard' as const },
- { name: 'Tasks', path: '/tasks', icon: <ListTodo size={16} />, hrOnly: false, adminOnly: false, moduleKey: 'tasks' as const },
+  { name: 'Tasks', path: '/tasks', icon: <ListTodo size={16} />, hrOnly: false, adminOnly: false, moduleKey: 'tasks' as const },
  { name: 'Team Chat', path: '/chat', icon: <MessageSquare size={16} />, hrOnly: false, adminOnly: false, moduleKey: 'team-chat' as const },
- { name: 'Privileges', path: '/privileges', icon: <ShieldCheck size={16} />, hrOnly: false, adminOnly: true, moduleKey: null },
+ { name: 'Privileges', path: '/privileges', icon: <ShieldCheck size={16} />, hrOnly: false, adminOnly: true, moduleKey: 'privileges' as const },
  { name: 'User Accounts', path: '/user-management',icon: <Shield size={16} />, hrOnly: true, adminOnly: false, moduleKey: 'user-management' as const },
  { name: 'Employees', path: '/employees', icon: <Users size={16} />, hrOnly: true, adminOnly: false, moduleKey: 'employees' as const },
  { name: 'Careers & Jobs', path: '/hrm/careers', icon: <Briefcase size={16} />, hrOnly: false, adminOnly: false, moduleKey: 'careers' as const },
@@ -124,6 +124,8 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
  { name: 'Clients', path: '/projects/clients',icon: <Building size={16} />, hrOnly: true },
  ];
 
+  const ADMIN_NAV_ALLOWLIST = ['dashboard', 'tasks', 'team-chat', 'privileges', 'user-management', 'employees', 'careers'];
+
  const getActiveNavItems = () => {
  let items;
  switch (activeModule) {
@@ -133,8 +135,11 @@ const Sidebar = ({ isOpen = false, onClose }: SidebarProps) => {
  default: items = hrmNavItems; break;
  }
  return items.filter(item => {
- if (item.adminOnly) return isAdmin;
- if (isAdmin) return true;
+ if (isAdmin) {
+   if (activeModule === 'HRM') return item.moduleKey ? ADMIN_NAV_ALLOWLIST.includes(item.moduleKey as string) : false;
+   return true;
+ }
+ if (item.adminOnly) return false;
  if (item.hrOnly && !canViewAll) return false;
  if (item.moduleKey) return hasModuleAccess(item.moduleKey);
  return true;

@@ -300,7 +300,7 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
  if (!notification.read) handleMarkOneAsRead(notification.id);
  if (notification.type === 'mention') {
  setIsNotificationsOpen(false);
- navigate('/team-chat');
+ navigate('/chat');
  }
  }}
  className="flex gap-3 p-3 rounded-md cursor-pointer transition-colors"
