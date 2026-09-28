@@ -170,7 +170,7 @@ export const deleteComplaint = (id: string) => api.delete(`/lifecycle/complaints
 export const getChatTeams = () =>
   api.get<import('./types').ChatTeamWithMeta[]>('/chat/teams').then(res => res.data);
 
-export const createChatTeam = (data: { name: string; memberIds?: string[]; restrictHistory?: boolean }) =>
+export const createChatTeam = (data: { name: string; memberIds?: string[]; restrictHistory?: boolean; teamLeadId?: string; projectId?: string }) =>
   api.post<import('./types').ChatTeam>('/chat/teams', data).then(res => res.data);
 
 
@@ -200,6 +200,9 @@ export const addChatMember = (teamId: string, data: { userId: string; roleInTeam
 
 export const removeChatMember = (teamId: string, userId: string) =>
   api.delete(`/chat/teams/${teamId}/members/${userId}`);
+
+export const updateChatTeamLead = (teamId: string, teamLeadId: string) =>
+  api.patch(`/chat/teams/${teamId}/lead`, { teamLeadId }).then(res => res.data);
 
 export const getChatReadState = (teamId: string) =>
   api.get<{ last_read_message_id: string | null }>(`/chat/teams/${teamId}/read-state`).then(res => res.data);

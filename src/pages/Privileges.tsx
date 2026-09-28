@@ -32,7 +32,7 @@ const MODULE_DEFINITIONS: ModuleDef[] = [
  // HRM - Core
  { key: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={14} />, group: 'HRM Core', defaultForAll: true },
  { key: 'tasks', label: 'Tasks', icon: <ListTodo size={14} />, group: 'HRM Core', defaultForAll: true },
- { key: 'team-chat', label: 'Team Chat', icon: <MessageSquare size={14} />, group: 'HRM Core', defaultForAll: true },
+ { key: 'team-chat', label: 'Team Chat', icon: <MessageSquare size={14} />, group: 'Projects', defaultForAll: true },
  { key: 'user-management',label: 'User Accounts', icon: <UserCog size={14} />, group: 'HRM Core', defaultForAll: false },
  { key: 'employees', label: 'Employees', icon: <Users size={14} />, group: 'HRM Core', defaultForAll: false },
  { key: 'lifecycle', label: 'Lifecycle', icon: <TrendingUp size={14} />, group: 'HRM Core', defaultForAll: true },
