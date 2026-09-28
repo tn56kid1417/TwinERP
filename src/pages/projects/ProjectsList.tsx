@@ -5,6 +5,7 @@ import { Plus, Search, MoreVertical, Calendar, UserPlus, X, ListTodo, User } fro
 import { useAuth } from '../../context/AuthContext';
 import { getEmployees, getProjects, addProject, updateProject, getTasks, addTask, updateTask } from '../../api';
 import { Employee, Project, Task } from '../../types';
+import { createChatTeam, updateChatTeamLead, addChatMember, removeChatMember, getChatTeams } from '../../api';
 
 const getStatusColor = (status: string) => {
  switch (status) {
@@ -25,19 +26,26 @@ const ProjectsList = () => {
  const [activeTab, setActiveTab] = useState('All');
  
  const [projects, setProjects] = useState<Project[]>([]);
+ const [showTeamModal, setShowTeamModal] = useState(false);
+ const [selectedProjectId, setSelectedProjectId] = useState('');
+ const [teamLeadId, setTeamLeadId] = useState('');
+ const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+ const [teamIdForManage, setTeamIdForManage] = useState<string | null>(null);
+
  const [tasks, setTasks] = useState<Task[]>([]);
  const [employees, setEmployees] = useState<Employee[]>([]);
  
- const [assignModalOpen, setAssignModalOpen] = useState(false);
- const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
- const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>('');
+ 
 
  const [newProjectModalOpen, setNewProjectModalOpen] = useState(false);
  const [newProjectName, setNewProjectName] = useState('');
  const [newProjectClient, setNewProjectClient] = useState('');
  const [newProjectStartDate, setNewProjectStartDate] = useState('');
  const [newProjectDeadline, setNewProjectDeadline] = useState('');
- const [newProjectDescription, setNewProjectDescription] = useState('');
+  const [newProjectDescription, setNewProjectDescription] = useState('');
+ const [newProjectLead, setNewProjectLead] = useState('');
+ const [newProjectMembers, setNewProjectMembers] = useState<string[]>([]);
+
 
  // Roles that can assign projects to team leaders
  
@@ -67,46 +75,174 @@ const ProjectsList = () => {
  return matchesSearch && matchesTab;
  });
 
- const handleAssignProjectClick = (projectId: string) => {
- setSelectedProjectId(projectId);
- setSelectedEmployeeId(teamLeaders[0]?.id || '');
- setAssignModalOpen(true);
- };
+ 
 
- const handleAssignProjectSubmit = async (e: React.FormEvent) => {
- e.preventDefault();
- if (selectedProjectId && selectedEmployeeId) {
- const project = projects.find(p => p.id === selectedProjectId);
- if (project && !project.assignees.includes(selectedEmployeeId)) {
- const updated = await updateProject(selectedProjectId, { assignees: [...project.assignees, selectedEmployeeId] });
- setProjects(prev => prev.map(p => p.id === selectedProjectId ? updated : p));
- }
- }
- setAssignModalOpen(false);
- };
+ 
+  const handleCreateTeamClick = async (projectId: string) => {
+    setSelectedProjectId(projectId);
+    const project = projects.find(p => p.id === projectId);
+    if (!project) return;
+    
+    // Attempt to load existing team
+    try {
+      const allTeams = await getChatTeams();
+      const existingTeam = allTeams.find(t => t.projectId === projectId);
+      if (existingTeam) {
+        setTeamIdForManage(existingTeam.id);
+        setTeamLeadId(existingTeam.teamLeadId);
+        setSelectedMembers(existingTeam.memberIds);
+      } else {
+        setTeamIdForManage(null);
+        setTeamLeadId(project.teamLeadId || '');
+        setSelectedMembers(project.assignees || []);
+      }
+    } catch (e) {
+      setTeamIdForManage(null);
+      setTeamLeadId(project.teamLeadId || '');
+      setSelectedMembers(project.assignees || []);
+    }
+    
+    setShowTeamModal(true);
+  };
 
- const handleTasksClick = (projectId: string) => {
+  const handleUpdateTeamLead = async (newLead: string) => {
+    setTeamLeadId(newLead);
+    if (teamIdForManage) {
+      try {
+        await updateChatTeamLead(teamIdForManage, newLead);
+        toast.success('Team lead updated');
+      } catch (err: any) {
+        toast.error('Failed to update lead');
+      }
+    }
+  };
+
+  const handleAddMember = async (empId: string) => {
+    if (!selectedMembers.includes(empId)) {
+      const next = [...selectedMembers, empId];
+      setSelectedMembers(next);
+      if (teamIdForManage) {
+        try {
+          await addChatMember(teamIdForManage, { userId: empId });
+          toast.success('Member added to chat team');
+        } catch (err: any) {
+          toast.error('Failed to add member');
+        }
+      }
+    }
+  };
+
+  const handleRemoveMember = async (empId: string) => {
+    if (empId === teamLeadId) {
+      toast.error('Cannot remove team lead');
+      return;
+    }
+    const next = selectedMembers.filter(id => id !== empId);
+    setSelectedMembers(next);
+    if (teamIdForManage) {
+      try {
+        await removeChatMember(teamIdForManage, empId);
+        toast.success('Member removed');
+      } catch (err: any) {
+        toast.error('Failed to remove member');
+      }
+    }
+  };
+
+  const submitCreateTeam = async () => {
+    const proj = projects.find(p => p.id === selectedProjectId);
+    if (!proj) return;
+    
+    if (teamIdForManage) {
+      // Already exists, just close modal, changes applied instantly
+      // But update project assignees to match
+      try {
+        const finalMembers = Array.from(new Set([...selectedMembers, teamLeadId]));
+        await updateProject(proj.id, { assignees: finalMembers, teamLeadId });
+        setProjects(prev => prev.map(p => p.id === proj.id ? { ...p, assignees: finalMembers, teamLeadId } : p));
+      } catch (e) {}
+      setShowTeamModal(false);
+      return;
+    }
+    
+    if (!teamLeadId) {
+      toast.error('Team lead is required');
+      return;
+    }
+    const finalMembers = new Set(selectedMembers);
+    finalMembers.add(teamLeadId);
+
+    try {
+      const team = await createChatTeam({ 
+        name: proj.name, 
+        memberIds: Array.from(finalMembers), 
+        teamLeadId, 
+        projectId: proj.id 
+      });
+      await updateChatTeamLead(team.id, teamLeadId);
+      
+      const membersArray = Array.from(finalMembers);
+      await updateProject(proj.id, { assignees: membersArray, teamLeadId });
+      setProjects(prev => prev.map(p => p.id === proj.id ? { ...p, assignees: membersArray, teamLeadId } : p));
+      
+      toast.success('Team created successfully!');
+      setShowTeamModal(false);
+    } catch (err: any) {
+      toast.error(err.response?.data?.error || 'Failed to create team');
+    }
+  };
+
+  const handleTasksClick = (projectId: string) => {
  navigate(`/projects/${projectId}/board`);
  };
 
- const handleCreateProject = async (e: React.FormEvent) => {
+  const handleCreateProject = async (e: React.FormEvent) => {
  e.preventDefault();
  if (newProjectName && newProjectClient && newProjectStartDate && newProjectDeadline) {
- const project = await addProject({
- name: newProjectName,
- client: newProjectClient,
- status: 'To Do',
- startDate: newProjectStartDate,
- deadline: newProjectDeadline,
- description: newProjectDescription
- });
- setProjects(prev => [...prev, project]);
- setNewProjectModalOpen(false);
- setNewProjectName('');
- setNewProjectClient('');
- setNewProjectStartDate('');
- setNewProjectDeadline('');
- setNewProjectDescription('');
+ const finalAssignees = new Set(newProjectMembers);
+ if (newProjectLead) finalAssignees.add(newProjectLead);
+ 
+ try {
+   const project = await addProject({
+   name: newProjectName,
+   client: newProjectClient,
+   status: 'To Do',
+   startDate: newProjectStartDate,
+   deadline: newProjectDeadline,
+   description: newProjectDescription,
+   assignees: Array.from(finalAssignees),
+   teamLeadId: newProjectLead || undefined
+   });
+   
+   setProjects(prev => [...prev, project]);
+   
+   if (newProjectLead) {
+     try {
+       const team = await createChatTeam({
+         name: project.name,
+         memberIds: Array.from(finalAssignees),
+         teamLeadId: newProjectLead,
+         projectId: project.id
+       });
+       await updateChatTeamLead(team.id, newProjectLead);
+     } catch (err: any) {
+       toast.error('Project created, but team setup failed: ' + (err.response?.data?.error || err.message));
+       // We don't throw, just show error. The user requested "leave a visible 'Retry team setup' action on that project row"
+       // Actually, the handleCreateTeamClick already exists for "Manage Team" if team is not set up.
+     }
+   }
+   
+   setNewProjectModalOpen(false);
+   setNewProjectName('');
+   setNewProjectClient('');
+   setNewProjectStartDate('');
+   setNewProjectDeadline('');
+   setNewProjectDescription('');
+   setNewProjectLead('');
+   setNewProjectMembers([]);
+ } catch (err: any) {
+   toast.error('Failed to create project');
+ }
  }
  };
 
@@ -250,60 +386,7 @@ const ProjectsList = () => {
 
  {/* Assign Project to Team Leader Modal */}
  <AnimatePresence>
- {assignModalOpen && (
- <div className="fixed inset-0 bg-black/50 dark:bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
- <motion.div
- initial={{ opacity: 0, scale: 0.95 }}
- animate={{ opacity: 1, scale: 1 }}
- exit={{ opacity: 0, scale: 0.95 }}
- className="relative bg-white backdrop-blur-2xl border border-slate-200 rounded-lg shadow-lg w-full max-w-md overflow-hidden"
- >
- <div className="flex items-center justify-between px-6 py-4.5 border-b border-slate-100 bg-slate-50 ">
- <h2 className="text-base font-bold text-slate-900 tracking-tight">Assign Team Leader</h2>
- <button 
- onClick={() => setAssignModalOpen(false)}
- className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
- >
- <X size={18} />
- </button>
- </div>
- <form onSubmit={handleAssignProjectSubmit} className="p-6">
- <div className="mb-6">
- <label className="block text-xs font-medium text-slate-600 mb-2">Select Team Leader</label>
- <select 
- value={selectedEmployeeId}
- onChange={(e) => setSelectedEmployeeId(e.target.value)}
- className="w-full bg-white border border-slate-200 text-slate-800 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-sm cursor-pointer"
- required
- >
- <option value=""disabled className="bg-white text-slate-400">Select a team leader...</option>
- {teamLeaders.map(emp => (
- <option key={emp.id} value={emp.id} className="bg-white text-slate-800">
- {emp.firstName} {emp.lastName}
- </option>
- ))}
- </select>
- <p className="text-xs text-slate-500 mt-2">Only employees with the 'Team Leader' role can be assigned as project owners.</p>
- </div>
- <div className="flex justify-end items-center gap-3 pt-4 border-t border-slate-100">
- <button 
- type="button"
- onClick={() => setAssignModalOpen(false)}
- className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-100 rounded-md transition-colors border border-slate-200 cursor-pointer"
- >
- Cancel
- </button>
- <button 
- type="submit"
- className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-md transition-all shadow-sm cursor-pointer"
- >
- Assign
- </button>
- </div>
- </form>
- </motion.div>
- </div>
- )}
+ 
  </AnimatePresence>
 
 
@@ -381,9 +464,41 @@ const ProjectsList = () => {
  rows={3}
  placeholder="Project description or notes"
  />
+ 
+ </div>
+ <div className="grid grid-cols-2 gap-4 mt-4">
+ <div>
+ <label className="block text-xs font-medium text-slate-600 mb-1.5">Team Lead (Optional)</label>
+ <select 
+ value={newProjectLead}
+ onChange={(e) => setNewProjectLead(e.target.value)}
+ className="w-full bg-white border border-slate-200 text-slate-800 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500"
+ >
+ <option value="">Select Team Lead</option>
+ {employees.map(emp => (
+ <option key={emp.id} value={emp.id}>{emp.name || emp.firstName + ' ' + emp.lastName}</option>
+ ))}
+ </select>
+ </div>
+ <div>
+ <label className="block text-xs font-medium text-slate-600 mb-1.5">Team Members (Optional)</label>
+ <select 
+ multiple
+ value={newProjectMembers}
+ onChange={(e) => setNewProjectMembers(Array.from(e.target.selectedOptions, option => option.value))}
+ className="w-full bg-white border border-slate-200 text-slate-800 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-blue-500"
+ style={{ height: '80px' }}
+ >
+ {employees.map(emp => (
+ <option key={emp.id} value={emp.id}>{emp.name || emp.firstName + ' ' + emp.lastName}</option>
+ ))}
+ </select>
+ <p className="text-[10px] text-slate-500 mt-1">Hold Ctrl/Cmd to select multiple</p>
+ </div>
  </div>
  </div>
  <div className="flex justify-end items-center gap-3 pt-4 border-t border-slate-100">
+
  <button 
  type="button"
  onClick={() => setNewProjectModalOpen(false)}

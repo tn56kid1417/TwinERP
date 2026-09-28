@@ -6,7 +6,11 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'twinerp-jwt-secret-key-production-2026';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  console.error('FATAL ERROR: JWT_SECRET environment variable is not set.');
+  process.exit(1);
+}
 
 const ATTENDANCE_FILE = process.env.VERCEL ? '/tmp/erp_attendances.json' : path.join(process.cwd(), '.attendances.json');
 const EMPLOYEES_FILE = process.env.VERCEL ? '/tmp/erp_employees.json' : path.join(process.cwd(), '.employees.json');
@@ -1012,7 +1016,7 @@ chatRouter.post('/chat/teams', async (req: express.Request, res: express.Respons
   if (!caller) return void res.status(401).json({ error: 'Unauthorized' });
   if (!isElevated(caller.userRole)) return void res.status(403).json({ error: 'Only HR/Admin/Managers can create teams' });
 
-  const { name, memberIds = [], restrictHistory = false } = req.body;
+  const { name, memberIds = [], restrictHistory = false, teamLeadId, projectId } = req.body;
   if (!name?.trim()) return void res.status(400).json({ error: 'Team name is required' });
 
   const teamId = `team-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
@@ -1023,7 +1027,9 @@ chatRouter.post('/chat/teams', async (req: express.Request, res: express.Respons
     name: name.trim(),
     created_by: caller.userId,
     created_at: now,
-    restrict_history_to_membership_window: Boolean(restrictHistory)
+    restrict_history_to_membership_window: Boolean(restrictHistory),
+    teamLeadId,
+    projectId
   };
 
   const creatorMembership = {
@@ -1438,6 +1444,30 @@ chatRouter.post('/chat/teams/:teamId/members', async (req: express.Request, res:
 });
 
 // DELETE /api/chat/teams/:teamId/members/:userId — remove member
+
+chatRouter.patch('/chat/teams/:teamId/lead', async (req, res) => {
+  const { teamId } = req.params;
+  const { teamLeadId } = req.body;
+  const caller = getCallerFromHeaders(req);
+  const team = localChatTeams.find(t => t.id === teamId);
+  if (!team) return res.status(404).json({error:'Not found'});
+  if (!isElevated(caller.userRole) && caller.userId !== team.created_by) return res.status(403).json({error:'Forbidden'});
+  
+  team.teamLeadId = teamLeadId;
+  localChatMembers.filter(m => m.team_id === teamId).forEach(m => {
+    if(m.user_id === teamLeadId) {
+      m.can_delete_others_messages = true;
+      m.can_remove_members = true;
+    } else if (m.user_id !== team.created_by) {
+      m.can_delete_others_messages = false;
+      m.can_remove_members = false;
+    }
+  });
+  persistChatTeams();
+  persistChatMembers();
+  res.json({success:true});
+});
+
 chatRouter.delete('/chat/teams/:teamId/members/:userId', async (req: express.Request, res: express.Response) => {
   const caller = getCallerFromHeaders(req);
   if (!caller) return void res.status(401).json({ error: 'Unauthorized' });
@@ -1671,6 +1701,31 @@ export function createApp() {
 
   const router = express.Router();
 
+function provisionEmployeeFromHire(app: any, job: any) {
+  const email = (app.email || app.candidateEmail || '').trim().toLowerCase();
+  if (!email) return null;
+  const existing = employees.find(e => e.email?.toLowerCase() === email);
+  if (existing) return existing.id;
+  
+  const newEmp = {
+    id: `emp-${Date.now()}`,
+    firstName: app.firstName || 'New',
+    lastName: app.lastName || 'Hire',
+    email: email,
+    role: 'Employee',
+    department: 'Engineering', // default or extract from job
+    status: 'Onboarding',
+    isActive: false,
+    joinDate: new Date().toISOString().split('T')[0],
+    position: job?.title || 'Employee',
+    createdAt: new Date().toISOString()
+  };
+  employees.push(newEmp);
+  saveChatFile(EMPLOYEES_FILE, employees);
+  return newEmp.id;
+}
+
+
   router.get('/health', (req, res) => {
     res.json({ status: 'ok', time: new Date().toISOString() });
   });
@@ -1686,11 +1741,6 @@ export function createApp() {
 
     // Find employee by email or alias
     let user = employees.find(e => e.email?.toLowerCase() === cleanEmail && e.isActive !== false);
-
-    // Fallback aliases for demo/admin convenience
-    if (!user && (cleanEmail === 'admin' || cleanEmail.startsWith('admin@') || cleanEmail.startsWith('demo@'))) {
-      user = employees.find(e => e.role === 'Admin') || employees[0];
-    }
 
     if (!user) {
       return res.status(401).json({ error: 'Invalid email or password' });
@@ -1741,7 +1791,7 @@ export function createApp() {
     if (
       pathName === '/health' ||
       pathName === '/login' ||
-      pathName.startsWith('/careers') ||
+      (pathName === '/careers' || pathName.match(/^\/careers\/[^/]+$/) || pathName.match(/^\/careers\/[^/]+\/apply$/)) ||
       pathName.startsWith('/apply')
     ) {
       return next();
@@ -1768,6 +1818,11 @@ export function createApp() {
   });
 
   router.get('/privileges/:userId', (req, res) => {
+    const callerId = (req as any).user?.id;
+    const callerRole = (req as any).user?.role || '';
+    if (callerId !== req.params.userId && !['Admin', 'HR', 'CEO', 'CTO'].includes(callerRole)) {
+      return res.status(403).json({ error: 'Forbidden' });
+    }
     const { userId } = req.params;
     res.json(privilegesMap[userId] || { userId, allowedModules: [], canAssignTasks: false });
   });
@@ -1797,7 +1852,8 @@ export function createApp() {
   // Module A: Core Employee Profile
   router.get('/employees', (req, res) => res.json(employees));
   router.post('/employees', (req, res) => {
-    const password = req.body.password || 'admin123';
+    const password = req.body.password;
+    if (!password) return res.status(400).json({ error: 'Password is required' });
     const passwordHash = bcrypt.hashSync(password, 10);
     const newEmp = { ...req.body, passwordHash, id: `e${Date.now()}`, isActive: true };
     employees.push(newEmp);
@@ -2141,6 +2197,18 @@ export function createApp() {
     const resignation = resignations.find(r => r.id === req.params.id);
     if (!resignation) return res.status(404).json({ error: 'Resignation not found' });
     
+    if (status === 'Approved' && resignation.status !== 'Approved') {
+      const emp = employees.find(e => e.id === resignation.employeeId);
+      if (emp && emp.isActive !== false) {
+        emp.isActive = false;
+        saveEmployees();
+        console.log(`[System Action] Deactivated employee ${emp.id} due to approved resignation.`);
+        if (privilegesMap[emp.id]) {
+          delete privilegesMap[emp.id];
+          savePrivileges();
+        }
+      }
+    }
     resignation.status = status;
     if (approvedBy) resignation.approvedBy = approvedBy;
     saveResignations();
@@ -2178,6 +2246,18 @@ export function createApp() {
     const termination = terminations.find(t => t.id === req.params.id);
     if (!termination) return res.status(404).json({ error: 'Termination not found' });
     
+    if (status === 'Approved' && termination.status !== 'Approved') {
+      const emp = employees.find(e => e.id === termination.employeeId);
+      if (emp && emp.isActive !== false) {
+        emp.isActive = false;
+        saveEmployees();
+        console.log(`[System Action] Deactivated employee ${emp.id} due to approved termination.`);
+        if (privilegesMap[emp.id]) {
+          delete privilegesMap[emp.id];
+          savePrivileges();
+        }
+      }
+    }
     termination.status = status;
     if (approvedBy) termination.approvedBy = approvedBy;
     saveTerminations();
@@ -2739,7 +2819,35 @@ export function createApp() {
             status: mailResult.status
           });
         } else {
-          app.status = 'HIRED';
+                    app.status = 'HIRED';
+          const convertedId = provisionEmployeeFromHire(app, job);
+          if (convertedId) {
+            app.convertedEmployeeId = convertedId;
+          }
+          
+          let employee = employees.find(e => e.email === recipient);
+          if (!employee) {
+            const nameParts = (app.candidateName || '').split(' ');
+            const firstName = nameParts[0] || 'Unknown';
+            const lastName = nameParts.slice(1).join(' ') || '';
+            employee = {
+              id: `emp_${Date.now()}`,
+              firstName,
+              lastName,
+              email: recipient,
+              phone: app.phone || '',
+              department: '',
+              role: 'Employee',
+              designation: job.title || '',
+              hireDate: new Date().toISOString().split('T')[0],
+              isActive: false,
+              status: 'Onboarding'
+            };
+            employees.push(employee);
+            saveEmployees();
+          }
+          app.convertedEmployeeId = employee.id;
+
           const template = job.hireTemplate || DEFAULT_CAREER_TEMPLATES.hireTemplate;
           const mergeCtx = buildMergeContext(app, job, null);
           const renderedHtml = renderTemplate(template, mergeCtx);
@@ -2953,7 +3061,8 @@ export function createApp() {
     const parts = (name || 'New User').trim().split(' ');
     const firstName = parts[0] || 'New';
     const lastName = parts.slice(1).join(' ') || 'User';
-    const passwordHash = bcrypt.hashSync(password || 'admin123', 10);
+    if (!password) return res.status(400).json({ error: 'Password is required' });
+    const passwordHash = bcrypt.hashSync(password, 10);
     const newEmp = {
       id: `e${Date.now()}`,
       firstName,
