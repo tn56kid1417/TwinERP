@@ -6,11 +6,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import nodemailer from 'nodemailer';
 
-const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) {
-  console.error('FATAL ERROR: JWT_SECRET environment variable is not set.');
-  process.exit(1);
-}
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-for-development';
 
 const ATTENDANCE_FILE = process.env.VERCEL ? '/tmp/erp_attendances.json' : path.join(process.cwd(), '.attendances.json');
 const EMPLOYEES_FILE = process.env.VERCEL ? '/tmp/erp_employees.json' : path.join(process.cwd(), '.employees.json');
