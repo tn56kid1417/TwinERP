@@ -112,7 +112,7 @@ export default function CareersList() {
                   placeholder="Search jobs, skills, or keywords..."
                   value={k}
                   onChange={(e) => setK(e.target.value)}
-                  className="pl-10 border-0 focus:ring-0 bg-white text-slate-900 placeholder:text-slate-500 h-10"
+                  className="pl-10 border-0 focus:ring-0 !bg-white !text-slate-900 placeholder:text-slate-500 h-10"
                 />
               </div>
               <Button className="bg-slate-700 hover:bg-slate-800 text-white px-6 shrink-0 h-10" type="button" tabIndex={-1}>
@@ -140,7 +140,7 @@ export default function CareersList() {
                         key={cat}
                         size="sm"
                         variant="outline"
-                        className={x === cat ? "text-xs bg-black text-white hover:bg-gray-800 border-black" : "text-xs bg-white text-slate-800 border-gray-300 hover:bg-gray-50"}
+                        className={x === cat ? "text-xs bg-[#082654] text-white hover:bg-[#0099d6] border-[#082654]" : "text-xs bg-white text-slate-800 border-gray-300 hover:bg-gray-50"}
                         onClick={() => setX(cat)}
                       >
                         {cat}
@@ -159,10 +159,10 @@ export default function CareersList() {
                         value={dynamicFilters[g.norm] || 'all'}
                         onValueChange={(val) => setDynamicFilters(prev => ({ ...prev, [g.norm]: val }))}
                       >
-                        <SelectTrigger className="bg-white text-slate-900 border-slate-300">
+                        <SelectTrigger className="!bg-white !text-slate-900 border-slate-300">
                           <SelectValue placeholder={`All ${g.label}`} />
                         </SelectTrigger>
-                        <SelectContent className="bg-white text-slate-900 border-slate-200">
+                        <SelectContent className="!bg-white !text-slate-900 border-slate-200">
                           <SelectItem value="all">All {g.label}</SelectItem>
                           {g.options.map(opt => (
                             <SelectItem key={opt} value={opt}>{opt}</SelectItem>
@@ -180,10 +180,10 @@ export default function CareersList() {
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
                   <Select value={A} onValueChange={setA}>
-                    <SelectTrigger className="bg-white text-slate-900 border-slate-300">
+                    <SelectTrigger className="!bg-white !text-slate-900 border-slate-300">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-white text-slate-900 border-slate-200">
+                    <SelectContent className="!bg-white !text-slate-900 border-slate-200">
                       <SelectItem value="newest">Newest First</SelectItem>
                       <SelectItem value="title">Job Title A-Z</SelectItem>
                     </SelectContent>
