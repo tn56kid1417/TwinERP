@@ -250,17 +250,17 @@ export default function CareersList() {
                   });
 
                   return (
-                    <Card key={job.id} className="border border-gray-200 shadow-sm hover:shadow-md hover:border-slate-300 rounded-xl overflow-hidden bg-white flex flex-col transition-all duration-200">
+                    <Card key={job.id} className="border border-gray-200 shadow-sm hover:shadow-md hover:border-slate-300 rounded-xl overflow-hidden !bg-white flex flex-col transition-all duration-200">
                       <CardContent className="p-4 flex flex-col flex-1 gap-3">
                         <div className="flex items-start justify-between gap-2">
-                          <h4 className="text-[15px] font-semibold text-gray-900 leading-tight line-clamp-2 flex-1">{job.title}</h4>
+                          <h4 className="text-[15px] font-semibold !text-gray-900 leading-tight line-clamp-2 flex-1">{job.title}</h4>
                           {isFeatured && (
-                            <Badge className="bg-yellow-100 text-yellow-800 border-yellow-200 hover:bg-yellow-100 shrink-0 px-2 py-0 text-[10px] h-5">
+                            <Badge className="!bg-yellow-100 !text-yellow-800 !border-yellow-200 hover:bg-yellow-100 shrink-0 px-2 py-0 text-[10px] h-5">
                               <Star className="h-3 w-3 mr-1" /> Featured
                             </Badge>
                           )}
                         </div>
-                        <div className="flex items-center text-gray-500 gap-1.5 -mt-1">
+                        <div className="flex items-center !text-gray-500 gap-1.5 -mt-1">
                           <Briefcase className="h-3.5 w-3.5 text-slate-400" />
                           <span className="text-xs">{(job.fields || []).length} fields · {job.publishedAt ? new Date(job.publishedAt).toLocaleDateString() : '—'}</span>
                         </div>
@@ -269,12 +269,12 @@ export default function CareersList() {
                           <div className="grid gap-2">
                             {primaryFields.slice(0, 3).map((ff: any, i: number) => (
                               <div key={i} className="flex items-center bg-blue-50 border border-blue-100 rounded-lg px-2.5 py-2 gap-2">
-                                <span className="text-[11px] font-medium text-slate-600 truncate max-w-[70px]" title={ff.label}>{ff.label}</span>
+                                <span className="text-[11px] font-medium !text-slate-600 truncate max-w-[70px]" title={ff.label}>{ff.label}</span>
                                 <span className="flex-1"></span>
                                 {ff.fieldType === 'LINK' ? (
                                   <a href={ff.value} target="_blank" rel="noreferrer" className="text-blue-600 hover:underline truncate max-w-[120px]" title={ff.value}>{ff.value}</a>
                                 ) : (
-                                  <span className="font-medium text-xs text-blue-900 font-semibold truncate max-w-[120px]" title={ff.value}>{ff.value}</span>
+                                  <span className="font-medium text-xs !text-blue-900 font-semibold truncate max-w-[120px]" title={ff.value}>{ff.value}</span>
                                 )}
                               </div>
                             ))}
@@ -291,7 +291,7 @@ export default function CareersList() {
                         {skills.length > 0 && (
                           <div className="flex flex-wrap gap-1.5">
                             {skills.slice(0, 4).map((s, i) => (
-                              <Badge key={i} variant="outline" className="bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200 px-2 py-0 text-[11px] h-5">
+                              <Badge key={i} variant="outline" className="!bg-slate-100 !text-slate-700 !border-slate-200 hover:bg-slate-200 px-2 py-0 text-[11px] h-5">
                                 {s}
                               </Badge>
                             ))}
@@ -302,7 +302,7 @@ export default function CareersList() {
                         )}
 
                         <div className="pt-3 border-t border-gray-100 mt-auto flex justify-end">
-                          <Button size="sm" className="bg-slate-800 hover:bg-slate-900 text-white h-8 text-xs px-4 rounded-full" onClick={() => navigate(`/careers/${job.slug}`)}>
+                          <Button size="sm" className="!bg-slate-800 hover:!bg-slate-900 !text-white h-8 text-xs px-4 rounded-full" onClick={() => navigate(`/careers/${job.slug}`)}>
                             View Details
                           </Button>
                         </div>
