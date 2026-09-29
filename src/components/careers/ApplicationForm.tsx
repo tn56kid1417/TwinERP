@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 import React, { useState } from 'react';
 import axios from 'axios';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -59,7 +60,7 @@ export function ApplicationForm({ open, onOpenChange, slug }: ApplicationFormPro
 
     setSubmitting(true);
     try {
-      const url = import.meta.env.VITE_API_URL || '/api';
+      const url = (import.meta as any).env.VITE_API_URL || '/api';
       await axios.post(`${url}/careers/${slug}/apply`, formData);
       setSuccess(true);
     } catch (err: any) {

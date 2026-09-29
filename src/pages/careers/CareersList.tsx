@@ -28,7 +28,7 @@ export default function CareersList() {
     try {
       setLoading(true);
       setError(null);
-      const url = import.meta.env.VITE_API_URL || '/api';
+      const url = (import.meta as any).env.VITE_API_URL || '/api';
       const res = await axios.get(`${url}/careers`);
       setJobs(res.data || []);
     } catch (err: any) {

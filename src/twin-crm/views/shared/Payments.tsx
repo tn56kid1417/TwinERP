@@ -57,7 +57,7 @@ export const Payments: React.FC = () => {
  if (!mainUser || !crmUser) return [];
  let result = purchases;
  
- const isLeader = mainUser.role === 'CEO' || mainUser.role === 'CTO' || mainUser.role === 'Admin' || mainUser.role === 'Sales Team Leader' || mainUser.role === 'Manager' || mainUser.department === 'HR';
+ const isLeader = mainUser.role === 'COMPANY_ADMIN' || mainUser.role === 'SALES_LEADER';
  
  if (!isLeader) {
  // Sales employee can only view their own completed payments
@@ -355,7 +355,7 @@ export const Payments: React.FC = () => {
  // Determine selectable leads based on role
  const selectableLeads = useMemo(() => {
  if (!mainUser || !crmUser) return [];
- const isLeader = mainUser.role === 'CEO' || mainUser.role === 'CTO' || mainUser.role === 'Admin' || mainUser.role === 'Sales Team Leader' || mainUser.role === 'Manager' || mainUser.department === 'HR';
+ const isLeader = mainUser.role === 'COMPANY_ADMIN' || mainUser.role === 'SALES_LEADER';
  
  if (isLeader) return leads;
  return leads.filter(l => l.assignedUserId === crmUser.id);

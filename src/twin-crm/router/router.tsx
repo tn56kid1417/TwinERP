@@ -39,7 +39,7 @@ export const AppRouter: React.FC = () => {
  </Route>
 
  {/* PROTECTED WORKSPACE PORTAL (Sidebar layout) */}
- <Route element={<ProtectedRoute allowedRoles={['COMPANY_ADMIN', 'SALES_USER', 'MARKETING', 'SALES_LEADER']} />}>
+ <Route element={<ProtectedRoute allowedRoles={['COMPANY_ADMIN', 'SALES_USER', 'SALES_LEADER']} />}>
  <Route element={<DashboardLayout />}>
  
  {/* Common routes for both admin & sales reps */}

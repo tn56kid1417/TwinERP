@@ -14,49 +14,10 @@ import type { UserAccount } from '../types';
 import type { ModuleKey, UserPrivileges } from '../types';
 import toast from 'react-hot-toast';
 
-// ─── Module Definitions ────────────────────────────────────────────────────
-interface ModuleDef {
- key: ModuleKey;
- label: string;
- icon: React.ReactNode;
- group: string;
- defaultForAll?: boolean; // true if non-HR employees get this by default
-}
+import { MODULE_REGISTRY } from '../config/modules';
+import type { ModuleDef } from '../config/modules';
 
-const MODULE_DEFINITIONS: ModuleDef[] = [
- // Top-Level Navigation Modules (Top of Sidebar)
- { key: 'hrm', label: 'HRM Module', icon: <LayoutDashboard size={14} />, group: 'Top-Level Navigation', defaultForAll: true },
- { key: 'crm', label: 'CRM Module', icon: <Globe size={14} />, group: 'Top-Level Navigation', defaultForAll: true },
- { key: 'projects', label: 'Projects Module', icon: <FolderKanban size={14} />, group: 'Top-Level Navigation', defaultForAll: true },
-
- // HRM - Core
- { key: 'dashboard', label: 'Dashboard', icon: <LayoutDashboard size={14} />, group: 'HRM Core', defaultForAll: true },
- { key: 'tasks', label: 'Tasks', icon: <ListTodo size={14} />, group: 'HRM Core', defaultForAll: true },
- { key: 'team-chat', label: 'Team Chat', icon: <MessageSquare size={14} />, group: 'Projects', defaultForAll: true },
- { key: 'user-management',label: 'User Accounts', icon: <UserCog size={14} />, group: 'HRM Core', defaultForAll: false },
- { key: 'employees', label: 'Employees', icon: <Users size={14} />, group: 'HRM Core', defaultForAll: false },
- { key: 'lifecycle', label: 'Lifecycle', icon: <TrendingUp size={14} />, group: 'HRM Core', defaultForAll: true },
- // HRM - Attendance & Leaves
- { key: 'attendance', label: 'Attendance', icon: <Clock size={14} />, group: 'Attendance', defaultForAll: false },
- { key: 'leaves', label: 'Leave Requests', icon: <Calendar size={14} />, group: 'Attendance', defaultForAll: true },
- { key: 'leave-balance', label: 'Leave Balance', icon: <BarChart2 size={14} />, group: 'Attendance', defaultForAll: true },
- { key: 'holidays', label: 'Holidays', icon: <Calendar size={14} />, group: 'Attendance', defaultForAll: false },
- // HRM - Finance
- { key: 'payslips', label: 'Payslips', icon: <DollarSign size={14} />, group: 'Finance', defaultForAll: true },
- // HRM - People
- { key: 'awards', label: 'Awards', icon: <Award size={14} />, group: 'People', defaultForAll: false },
- { key: 'announcements', label: 'Announcements', icon: <Megaphone size={14} />, group: 'People', defaultForAll: true },
- { key: 'events', label: 'Events', icon: <PartyPopper size={14} />, group: 'People', defaultForAll: true },
- { key: 'letters', label: 'Letter Generator', icon: <Mail size={14} />, group: 'People', defaultForAll: false },
- // HRM - Exits
- { key: 'resignations', label: 'Resignations', icon: <UserMinus size={14} />, group: 'Exits', defaultForAll: true },
- { key: 'terminations', label: 'Terminations', icon: <UserX size={14} />, group: 'Exits', defaultForAll: false },
- // HRM - Analytics & Docs
- { key: 'analytics', label: 'Analytics', icon: <BarChart size={14} />, group: 'Reports', defaultForAll: true },
- { key: 'careers', label: 'Careers & Jobs', icon: <Briefcase size={14} />, group: 'Reports', defaultForAll: true },
- { key: 'documents', label: 'Documents', icon: <FileText size={14} />, group: 'Reports', defaultForAll: true },
- { key: 'settings', label: 'Settings', icon: <Settings size={14} />, group: 'Reports', defaultForAll: true },
-];
+const MODULE_DEFINITIONS = MODULE_REGISTRY.filter((m) => !!m.key) as (ModuleDef & { key: ModuleKey })[];
 
 const MODULE_GROUPS = Array.from(new Set(MODULE_DEFINITIONS.map(m => m.group)));
 

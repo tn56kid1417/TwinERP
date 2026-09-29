@@ -1,3 +1,4 @@
+import { can, isAdmin as checkIsAdmin, isExecutive } from '../../shared/roles';
 import type { User } from '../types'
 import { useAuth } from '../../context/AuthContext'
 import { useMemo } from 'react'
@@ -18,10 +19,13 @@ export const useAuthStore = (): AuthState => {
   
   const mappedUser = useMemo<User | null>(() => {
     if (!mainUser) return null;
-    let mappedRole: any = 'SALES_USER';
-    if (mainUser.department === "Marketing") mappedRole = 'MARKETING';
-    else if (mainUser.role === "Manager" || mainUser.role === "Team Leader" || mainUser.role === "Sales Team Leader") mappedRole = 'SALES_LEADER';
-    else if (mainUser.role === "CEO" || mainUser.role === "Admin" || mainUser.department === "HR") mappedRole = 'COMPANY_ADMIN';
+    let mappedRole: any = null;
+    if (checkIsAdmin(mainUser.role) || isExecutive(mainUser.role)) {
+      mappedRole = 'COMPANY_ADMIN';
+    } else if (mainUser.department === 'CRM') {
+      if (mainUser.role === 'TL') mappedRole = 'SALES_LEADER';
+      else if (mainUser.role === 'Member') mappedRole = 'SALES_USER';
+    }
 
     return {
       id: mainUser.id,

@@ -117,6 +117,7 @@ export interface Project {
   status: string;
   startDate?: string;
   deadline: string;
+  teamLeadId?: string;
   assignees: string[]; // Typically Team Leaders assigned by higher-ups
   description?: string;
 }
@@ -303,6 +304,7 @@ export type ModuleKey =
   | 'tasks'
   | 'dashboard'
   | 'user-management'
+  | 'privileges'
   | 'employees'
   | 'careers'
   | 'documents'
@@ -410,6 +412,9 @@ export interface ChatReadState {
 
 /** ChatTeam enriched with membership info + unread count (returned by GET /chat/teams) */
 export interface ChatTeamWithMeta extends ChatTeam {
+  projectId?: string;
+  teamLeadId?: string;
+  memberIds?: string[];
   membership: {
     roleInTeam: string;
     canPost: boolean;

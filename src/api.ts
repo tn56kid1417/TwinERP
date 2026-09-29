@@ -91,7 +91,7 @@ export default api;
 
 // Project APIs
 export const getProjects = () => api.get<import('./types').Project[]>('/projects').then(res => res.data);
-export const addProject = (data: Omit<import('./types').Project, 'id' | 'assignees'>) => api.post<import('./types').Project>('/projects', data).then(res => res.data);
+export const addProject = (data: Omit<import('./types').Project, 'id'>) => api.post<import('./types').Project>('/projects', data).then(res => res.data);
 export const updateProject = (id: string, data: Partial<import('./types').Project>) => api.put<import('./types').Project>(`/projects/${id}`, data).then(res => res.data);
 
 // Task APIs

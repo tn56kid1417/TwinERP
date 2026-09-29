@@ -1,3 +1,4 @@
+import { validateRoleDepartment } from '../src/shared/roles';
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
@@ -83,7 +84,7 @@ const seedNotifications = (): any[] => [
     time: '10 mins ago',
     timestamp: new Date(Date.now() - 10 * 60000).toISOString(),
     read: false,
-    targetRole: 'HR'
+    targetRole: 'HRM'
   },
   {
     id: 'n2',
@@ -1697,6 +1698,42 @@ export function createApp() {
 
   const router = express.Router();
 
+const validateEmployee = (req, res, next) => {
+  if (!['POST', 'PUT', 'PATCH'].includes(req.method)) return next();
+  
+  let role = req.body.role;
+  let dept = req.body.department;
+  let isActive = req.body.isActive;
+  let status = req.body.status;
+  
+  if (req.method === 'PUT' || req.method === 'PATCH') {
+    const id = req.params.id || req.body.id;
+    let existing = employees.find(e => e.id === id);
+    if (!existing) existing = users.find(u => u.id === id);
+    
+    if (existing) {
+      if (role === undefined) role = existing.role;
+      if (dept === undefined) dept = existing.department;
+      if (isActive === undefined) isActive = existing.isActive;
+      if (status === undefined) status = existing.status;
+    }
+  }
+  
+  const isOnboarding = isActive === false && status === 'Onboarding';
+  
+  const err = validateRoleDepartment(role, dept, isOnboarding);
+  if (err) return res.status(400).json({ error: err });
+  
+  const isExecutiveRole = ['Admin', 'CEO', 'COO', 'CTO'].includes(role);
+  if (isExecutiveRole) req.body.department = null;
+  
+  next();
+};
+
+
+
+
+
 function provisionEmployeeFromHire(app: any, job: any) {
   const email = (app.email || app.candidateEmail || '').trim().toLowerCase();
   if (!email) return null;
@@ -1708,7 +1745,7 @@ function provisionEmployeeFromHire(app: any, job: any) {
     firstName: app.firstName || 'New',
     lastName: app.lastName || 'Hire',
     email: email,
-    role: 'Employee',
+    role: 'Member',
     department: 'Engineering', // default or extract from job
     status: 'Onboarding',
     isActive: false,
@@ -1847,7 +1884,7 @@ function provisionEmployeeFromHire(app: any, job: any) {
 
   // Module A: Core Employee Profile
   router.get('/employees', (req, res) => res.json(employees));
-  router.post('/employees', (req, res) => {
+  router.post('/employees', validateEmployee, (req, res) => {
     const password = req.body.password;
     if (!password) return res.status(400).json({ error: 'Password is required' });
     const passwordHash = bcrypt.hashSync(password, 10);
@@ -1857,7 +1894,7 @@ function provisionEmployeeFromHire(app: any, job: any) {
     const { passwordHash: _ph, password: _pw, ...cleanEmp } = newEmp;
     res.status(201).json(cleanEmp);
   });
-  router.put('/employees/:id', (req, res) => {
+  router.put('/employees/:id', validateEmployee, (req, res) => {
     const index = employees.findIndex(e => e.id === req.params.id);
     if (index === -1) return res.status(404).json({ error: 'Employee not found' });
     if (req.body.password) {
@@ -2833,7 +2870,7 @@ function provisionEmployeeFromHire(app: any, job: any) {
               email: recipient,
               phone: app.phone || '',
               department: '',
-              role: 'Employee',
+              role: 'Member',
               designation: job.title || '',
               hireDate: new Date().toISOString().split('T')[0],
               isActive: false,
@@ -3052,7 +3089,7 @@ function provisionEmployeeFromHire(app: any, job: any) {
     });
   });
 
-  router.post('/users', (req, res) => {
+  router.post('/users', validateEmployee, (req, res) => {
     const { name, email, role, department, designation, shift, phone, password } = req.body;
     const parts = (name || 'New User').trim().split(' ');
     const firstName = parts[0] || 'New';
@@ -3083,7 +3120,7 @@ function provisionEmployeeFromHire(app: any, job: any) {
     });
   });
 
-  router.patch('/users/:id', (req, res) => {
+  router.patch('/users/:id', validateEmployee, (req, res) => {
     const emp = employees.find(e => e.id === req.params.id);
     if (!emp) return res.status(404).json({ message: 'User not found' });
     if (req.body.name) {
@@ -3144,29 +3181,9 @@ function provisionEmployeeFromHire(app: any, job: any) {
     res.json(departmentsList);
   });
 
-  router.post('/org-structure/departments', (req, res) => {
-    const { name } = req.body;
-    if (!name?.trim()) return res.status(400).json({ error: 'Department name required' });
-    const id = name.trim().replace(/\s+/g, '_');
-    const newDept = { id, name: name.trim() };
-    departmentsList.push(newDept);
-    saveDepartments();
-    res.status(201).json(newDept);
-  });
-
-  router.put('/org-structure/departments/:id', (req, res) => {
-    const idx = departmentsList.findIndex(d => d.id === req.params.id);
-    if (idx === -1) return res.status(404).json({ error: 'Department not found' });
-    if (req.body.name) departmentsList[idx].name = req.body.name.trim();
-    saveDepartments();
-    res.json(departmentsList[idx]);
-  });
-
-  router.delete('/org-structure/departments/:id', (req, res) => {
-    departmentsList = departmentsList.filter(d => d.id !== req.params.id);
-    saveDepartments();
-    res.status(204).end();
-  });
+  router.post('/org-structure/departments', (req,res) => res.status(405).send());
+  router.put('/org-structure/departments/:id', (req,res) => res.status(405).send());
+  router.delete('/org-structure/departments/:id', (req,res) => res.status(405).send());
 
   // Org Structure: Branches CRUD (Tier 4)
   router.get('/org-structure/branches', (req, res) => {

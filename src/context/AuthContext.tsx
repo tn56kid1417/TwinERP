@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { Employee } from '../types';
 import type { ModuleKey, PrivilegesMap, UserPrivileges } from '../types';
 import { getPrivilegesMap, getUserPrivileges, updateUserPrivileges, deleteUserPrivileges } from '../api';
+import { can, isAdmin as checkIsAdmin, isExecutive } from '../shared/roles';
 
 interface AuthContextType {
  user: Employee | null;
@@ -38,7 +39,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
  // Fetch privileges from backend server on mount / login
  const fetchPrivilegesFromServer = useCallback(async (currentUser: Employee | null) => {
  try {
- if (currentUser && ['Admin', 'HR', 'CEO', 'CTO'].includes(currentUser.role)) {
+ if (currentUser && (checkIsAdmin(currentUser.role) || isExecutive(currentUser.role) || currentUser.department === 'HRM')) {
  const fullMap = await getPrivilegesMap();
  if (fullMap && typeof fullMap === 'object') {
  setPrivilegesMap(fullMap);
@@ -142,34 +143,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
  }
  }, []);
 
- const isHR = user?.role === 'Manager' || user?.department === 'HR' || user?.role === 'CEO' || user?.role === 'CTO';
- const isAdmin = user?.role === 'Admin';
- const canViewAll = isHR || isAdmin;
- // Admin now has full canEdit (removed the previous !isAdmin restriction)
- const canEdit = canViewAll;
+ const isAdmin = checkIsAdmin(user?.role);
+  const isHR = can.manageEmployees(user?.role, user?.department);
+  const canViewAll = can.viewAllDepartments(user?.role, user?.department);
+  // Admin now has full canEdit (removed the previous !isAdmin restriction)
+  const canEdit = canViewAll;
 
- let userRoleCategory = 'Employee';
- if (user?.role === 'CEO' || user?.role === 'CTO' || user?.role === 'Admin') {
- userRoleCategory = 'Executive';
- } else if (user?.department === 'HR' || user?.role === 'Manager') {
- userRoleCategory = 'HR';
- }
+  let userRoleCategory = 'Member';
+  if (checkIsAdmin(user?.role) || isExecutive(user?.role)) {
+  userRoleCategory = 'Executive';
+  } else if (user?.department === 'HRM') {
+  userRoleCategory = 'HR';
+  } else if (user?.role === 'TL') {
+  userRoleCategory = 'TL';
+  }
 
- const canApprove = (submittedByRole?: string) => {
- if (isAdmin) return true; // Admin can approve everything
- if (userRoleCategory === 'Executive') return true;
- if (userRoleCategory === 'HR' && submittedByRole !== 'HR' && submittedByRole !== 'Executive') return true;
- return false;
- };
+  const canApprove = (submittedByRole?: string) => {
+  return can.approveLeave(user?.role, user?.department);
+  };
 
- // Task assignment permissions: COO, CTO, CEO, Admin can assign tasks by default.
- // Can also be explicitly overridden per user in Privileges.
- const userRoleNormalized = (user?.role || '').trim().toUpperCase();
- const isExecutiveAssigner = ['CEO', 'CTO', 'COO', 'ADMIN'].includes(userRoleNormalized);
- const userPrivilege = user ? privilegesMap[user.id] : undefined;
- const canAssignTasks = userPrivilege?.canAssignTasks !== undefined
- ? userPrivilege.canAssignTasks
- : (isAdmin || isExecutiveAssigner);
+  // Task assignment permissions: COO, CTO, CEO, Admin can assign tasks by default.
+  // Can also be explicitly overridden per user in Privileges.
+  const isExecutiveAssigner = can.assignTasks(user?.role, user?.department);
+  const userPrivilege = user ? privilegesMap[user.id] : undefined;
+  const canAssignTasks = userPrivilege?.canAssignTasks !== undefined
+  ? userPrivilege.canAssignTasks
+  : (isAdmin || isExecutiveAssigner);
 
  /**
  * Check if the current user has access to a specific module.

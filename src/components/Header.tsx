@@ -20,7 +20,7 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
  const [notifications, setNotifications] = useState<AppNotification[]>([]);
  const [activeTab, setActiveTab] = useState<'all' | 'manager' | 'overdue'>('all');
 
- const isManager = isHR || isAdmin || user?.role === 'Manager' || user?.role?.toLowerCase().includes('manager') || user?.department === 'HR';
+ const isManager = isHR || isAdmin || user?.role === 'TL';
 
  const fetchNotifications = async () => {
  try {
@@ -50,7 +50,7 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
  }
  if (!n.targetRole || n.targetRole === 'All') return true;
  if (isManager) {
- if (n.targetRole === 'HR' || n.targetRole === 'Manager' || n.targetRole.includes('Manager') || n.targetRole.includes('HR')) return true;
+ if (n.targetRole === 'HRM' || n.targetRole === 'Admin' || n.targetRole === 'CEO') return true;
  if (n.type === 'overdue_break' || n.type === 'mention') return true;
  }
  return false;
@@ -79,7 +79,7 @@ export default function Header({ onToggleSidebar }: HeaderProps) {
  const overdueNotifications = notifications.filter(n => n.type === 'overdue_break');
  const unreadOverdueCount = overdueNotifications.filter(n => !n.read).length;
  const managerNotifications = notifications.filter(n =>
- n.type === 'overdue_break' || n.targetRole?.includes('Manager') || n.targetRole?.includes('HR')
+ n.type === 'overdue_break' || n.targetRole?.includes('HRM')
  );
  const displayedNotifications = activeTab === 'overdue'
  ? overdueNotifications

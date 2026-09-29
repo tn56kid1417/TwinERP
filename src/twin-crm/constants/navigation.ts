@@ -34,7 +34,7 @@ export const SIDEBAR_NAV: NavItem[] = [
     name: 'Upload Leads',
     href: '/upload-leads',
     icon: UploadCloud,
-    allowedRoles: ['COMPANY_ADMIN', 'MARKETING'],
+    allowedRoles: ['COMPANY_ADMIN'],
   },
   {
     name: 'Customers',

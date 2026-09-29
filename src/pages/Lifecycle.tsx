@@ -1,3 +1,4 @@
+import { DEPARTMENTS } from '../shared/roles';
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -475,7 +476,7 @@ export default function Lifecycle() {
  onChange={(e) => setPromoForm({ ...promoForm, newDepartment: e.target.value })}
  className="w-full px-3 py-2 bg-slate-50/80 border border-slate-200 rounded-md text-xs text-slate-900 outline-none focus:border-blue-500"
  >
- {['Engineering', 'Sales', 'Marketing', 'HR', 'Design', 'Finance', 'Executive'].map(d => (
+ {DEPARTMENTS.map(d => (
  <option key={d} value={d}>{d}</option>
  ))}
  </select>

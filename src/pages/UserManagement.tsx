@@ -13,7 +13,7 @@ import { useAuth } from '../context/AuthContext';
 import { getErrorMessage } from '../utils/error';
 import toast from 'react-hot-toast';
 
-const ROLE_OPTIONS = ['HR', 'TL', 'Member', 'CEO', 'COO', 'CTO', 'Admin', 'Developer', 'Sales Rep', 'Marketing'];
+const ROLE_OPTIONS = ['Admin', 'CEO', 'COO', 'CTO', 'TL', 'Member'];
 
 export default function UserManagement() {
  const { user: currentUser, canViewAll } = useAuth();

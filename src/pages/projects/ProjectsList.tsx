@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'motion/react';
 import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Search, MoreVertical, Calendar, UserPlus, X, ListTodo, User } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -356,7 +357,7 @@ const ProjectsList = () => {
  <div className="flex items-center justify-end gap-2">
  {canEdit && (
  <button 
- onClick={() => handleAssignProjectClick(project.id)}
+ onClick={() => handleCreateTeamClick(project.id)}
  className="p-1.5 text-blue-600 hover:text-blue-400 hover:bg-blue-700/10 rounded transition-colors"
  title="Assign Team Leader"
  >
@@ -476,7 +477,7 @@ const ProjectsList = () => {
  >
  <option value="">Select Team Lead</option>
  {employees.map(emp => (
- <option key={emp.id} value={emp.id}>{emp.name || emp.firstName + ' ' + emp.lastName}</option>
+ <option key={emp.id} value={emp.id}>{emp.firstName + ' ' + emp.lastName || emp.firstName + ' ' + emp.lastName}</option>
  ))}
  </select>
  </div>
@@ -490,7 +491,7 @@ const ProjectsList = () => {
  style={{ height: '80px' }}
  >
  {employees.map(emp => (
- <option key={emp.id} value={emp.id}>{emp.name || emp.firstName + ' ' + emp.lastName}</option>
+ <option key={emp.id} value={emp.id}>{emp.firstName + ' ' + emp.lastName || emp.firstName + ' ' + emp.lastName}</option>
  ))}
  </select>
  <p className="text-[10px] text-slate-500 mt-1">Hold Ctrl/Cmd to select multiple</p>

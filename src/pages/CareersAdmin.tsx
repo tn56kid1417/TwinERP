@@ -1,3 +1,4 @@
+import { DEPARTMENTS, Department } from '../shared/roles';
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useNavigate } from 'react-router-dom';
@@ -45,7 +46,7 @@ export default function CareersAdmin() {
  // Form fields
  const [formData, setFormData] = useState({
  title: '',
- department: 'Engineering',
+ department: DEPARTMENTS[0] as Department,
  location: 'Remote / Chennai',
  employmentType: 'Full-Time',
  status: 'DRAFT' as 'DRAFT' | 'PUBLISHED' | 'CLOSED',
@@ -105,7 +106,7 @@ export default function CareersAdmin() {
  setEditingJob(null);
  setFormData({
  title: '',
- department: 'Engineering',
+ department: DEPARTMENTS[0],
  location: 'Remote / Chennai',
  employmentType: 'Full-Time',
  status: 'DRAFT',
@@ -124,7 +125,7 @@ export default function CareersAdmin() {
  setEditingJob(job);
  setFormData({
  title: job.title,
- department: job.department || 'Engineering',
+ department: (job.department as Department) || (DEPARTMENTS[0] as Department),
  location: job.location || 'Remote',
  employmentType: job.employmentType || 'Full-Time',
  status: job.status,
@@ -541,10 +542,10 @@ export default function CareersAdmin() {
  </label>
  <select
  value={formData.department}
- onChange={(e) => setFormData({ ...formData, department: e.target.value })}
+ onChange={(e) => setFormData({ ...formData, department: e.target.value as Department })}
  className="w-full px-3.5 py-2.5 bg-slate-50/80 border border-slate-200 rounded-md text-sm text-slate-900 outline-none focus:border-blue-500"
  >
- {['Engineering', 'Product', 'Design', 'Marketing', 'Sales', 'HR', 'Finance'].map(d => (
+ {DEPARTMENTS.map(d => (
  <option key={d} value={d}>{d}</option>
  ))}
  </select>
