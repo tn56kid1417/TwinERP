@@ -1,8 +1,8 @@
 const http = require('http');
 const jwt = require('jsonwebtoken');
+const { execSync } = require('child_process');
 
 // 1. Rebuild server.cjs
-const { execSync } = require('child_process');
 execSync('npx esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs', { stdio: 'inherit' });
 
 // 2. Import server app
@@ -61,7 +61,9 @@ async function runTests() {
         { id: 'f1', label: 'Experience', value: '5+ Years', section: 'PRIMARY', order: 1 }
       ],
       rounds: [
-        { id: 'r1', title: 'Round 1: Screening', shortDescription: 'Profile review', order: 1 }
+        { id: 'r1', title: 'Round 1: Screening', shortDescription: 'Profile review', order: 1 },
+        { id: 'r2', title: 'Round 2: Technical Architecture', shortDescription: 'Hands-on design', order: 2 },
+        { id: 'r3', title: 'Round 3: Leadership Fit', shortDescription: 'Exec alignment', order: 3 }
       ]
     };
 
@@ -106,22 +108,89 @@ async function runTests() {
         highestQualification: 'B.Tech IT',
         experience: '5 years AWS & Terraform',
         currentCompany: 'Cloud Systems',
-        resumeLink: 'https://example.com/resumes/devops.pdf'
+        resumeLink: 'https://example.com/resumes/devops.pdf',
+        coverNote: 'Excited to bring automated deployments to Twincord!'
       })
     });
     console.log(`Status: ${applyRes.status}`);
     if (applyRes.status !== 201) throw new Error(`POST /api/careers/${createdJob.slug}/apply failed`);
 
-    // 7. Testing Attendance shifts route
-    console.log('7. Testing GET /api/attendance/shifts...');
+    // 7. Admin GET /api/careers/admin/applications (Test pipeline retrival)
+    console.log('7. Testing GET /api/careers/admin/applications (Global & per-job pipeline)...');
+    const appsRes = await req('/api/careers/admin/applications', {
+      headers: { 'Authorization': `Bearer ${adminToken}` }
+    });
+    console.log(`Status: ${appsRes.status}, count: ${Array.isArray(appsRes.body) ? appsRes.body.length : 0}`);
+    if (appsRes.status !== 200 || !Array.isArray(appsRes.body)) throw new Error('GET /api/careers/admin/applications failed');
+
+    const app = appsRes.body.find(a => a.candidateEmail === 'devops.candidate@example.com');
+    if (!app) throw new Error('Submitted candidate not found in pipeline');
+
+    // 8. Admin PATCH /api/applications/:id (Candidate editing + Interview scheduling)
+    console.log(`8. Testing PATCH /api/applications/${app.id} (Candidate editing & interview scheduling)...`);
+    const editAppRes = await req(`/api/applications/${app.id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`
+      },
+      body: JSON.stringify({
+        rating: 5,
+        notes: 'Exceptional deep knowledge of distributed cloud architecture',
+        interviewDate: '2026-10-05',
+        interviewTime: '15:00',
+        interviewerName: 'Chief Technology Officer',
+        meetingLink: 'https://meet.google.com/abc-defg-hij'
+      })
+    });
+    console.log(`Status: ${editAppRes.status}, rating: ${editAppRes.body?.rating}, scheduled: ${editAppRes.body?.interviewDate}`);
+    if (editAppRes.status !== 200 || editAppRes.body?.rating !== 5) throw new Error('PATCH /api/applications/:id failed');
+
+    // 9. Admin PATCH /api/applications/:id/round (Round upgrade)
+    console.log(`9. Testing PATCH /api/applications/${app.id}/round (Upgrade to Technical Round)...`);
+    const roundRes = await req(`/api/applications/${app.id}/round`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`
+      },
+      body: JSON.stringify({ roundId: 'r2', status: 'INTERVIEWING' })
+    });
+    console.log(`Status: ${roundRes.status}, round: ${roundRes.body?.currentRoundId}`);
+    if (roundRes.status !== 200 || roundRes.body?.currentRoundId !== 'r2') throw new Error('PATCH /api/applications/:id/round failed');
+
+    // 10. Admin PATCH /api/applications/:id/status (Hire candidate & employee provisioning)
+    console.log(`10. Testing PATCH /api/applications/${app.id}/status (Hire candidate)...`);
+    const hireRes = await req(`/api/applications/${app.id}/status`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${adminToken}`
+      },
+      body: JSON.stringify({ status: 'HIRED' })
+    });
+    console.log(`Status: ${hireRes.status}, app status: ${hireRes.body?.status}, convertedEmp: ${hireRes.body?.convertedEmployeeId}`);
+    if (hireRes.status !== 200 || hireRes.body?.status !== 'HIRED' || !hireRes.body?.convertedEmployeeId) {
+      throw new Error('PATCH /api/applications/:id/status (HIRED) failed');
+    }
+
+    // 11. Testing Attendance shifts route
+    console.log('11. Testing GET /api/attendance/shifts...');
     const shiftsRes = await req('/api/attendance/shifts', {
       headers: { 'Authorization': `Bearer ${adminToken}` }
     });
     console.log(`Status: ${shiftsRes.status}, shifts: ${shiftsRes.body.length}`);
     if (shiftsRes.status !== 200 || !Array.isArray(shiftsRes.body)) throw new Error('GET /api/attendance/shifts failed');
 
-    // 8. Clean up: Delete created job
-    console.log(`8. Testing DELETE /api/careers/admin/${createdJob.id}...`);
+    // 12. Clean up: Delete created candidate and job
+    console.log(`12. Testing DELETE /api/applications/${app.id}...`);
+    const delAppRes = await req(`/api/applications/${app.id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${adminToken}` }
+    });
+    console.log(`Status: ${delAppRes.status}`);
+
+    console.log(`13. Testing DELETE /api/careers/admin/${createdJob.id}...`);
     const delRes = await req(`/api/careers/admin/${createdJob.id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${adminToken}` }
@@ -130,7 +199,7 @@ async function runTests() {
     if (delRes.status !== 204) throw new Error(`DELETE /api/careers/admin/${createdJob.id} failed`);
 
     console.log('\n====================================================');
-    console.log('>>> ALL VERIFICATIONS & TESTS PASSED 100%! <<<');
+    console.log('>>> ALL VERIFICATIONS & REAL-WORLD SUITE PASSED 100%! <<<');
     console.log('====================================================\n');
   } finally {
     server.close();

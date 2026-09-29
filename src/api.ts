@@ -127,10 +127,14 @@ export const publishJob = (id: string) => api.patch<import('./types').JobPosting
 export const closeJob = (id: string) => api.patch<import('./types').JobPosting>(`/careers/admin/${id}/close`).then(res => res.data);
 export const deleteJob = (id: string) => api.delete(`/careers/admin/${id}`);
 
+export const getAllJobApplications = (params?: { jobId?: string; status?: string; search?: string }) => 
+  api.get<import('./types').JobApplication[]>('/careers/admin/applications', { params }).then(res => res.data);
 export const getJobApplications = (jobId: string) => api.get<import('./types').JobApplication[]>(`/careers/${jobId}/applications`).then(res => res.data);
 export const createJobApplication = (jobId: string, data: Partial<import('./types').JobApplication>) => api.post<import('./types').JobApplication>(`/careers/${jobId}/applications`, data).then(res => res.data);
+export const updateJobApplication = (id: string, data: Partial<import('./types').JobApplication>) => api.patch<import('./types').JobApplication>(`/applications/${id}`, data).then(res => res.data);
 export const updateApplicationRound = (id: string, roundId: string, status?: string) => api.patch<import('./types').JobApplication>(`/applications/${id}/round`, { roundId, status }).then(res => res.data);
 export const updateApplicationStatus = (id: string, status: string, notes?: string) => api.patch<import('./types').JobApplication>(`/applications/${id}/status`, { status, notes }).then(res => res.data);
+export const decideJobApplication = (id: string, decision: 'ACCEPT' | 'REJECT') => api.patch<import('./types').JobApplication>(`/careers/admin/applications/${id}/decide`, { decision }).then(res => res.data);
 export const deleteJobApplication = (id: string) => api.delete(`/applications/${id}`);
 
 // --- Documents & Contracts APIs ---

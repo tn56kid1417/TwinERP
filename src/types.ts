@@ -221,11 +221,16 @@ export interface JobApplication {
   portfolioUrl?: string;
   coverNote?: string;
   currentRoundId?: string;
-  status: 'APPLIED' | 'IN_REVIEW' | 'INTERVIEWING' | 'HIRED' | 'REJECTED' | 'PENDING';
+  status: 'APPLIED' | 'IN_REVIEW' | 'INTERVIEWING' | 'IN_PROGRESS' | 'HIRED' | 'REJECTED' | 'PENDING';
   appliedAt: string;
   notes?: string;
   rating?: number;
-  emailLogs?: Array<{ sentAt: string; subject: string; templateType: string; to: string }>;
+  interviewDate?: string;
+  interviewTime?: string;
+  interviewerName?: string;
+  meetingLink?: string;
+  convertedEmployeeId?: string;
+  emailLogs?: Array<{ sentAt: string; subject: string; templateType: string; to: string; status?: string; error?: string }>;
 }
 
 // --- Documents & Contracts Types ---

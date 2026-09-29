@@ -249,20 +249,27 @@ const getMailTransporter = () => {
 export async function sendEmail(options: { to: string; subject: string; html: string }): Promise<{ status: 'Sent' | 'Failed' | 'Not Configured'; error?: string }> {
   const transporter = getMailTransporter();
   if (!transporter) {
-    console.log(`[Mailer] Mailer not configured. To enable real email dispatch, provide environment variables: SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM.`);
-    return { status: 'Not Configured', error: 'SMTP credentials not configured in environment (requires SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM)' };
+    console.log(`[Mailer] Mailer not configured. Skipping email to ${options.to}.`);
+    return { status: 'Not Configured', error: 'SMTP credentials not configured in environment' };
   }
 
   try {
     const from = process.env.SMTP_FROM || process.env.SMTP_USER || 'no-reply@twincord.in';
-    const info = await transporter.sendMail({
+    const mailPromise = transporter.sendMail({
       from,
       to: options.to,
       subject: options.subject,
       html: options.html,
     });
-    console.log(`[Mailer] Email sent successfully to ${options.to}: ${info.messageId}`);
-    return { status: 'Sent' };
+    const timeoutPromise = new Promise<{ status: 'Failed'; error: string }>((resolve) =>
+      setTimeout(() => resolve({ status: 'Failed', error: 'Email dispatch timeout exceeded' }), 2000)
+    );
+    const res = await Promise.race([mailPromise, timeoutPromise]);
+    if ((res as any).messageId) {
+      console.log(`[Mailer] Email sent successfully to ${options.to}: ${(res as any).messageId}`);
+      return { status: 'Sent' };
+    }
+    return res as any;
   } catch (err: any) {
     console.error(`[Mailer] Failed to send email to ${options.to}:`, err);
     return { status: 'Failed', error: err?.message || 'Unknown email error' };
@@ -2547,6 +2554,28 @@ function provisionEmployeeFromHire(app: any, job: any) {
     res.json(jobPostings);
   });
 
+  // Global & per-job applicant pipeline (MUST be before /careers/admin/:id)
+  router.get('/careers/admin/applications', (req, res) => {
+    let list = [...jobApplications];
+    const { jobId, status, search } = req.query as any;
+    if (jobId && typeof jobId === 'string' && jobId !== 'ALL') {
+      list = list.filter(a => a.jobId === jobId);
+    }
+    if (status && typeof status === 'string' && status !== 'ALL') {
+      list = list.filter(a => a.status === status);
+    }
+    if (search && typeof search === 'string' && search.trim()) {
+      const q = search.trim().toLowerCase();
+      list = list.filter(a =>
+        (a.candidateName || '').toLowerCase().includes(q) ||
+        (a.candidateEmail || '').toLowerCase().includes(q) ||
+        (a.candidatePhone || '').toLowerCase().includes(q) ||
+        (a.notes || '').toLowerCase().includes(q)
+      );
+    }
+    res.json(list);
+  });
+
   router.get('/careers/admin/:id', (req, res) => {
     const job = jobPostings.find(j => j.id === req.params.id);
     if (!job) return res.status(404).json({ message: 'Job posting not found' });
@@ -2701,6 +2730,46 @@ function provisionEmployeeFromHire(app: any, job: any) {
     res.json(apps);
   });
 
+  // Edit / update full applicant details & schedule interviews
+  router.patch('/applications/:id', (req, res) => {
+    const app = jobApplications.find(a => a.id === req.params.id);
+    if (!app) return res.status(404).json({ message: 'Application not found' });
+    
+    const body = req.body || {};
+    if (body.candidateName !== undefined) {
+      app.candidateName = body.candidateName;
+      app.fullName = body.candidateName;
+    }
+    if (body.candidateEmail !== undefined) {
+      app.candidateEmail = body.candidateEmail;
+      app.email = body.candidateEmail;
+    }
+    if (body.candidatePhone !== undefined) {
+      app.candidatePhone = body.candidatePhone;
+      app.phone = body.candidatePhone;
+    }
+    if (body.qualification !== undefined) app.qualification = body.qualification;
+    if (body.experience !== undefined) app.experience = body.experience;
+    if (body.currentOrg !== undefined) app.currentOrg = body.currentOrg;
+    if (body.resumeUrl !== undefined) {
+      app.resumeUrl = body.resumeUrl;
+      app.resumeLink = body.resumeUrl;
+    }
+    if (body.portfolioUrl !== undefined) app.portfolioUrl = body.portfolioUrl;
+    if (body.coverNote !== undefined) app.coverNote = body.coverNote;
+    if (body.currentRoundId !== undefined) app.currentRoundId = body.currentRoundId;
+    if (body.status !== undefined) app.status = body.status;
+    if (body.notes !== undefined) app.notes = body.notes;
+    if (body.rating !== undefined) app.rating = body.rating;
+    if (body.interviewDate !== undefined) app.interviewDate = body.interviewDate;
+    if (body.interviewTime !== undefined) app.interviewTime = body.interviewTime;
+    if (body.interviewerName !== undefined) app.interviewerName = body.interviewerName;
+    if (body.meetingLink !== undefined) app.meetingLink = body.meetingLink;
+
+    saveChatFile(APPLICATIONS_FILE, jobApplications);
+    res.json(app);
+  });
+
   router.post('/careers/:jobId/applications', (req, res) => {
     const newApp = {
       id: `app-${Date.now()}`,
@@ -2815,34 +2884,7 @@ function provisionEmployeeFromHire(app: any, job: any) {
         } else {
           app.status = 'HIRED';
           const convertedId = provisionEmployeeFromHire(app, job);
-          if (convertedId) {
-            app.convertedEmployeeId = convertedId;
-          }
-          
-          let employee = employees.find(e => e.email === recipient);
-          if (!employee) {
-            const nameParts = (app.candidateName || '').split(' ');
-            const firstName = nameParts[0] || 'Unknown';
-            const lastName = nameParts.slice(1).join(' ') || '';
-            const rawDept = job?.department;
-            const validDept = ['HRM', 'CRM', 'PM'].includes(rawDept) ? rawDept : null;
-            employee = {
-              id: `emp_${Date.now()}`,
-              firstName,
-              lastName,
-              email: recipient,
-              phone: app.phone || '',
-              department: validDept,
-              role: 'Member',
-              designation: job.title || '',
-              hireDate: new Date().toISOString().split('T')[0],
-              isActive: false,
-              status: 'Onboarding'
-            };
-            employees.push(employee);
-            saveEmployees();
-          }
-          app.convertedEmployeeId = employee.id;
+          app.convertedEmployeeId = convertedId;
 
           const template = job.hireTemplate || DEFAULT_CAREER_TEMPLATES.hireTemplate;
           const mergeCtx = buildMergeContext(app, job, null);
@@ -2879,6 +2921,11 @@ function provisionEmployeeFromHire(app: any, job: any) {
 
     const job = jobPostings.find(j => j.id === app.jobId);
     const recipient = app.email || app.candidateEmail;
+
+    if (status === 'HIRED' && !app.convertedEmployeeId) {
+      const convertedId = provisionEmployeeFromHire(app, job);
+      app.convertedEmployeeId = convertedId;
+    }
 
     try {
       if (!app.emailLogs) app.emailLogs = [];
