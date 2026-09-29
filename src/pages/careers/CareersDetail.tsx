@@ -19,7 +19,7 @@ export default function CareersDetail() {
   const [error, setError] = useState<string | null>(null);
   const [showApply, setShowApply] = useState(false);
 
-  const savedJobs = JSON.parse(localStorage.getItem('savedJobs_twinspace') || '[]');
+  const savedJobs = JSON.parse(localStorage.getItem('savedJobs_twincord') || '[]');
 
   const loadJob = async () => {
     try {

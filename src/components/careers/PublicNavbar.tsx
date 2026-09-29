@@ -18,17 +18,17 @@ export function PublicNavbar() {
               href="https://twincord.in/"
               target="_blank"
               rel="noopener noreferrer"
-              aria-label="TwinSpace — home"
+              aria-label="Twincord — home"
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 lg:static lg:translate-x-0 lg:translate-y-0 order-2 lg:order-1 flex h-[56px] w-[210px] shrink-0 items-center justify-center overflow-hidden"
             >
               <img
-                src="/TwinSpace_nav.png"
-                alt="TwinSpace Logo"
+                src="/Twincord_nav.png"
+                alt="Twincord Logo"
                 loading="lazy"
                 decoding="async"
                 className="h-[220px] w-[220px] max-w-none object-contain"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/TwinSpace_Logo.png';
+                  (e.target as HTMLImageElement).src = '/Twincord_Logo.png';
                 }}
               />
             </a>

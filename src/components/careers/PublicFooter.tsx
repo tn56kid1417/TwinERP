@@ -7,8 +7,8 @@ export function PublicFooter() {
         <div className="flex items-center justify-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
             <img
-              src="/TwinSpace_Logo.png"
-              alt="TwinSpace"
+              src="/Twincord_Logo.png"
+              alt="Twincord"
               className="h-6 w-auto object-contain"
               onError={(e) => { (e.target as HTMLElement).style.display = 'none'; }}
             />

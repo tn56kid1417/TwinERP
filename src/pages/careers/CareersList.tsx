@@ -22,7 +22,7 @@ export default function CareersList() {
   const [dynamicFilters, setDynamicFilters] = useState<Record<string, string>>({});
   const [A, setA] = useState('newest');
 
-  const savedJobs = JSON.parse(localStorage.getItem('savedJobs_twinspace') || '[]');
+  const savedJobs = JSON.parse(localStorage.getItem('savedJobs_twincord') || '[]');
 
   const loadJobs = async () => {
     try {

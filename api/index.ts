@@ -254,7 +254,7 @@ export async function sendEmail(options: { to: string; subject: string; html: st
   }
 
   try {
-    const from = process.env.SMTP_FROM || process.env.SMTP_USER || 'no-reply@twinspace.io';
+    const from = process.env.SMTP_FROM || process.env.SMTP_USER || 'no-reply@twincord.in';
     const info = await transporter.sendMail({
       from,
       to: options.to,
@@ -460,15 +460,15 @@ let projectActivities: any[] = [
 
 export const DEFAULT_CAREER_TEMPLATES = {
   applicationConfirmationTemplate: `<p>Dear {{fullName}},</p>
-<p>Thank you for applying to <strong>{{jobTitle}}</strong> at TwinSpace.</p>
+<p>Thank you for applying to <strong>{{jobTitle}}</strong> at Twincord.</p>
 <p>We have received your application and will review it shortly. You will be notified about next steps.</p>
-<p>Warm regards,<br/>TwinSpace Hiring Team</p>`,
+<p>Warm regards,<br/>Twincord Hiring Team</p>`,
 
   rejectionTemplate: `<p>Dear {{fullName}},</p>
-<p>Thank you for your interest in <strong>{{jobTitle}}</strong> at TwinSpace.</p>
+<p>Thank you for your interest in <strong>{{jobTitle}}</strong> at Twincord.</p>
 <p>After careful consideration, we regret to inform you that we will not be moving forward with your application at this time.</p>
 <p>We appreciate the time and effort you invested and encourage you to apply for future openings that match your profile.</p>
-<p>Warm regards,<br/>TwinSpace Hiring Team</p>`,
+<p>Warm regards,<br/>Twincord Hiring Team</p>`,
 
   roundAdvanceTemplate: `<p>Dear {{fullName}},</p>
 <p>Congratulations! You have been shortlisted for the next stage of our hiring process for <strong>{{jobTitle}}</strong>.</p>
@@ -476,13 +476,13 @@ export const DEFAULT_CAREER_TEMPLATES = {
 <p>{{roundShortDescription}}</p>
 <p>{{roundLongDescription}}</p>
 <p>Our team will be in touch shortly with further details. Please reply to this email if you have any questions.</p>
-<p>Best regards,<br/>TwinSpace Hiring Team</p>`,
+<p>Best regards,<br/>Twincord Hiring Team</p>`,
 
   hireTemplate: `<p>Dear {{fullName}},</p>
-<p>We are delighted to inform you that you have been selected for <strong>{{jobTitle}}</strong> at TwinSpace!</p>
+<p>We are delighted to inform you that you have been selected for <strong>{{jobTitle}}</strong> at Twincord!</p>
 <p>Our hiring team will contact you shortly with next steps regarding onboarding and formalities.</p>
 <p>Congratulations and welcome aboard!</p>
-<p>Warm regards,<br/>TwinSpace Hiring Team</p>`,
+<p>Warm regards,<br/>Twincord Hiring Team</p>`,
 };
 
 export function renderTemplate(template: string, context: Record<string, string>): string {
@@ -506,7 +506,7 @@ export function buildMergeContext(application: any, job: any, round: any = null)
     roundTitle: round?.title || '',
     roundShortDescription: round?.shortDescription || '',
     roundLongDescription: round?.longDescription || '',
-    companyName: 'TwinSpace',
+    companyName: 'Twincord',
   };
 }
 
@@ -2782,13 +2782,13 @@ function provisionEmployeeFromHire(app: any, job: any) {
         const renderedHtml = renderTemplate(template, mergeCtx);
         const mailResult = await sendEmail({
           to: recipient,
-          subject: `Update on your application for ${job.title} at TwinSpace`,
+          subject: `Update on your application for ${job.title} at Twincord`,
           html: renderedHtml,
         });
         app.emailLogs.push({
           sentAt: new Date().toISOString(),
           to: recipient,
-          subject: `Update on your application for ${job.title} at TwinSpace`,
+          subject: `Update on your application for ${job.title} at Twincord`,
           templateType: 'rejection',
           status: mailResult.status
         });
@@ -2849,13 +2849,13 @@ function provisionEmployeeFromHire(app: any, job: any) {
           const renderedHtml = renderTemplate(template, mergeCtx);
           const mailResult = await sendEmail({
             to: recipient,
-            subject: `Offer of Employment: ${job.title} at TwinSpace`,
+            subject: `Offer of Employment: ${job.title} at Twincord`,
             html: renderedHtml,
           });
           app.emailLogs.push({
             sentAt: new Date().toISOString(),
             to: recipient,
-            subject: `Offer of Employment: ${job.title} at TwinSpace`,
+            subject: `Offer of Employment: ${job.title} at Twincord`,
             templateType: 'hire',
             status: mailResult.status
           });
@@ -2889,13 +2889,13 @@ function provisionEmployeeFromHire(app: any, job: any) {
         const renderedHtml = renderTemplate(template, mergeCtx);
         const mailResult = await sendEmail({
           to: recipient,
-          subject: `Update on your application for ${job?.title || 'Position'} at TwinSpace`,
+          subject: `Update on your application for ${job?.title || 'Position'} at Twincord`,
           html: renderedHtml,
         });
         app.emailLogs.push({
           sentAt: new Date().toISOString(),
           to: recipient,
-          subject: `Update on your application for ${job?.title || 'Position'} at TwinSpace`,
+          subject: `Update on your application for ${job?.title || 'Position'} at Twincord`,
           templateType: 'rejection',
           html: renderedHtml,
           status: mailResult.status,
@@ -2907,13 +2907,13 @@ function provisionEmployeeFromHire(app: any, job: any) {
         const renderedHtml = renderTemplate(template, mergeCtx);
         const mailResult = await sendEmail({
           to: recipient,
-          subject: `Offer of Employment: ${job?.title || 'Position'} at TwinSpace`,
+          subject: `Offer of Employment: ${job?.title || 'Position'} at Twincord`,
           html: renderedHtml,
         });
         app.emailLogs.push({
           sentAt: new Date().toISOString(),
           to: recipient,
-          subject: `Offer of Employment: ${job?.title || 'Position'} at TwinSpace`,
+          subject: `Offer of Employment: ${job?.title || 'Position'} at Twincord`,
           templateType: 'hire',
           html: renderedHtml,
           status: mailResult.status,
@@ -2986,13 +2986,13 @@ function provisionEmployeeFromHire(app: any, job: any) {
       const renderedHtml = renderTemplate(template, mergeCtx);
       const mailResult = await sendEmail({
         to: newApp.email,
-        subject: `Application Received - ${job.title} at TwinSpace`,
+        subject: `Application Received - ${job.title} at Twincord`,
         html: renderedHtml,
       });
       const emailLog = {
         sentAt: new Date().toISOString(),
         to: newApp.email,
-        subject: `Application Received - ${job.title} at TwinSpace`,
+        subject: `Application Received - ${job.title} at Twincord`,
         templateType: 'application_confirmation',
         html: renderedHtml,
         status: mailResult.status,
