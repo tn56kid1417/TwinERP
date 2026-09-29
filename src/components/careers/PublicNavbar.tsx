@@ -15,20 +15,18 @@ export function PublicNavbar() {
           <div className="absolute inset-0 bg-white dark:bg-white -z-10 transition-colors duration-300" />
           <div className="w-full max-w-7xl mx-auto h-full flex items-center justify-center lg:justify-start relative px-5 sm:px-6 lg:px-8">
             <a
-              href="https://twincord.in/"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="Twincord — home"
+              href="/careers"
+              aria-label="TwinSpace — home"
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 lg:static lg:translate-x-0 lg:translate-y-0 order-2 lg:order-1 flex h-[56px] w-[210px] shrink-0 items-center justify-center overflow-hidden"
             >
               <img
-                src="/Twincord_nav.png"
-                alt="Twincord Logo"
-                loading="lazy"
+                src="/TwinSpace_nav.png"
+                alt="TwinSpace Logo"
+                loading="eager"
                 decoding="async"
-                className="h-[220px] w-[220px] max-w-none object-contain"
+                className="h-[52px] w-auto max-w-[200px] object-contain"
                 onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/Twincord_Logo.png';
+                  (e.target as HTMLImageElement).src = '/TwinSpace_Logo.png';
                 }}
               />
             </a>
