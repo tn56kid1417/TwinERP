@@ -1,3 +1,4 @@
+require('dotenv').config();
 const http = require('http');
 const jwt = require('jsonwebtoken');
 const { execSync } = require('child_process');
