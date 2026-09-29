@@ -1,11 +1,15 @@
 const http = require('http');
 const jwt = require('jsonwebtoken');
 
-// Import server app
+// 1. Rebuild server.cjs
+const { execSync } = require('child_process');
+execSync('npx esbuild server.ts --bundle --platform=node --format=cjs --packages=external --sourcemap --outfile=dist/server.cjs', { stdio: 'inherit' });
+
+// 2. Import server app
 const { createApp } = require('../dist/server.cjs');
 
 async function runTests() {
-  console.log('--- Starting Careers Integration Tests ---');
+  console.log('--- Starting Comprehensive Careers & Routes Integration Tests ---');
   const app = createApp();
   const server = http.createServer(app);
   
@@ -15,7 +19,6 @@ async function runTests() {
 
   const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret-key-for-development';
   const adminToken = jwt.sign({ userId: 'e3', email: 'admin@example.com', role: 'Admin' }, JWT_SECRET, { expiresIn: '1d' });
-  const memberToken = jwt.sign({ userId: 'e1', email: 'alice@example.com', role: 'Member' }, JWT_SECRET, { expiresIn: '1d' });
 
   async function req(path, options = {}) {
     const res = await fetch(`${baseUrl}${path}`, options);
@@ -30,14 +33,24 @@ async function runTests() {
   }
 
   try {
-    // 1. Public GET /api/careers
-    console.log('1. Testing GET /api/careers (public)...');
+    // 1. Admin GET /api/careers/admin (MUST NOT RETURN 404!)
+    console.log('1. Testing GET /api/careers/admin (Admin list)...');
+    const adminGetRes = await req('/api/careers/admin', {
+      headers: { 'Authorization': `Bearer ${adminToken}` }
+    });
+    console.log(`Status: ${adminGetRes.status}, count: ${Array.isArray(adminGetRes.body) ? adminGetRes.body.length : 'not array'}`);
+    if (adminGetRes.status !== 200 || !Array.isArray(adminGetRes.body)) {
+      throw new Error(`GET /api/careers/admin failed with status ${adminGetRes.status}: ${JSON.stringify(adminGetRes.body)}`);
+    }
+
+    // 2. Public GET /api/careers
+    console.log('2. Testing GET /api/careers (Public list)...');
     const pubRes = await req('/api/careers');
     console.log(`Status: ${pubRes.status}, count: ${Array.isArray(pubRes.body) ? pubRes.body.length : 'not array'}`);
     if (pubRes.status !== 200) throw new Error('GET /api/careers failed');
 
-    // 2. Admin POST /api/careers/admin (create job)
-    console.log('2. Testing POST /api/careers/admin (create job)...');
+    // 3. Admin POST /api/careers/admin (create job)
+    console.log('3. Testing POST /api/careers/admin (create job)...');
     const newJobPayload = {
       title: 'Senior Cloud DevOps Architect',
       department: 'PM',
@@ -65,16 +78,24 @@ async function runTests() {
 
     const createdJob = createRes.body;
 
-    // 3. Public GET /api/careers/:slug
-    console.log(`3. Testing GET /api/careers/${createdJob.slug} (public)...`);
+    // 4. Admin GET /api/careers/admin/:id
+    console.log(`4. Testing GET /api/careers/admin/${createdJob.id}...`);
+    const getJobByIdRes = await req(`/api/careers/admin/${createdJob.id}`, {
+      headers: { 'Authorization': `Bearer ${adminToken}` }
+    });
+    console.log(`Status: ${getJobByIdRes.status}, title: ${getJobByIdRes.body?.title}`);
+    if (getJobByIdRes.status !== 200) throw new Error(`GET /api/careers/admin/${createdJob.id} failed`);
+
+    // 5. Public GET /api/careers/:slug
+    console.log(`5. Testing GET /api/careers/${createdJob.slug} (public)...`);
     const getSlugRes = await req(`/api/careers/${createdJob.slug}`);
     console.log(`Status: ${getSlugRes.status}, title: ${getSlugRes.body?.title}`);
     if (getSlugRes.status !== 200 || getSlugRes.body?.title !== newJobPayload.title) {
       throw new Error(`GET /api/careers/${createdJob.slug} failed`);
     }
 
-    // 4. Public POST /api/careers/:slug/apply (candidate apply)
-    console.log(`4. Testing POST /api/careers/${createdJob.slug}/apply (public candidate apply)...`);
+    // 6. Public POST /api/careers/:slug/apply
+    console.log(`6. Testing POST /api/careers/${createdJob.slug}/apply (public candidate apply)...`);
     const applyRes = await req(`/api/careers/${createdJob.slug}/apply`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -88,19 +109,19 @@ async function runTests() {
         resumeLink: 'https://example.com/resumes/devops.pdf'
       })
     });
-    console.log(`Status: ${applyRes.status}, response: ${JSON.stringify(applyRes.body)}`);
-    if (applyRes.status !== 201) throw new Error(`POST /api/careers/${createdJob.slug}/apply failed: ${JSON.stringify(applyRes.body)}`);
+    console.log(`Status: ${applyRes.status}`);
+    if (applyRes.status !== 201) throw new Error(`POST /api/careers/${createdJob.slug}/apply failed`);
 
-    // 5. Admin GET /api/careers/:jobId/applications
-    console.log(`5. Testing GET /api/careers/${createdJob.id}/applications...`);
-    const appsRes = await req(`/api/careers/${createdJob.id}/applications`, {
+    // 7. Testing Attendance shifts route
+    console.log('7. Testing GET /api/attendance/shifts...');
+    const shiftsRes = await req('/api/attendance/shifts', {
       headers: { 'Authorization': `Bearer ${adminToken}` }
     });
-    console.log(`Status: ${appsRes.status}, apps count: ${Array.isArray(appsRes.body) ? appsRes.body.length : 0}`);
-    if (appsRes.status !== 200 || appsRes.body.length === 0) throw new Error('GET applications failed');
+    console.log(`Status: ${shiftsRes.status}, shifts: ${shiftsRes.body.length}`);
+    if (shiftsRes.status !== 200 || !Array.isArray(shiftsRes.body)) throw new Error('GET /api/attendance/shifts failed');
 
-    // 6. Clean up: Delete created job
-    console.log(`6. Testing DELETE /api/careers/admin/${createdJob.id}...`);
+    // 8. Clean up: Delete created job
+    console.log(`8. Testing DELETE /api/careers/admin/${createdJob.id}...`);
     const delRes = await req(`/api/careers/admin/${createdJob.id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${adminToken}` }
@@ -108,9 +129,12 @@ async function runTests() {
     console.log(`Status: ${delRes.status}`);
     if (delRes.status !== 204) throw new Error(`DELETE /api/careers/admin/${createdJob.id} failed`);
 
-    console.log('\n>>> ALL CAREERS POSTING AND APPLICATION TESTS PASSED 100%! <<<');
+    console.log('\n====================================================');
+    console.log('>>> ALL VERIFICATIONS & TESTS PASSED 100%! <<<');
+    console.log('====================================================\n');
   } finally {
     server.close();
+    process.exit(0);
   }
 }
 

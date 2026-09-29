@@ -2055,7 +2055,16 @@ function provisionEmployeeFromHire(app: any, job: any) {
 
   router.get('/attendance', (req, res) => res.json(attendances));
 
-  router.get('/attendance/:employeeId', (req, res) => {
+  router.get('/attendance/shifts', (req, res) => {
+    res.json([
+      { id: 's1', name: 'Morning', startTime: '09:00', endTime: '18:00' },
+      { id: 's2', name: 'Evening', startTime: '13:00', endTime: '22:00' },
+      { id: 's3', name: 'Night', startTime: '21:00', endTime: '06:00' }
+    ]);
+  });
+
+  router.get('/attendance/:employeeId', (req, res, next) => {
+    if (req.params.employeeId === 'shifts') return next();
     const empAtt = attendances.filter(a => a.employeeId === req.params.employeeId);
     res.json(empAtt);
   });
@@ -2532,102 +2541,8 @@ function provisionEmployeeFromHire(app: any, job: any) {
     res.status(204).end();
   });
 
-  // --- Public Careers Portal Endpoints (No Auth Required) ---
-  router.get('/careers', (_req, res) => {
-    const published = jobPostings.filter(j => j.status === 'PUBLISHED');
-    res.json(published);
-  });
-
-  router.get('/careers/:slug', (req, res) => {
-    const slugOrId = req.params.slug;
-    const job = jobPostings.find(j => (j.slug === slugOrId || j.id === slugOrId) && j.status === 'PUBLISHED');
-    if (!job) return res.status(404).json({ message: 'Job not found' });
-    res.json(job);
-  });
-
-  // Public candidate application submission + Automatic Confirmation Email (Tier 2)
-  router.post('/careers/:slug/apply', async (req, res) => {
-    const slugOrId = req.params.slug;
-    const job = jobPostings.find(j => (j.slug === slugOrId || j.id === slugOrId) && j.status === 'PUBLISHED');
-    if (!job) return res.status(404).json({ message: 'Job posting not found or not published' });
-
-    const body = req.body || {};
-    const fullName = (body.fullName || body.candidateName || body.name || '').trim();
-    const email = (body.email || body.candidateEmail || '').trim();
-    const phone = (body.phone || body.candidatePhone || '').trim();
-    const qualification = (body.qualification || body.highestQualification || '').trim();
-    const experience = (body.experience || '').trim();
-    const currentOrg = (body.currentOrg || body.currentCompany || '').trim();
-    const resumeLink = (body.resumeLink || body.resumeUrl || '').trim();
-    const coverNote = (body.coverNote || body.note || '').trim();
-
-    if (!fullName) return res.status(400).json({ message: 'Full name is required' });
-    if (!email) return res.status(400).json({ message: 'Email is required' });
-
-    const newApp = {
-      id: `app-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-      jobId: job.id,
-      candidateName: fullName,
-      fullName: fullName,
-      candidateEmail: email,
-      email: email,
-      candidatePhone: phone,
-      phone: phone,
-      qualification,
-      experience,
-      currentOrg,
-      resumeUrl: resumeLink,
-      resumeLink: resumeLink,
-      coverNote,
-      currentRoundId: job.rounds?.[0]?.id || null,
-      status: 'APPLIED',
-      appliedAt: new Date().toISOString(),
-      emailLogs: [] as any[]
-    };
-
-    // Route through real mailer integration
-    try {
-      const template = job.applicationConfirmationTemplate || DEFAULT_CAREER_TEMPLATES.applicationConfirmationTemplate;
-      const mergeCtx = buildMergeContext(newApp, job, job.rounds?.[0] || null);
-      const renderedHtml = renderTemplate(template, mergeCtx);
-      const mailResult = await sendEmail({
-        to: newApp.email,
-        subject: `Application Received - ${job.title} at TwinSpace`,
-        html: renderedHtml,
-      });
-      const emailLog = {
-        sentAt: new Date().toISOString(),
-        to: newApp.email,
-        subject: `Application Received - ${job.title} at TwinSpace`,
-        templateType: 'application_confirmation',
-        html: renderedHtml,
-        status: mailResult.status,
-        error: mailResult.error
-      };
-      newApp.emailLogs.push(emailLog);
-    } catch (err) {
-      console.error('[Careers Email] Failed to render/send confirmation email:', err);
-    }
-
-    jobApplications.unshift(newApp);
-    saveChatFile(APPLICATIONS_FILE, jobApplications);
-
-    // Notify HR & Managers on the ERP Header Notification Bell
-    try {
-      addNotification({
-        title: `New Job Application: ${job.title}`,
-        message: `${newApp.fullName} applied for ${job.title}. Candidate profile available in recruitment pipeline.`,
-        type: 'approval',
-        targetRole: 'HR,Manager'
-      });
-    } catch (err) {
-      console.error('Failed to dispatch in-app notification for new application:', err);
-    }
-
-    res.status(201).json({ message: 'Application submitted successfully', application: newApp });
-  });
-
-  // --- HRM Dashboard Careers & Job Postings Endpoints ---
+  // --- Careers & Job Postings Endpoints ---
+  // 1. Admin endpoints MUST be registered before parameterized /careers/:slug routes
   router.get('/careers/admin', (_req, res) => {
     res.json(jobPostings);
   });
@@ -2641,7 +2556,7 @@ function provisionEmployeeFromHire(app: any, job: any) {
   router.post('/careers/admin', (req, res) => {
     const body = req.body || {};
     const baseSlug = body.slug || (body.title || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    let slug = baseSlug;
+    let slug = baseSlug || `job-${Date.now()}`;
     let suffix = 0;
     while (jobPostings.some(j => j.slug === slug)) {
       suffix++;
@@ -2652,8 +2567,8 @@ function provisionEmployeeFromHire(app: any, job: any) {
       id: `job-${Date.now()}`,
       createdAt: new Date().toISOString(),
       status: body.status || 'DRAFT',
-      fields: body.fields || [],
-      rounds: body.rounds || [],
+      fields: Array.isArray(body.fields) ? body.fields : [],
+      rounds: Array.isArray(body.rounds) ? body.rounds : [],
       applicationConfirmationTemplate: body.applicationConfirmationTemplate?.trim() || DEFAULT_CAREER_TEMPLATES.applicationConfirmationTemplate,
       roundAdvanceTemplate: body.roundAdvanceTemplate?.trim() || DEFAULT_CAREER_TEMPLATES.roundAdvanceTemplate,
       rejectionTemplate: body.rejectionTemplate?.trim() || DEFAULT_CAREER_TEMPLATES.rejectionTemplate,
@@ -2700,7 +2615,6 @@ function provisionEmployeeFromHire(app: any, job: any) {
     res.status(204).end();
   });
 
-  
   // --- Fields Management ---
   router.post('/careers/admin/:id/fields', (req, res) => {
     const job = jobPostings.find(j => j.id === req.params.id);
@@ -2781,7 +2695,7 @@ function provisionEmployeeFromHire(app: any, job: any) {
     res.status(204).end();
   });
 
-// --- Applications & Candidate Pipeline ---
+  // --- Applications & Candidate Pipeline ---
   router.get('/careers/:jobId/applications', (req, res) => {
     const apps = jobApplications.filter(a => a.jobId === req.params.jobId);
     res.json(apps);
@@ -2841,7 +2755,6 @@ function provisionEmployeeFromHire(app: any, job: any) {
     res.json(app);
   });
 
-  
   // --- Decide Application ---
   router.patch('/careers/admin/applications/:id/decide', async (req, res) => {
     const app = jobApplications.find(a => a.id === req.params.id);
@@ -2900,7 +2813,7 @@ function provisionEmployeeFromHire(app: any, job: any) {
             status: mailResult.status
           });
         } else {
-                    app.status = 'HIRED';
+          app.status = 'HIRED';
           const convertedId = provisionEmployeeFromHire(app, job);
           if (convertedId) {
             app.convertedEmployeeId = convertedId;
@@ -2911,13 +2824,15 @@ function provisionEmployeeFromHire(app: any, job: any) {
             const nameParts = (app.candidateName || '').split(' ');
             const firstName = nameParts[0] || 'Unknown';
             const lastName = nameParts.slice(1).join(' ') || '';
+            const rawDept = job?.department;
+            const validDept = ['HRM', 'CRM', 'PM'].includes(rawDept) ? rawDept : null;
             employee = {
               id: `emp_${Date.now()}`,
               firstName,
               lastName,
               email: recipient,
               phone: app.phone || '',
-              department: '',
+              department: validDept,
               role: 'Member',
               designation: job.title || '',
               hireDate: new Date().toISOString().split('T')[0],
@@ -2960,45 +2875,46 @@ function provisionEmployeeFromHire(app: any, job: any) {
     if (!app) return res.status(404).json({ message: 'Application not found' });
     const { status, notes } = req.body;
     app.status = status;
-    if (notes !== undefined) app.notes = notes;
+    if (notes) app.notes = notes;
 
     const job = jobPostings.find(j => j.id === app.jobId);
     const recipient = app.email || app.candidateEmail;
 
     try {
       if (!app.emailLogs) app.emailLogs = [];
-      if (status === 'HIRED') {
-        const template = job?.hireTemplate || DEFAULT_CAREER_TEMPLATES.hireTemplate;
-        const mergeCtx = buildMergeContext(app, job);
+
+      if (status === 'REJECTED') {
+        const template = job?.rejectionTemplate || DEFAULT_CAREER_TEMPLATES.rejectionTemplate;
+        const mergeCtx = buildMergeContext(app, job, null);
         const renderedHtml = renderTemplate(template, mergeCtx);
         const mailResult = await sendEmail({
           to: recipient,
-          subject: `Offer of Employment: ${job?.title} at TwinSpace`,
+          subject: `Update on your application for ${job?.title || 'Position'} at TwinSpace`,
           html: renderedHtml,
         });
         app.emailLogs.push({
           sentAt: new Date().toISOString(),
           to: recipient,
-          subject: `Offer of Employment: ${job?.title} at TwinSpace`,
-          templateType: 'hire',
+          subject: `Update on your application for ${job?.title || 'Position'} at TwinSpace`,
+          templateType: 'rejection',
           html: renderedHtml,
           status: mailResult.status,
           error: mailResult.error
         });
-      } else if (status === 'REJECTED') {
-        const template = job?.rejectionTemplate || DEFAULT_CAREER_TEMPLATES.rejectionTemplate;
-        const mergeCtx = buildMergeContext(app, job);
+      } else if (status === 'HIRED') {
+        const template = job?.hireTemplate || DEFAULT_CAREER_TEMPLATES.hireTemplate;
+        const mergeCtx = buildMergeContext(app, job, null);
         const renderedHtml = renderTemplate(template, mergeCtx);
         const mailResult = await sendEmail({
           to: recipient,
-          subject: `Update on your application for ${job?.title} at TwinSpace`,
+          subject: `Offer of Employment: ${job?.title || 'Position'} at TwinSpace`,
           html: renderedHtml,
         });
         app.emailLogs.push({
           sentAt: new Date().toISOString(),
           to: recipient,
-          subject: `Update on your application for ${job?.title} at TwinSpace`,
-          templateType: 'rejection',
+          subject: `Offer of Employment: ${job?.title || 'Position'} at TwinSpace`,
+          templateType: 'hire',
           html: renderedHtml,
           status: mailResult.status,
           error: mailResult.error
@@ -3018,7 +2934,102 @@ function provisionEmployeeFromHire(app: any, job: any) {
     res.status(204).end();
   });
 
-  // --- Documents & Contracts Endpoints (Tier 4: GET/POST/PUT/DELETE, file-backed) ---
+  // --- Public Careers Portal Endpoints (Registered AFTER admin endpoints) ---
+  router.get('/careers', (_req, res) => {
+    const published = jobPostings.filter(j => j.status === 'PUBLISHED');
+    res.json(published);
+  });
+
+  // Public candidate application submission + Automatic Confirmation Email (Tier 2)
+  router.post('/careers/:slug/apply', async (req, res) => {
+    const slugOrId = req.params.slug;
+    const job = jobPostings.find(j => (j.slug === slugOrId || j.id === slugOrId) && j.status === 'PUBLISHED');
+    if (!job) return res.status(404).json({ message: 'Job posting not found or not published' });
+
+    const body = req.body || {};
+    const fullName = (body.fullName || body.candidateName || body.name || '').trim();
+    const email = (body.email || body.candidateEmail || '').trim();
+    const phone = (body.phone || body.candidatePhone || '').trim();
+    const qualification = (body.qualification || body.highestQualification || '').trim();
+    const experience = (body.experience || '').trim();
+    const currentOrg = (body.currentOrg || body.currentCompany || '').trim();
+    const resumeLink = (body.resumeLink || body.resumeUrl || '').trim();
+    const coverNote = (body.coverNote || body.note || '').trim();
+
+    if (!fullName) return res.status(400).json({ message: 'Full name is required' });
+    if (!email) return res.status(400).json({ message: 'Email is required' });
+
+    const newApp = {
+      id: `app-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      jobId: job.id,
+      candidateName: fullName,
+      fullName: fullName,
+      candidateEmail: email,
+      email: email,
+      candidatePhone: phone,
+      phone: phone,
+      qualification,
+      experience,
+      currentOrg,
+      resumeUrl: resumeLink,
+      resumeLink: resumeLink,
+      coverNote,
+      currentRoundId: job.rounds?.[0]?.id || null,
+      status: 'APPLIED',
+      appliedAt: new Date().toISOString(),
+      emailLogs: [] as any[]
+    };
+
+    try {
+      const template = job.applicationConfirmationTemplate || DEFAULT_CAREER_TEMPLATES.applicationConfirmationTemplate;
+      const mergeCtx = buildMergeContext(newApp, job, job.rounds?.[0] || null);
+      const renderedHtml = renderTemplate(template, mergeCtx);
+      const mailResult = await sendEmail({
+        to: newApp.email,
+        subject: `Application Received - ${job.title} at TwinSpace`,
+        html: renderedHtml,
+      });
+      const emailLog = {
+        sentAt: new Date().toISOString(),
+        to: newApp.email,
+        subject: `Application Received - ${job.title} at TwinSpace`,
+        templateType: 'application_confirmation',
+        html: renderedHtml,
+        status: mailResult.status,
+        error: mailResult.error
+      };
+      newApp.emailLogs.push(emailLog);
+    } catch (err) {
+      console.error('[Careers Email] Failed to render/send confirmation email:', err);
+    }
+
+    jobApplications.unshift(newApp);
+    saveChatFile(APPLICATIONS_FILE, jobApplications);
+
+    try {
+      addNotification({
+        title: `New Job Application: ${job.title}`,
+        message: `${newApp.fullName} applied for ${job.title}. Candidate profile available in recruitment pipeline.`,
+        type: 'approval',
+        targetRole: 'HR,Manager'
+      });
+    } catch (err) {
+      console.error('Failed to dispatch in-app notification for new application:', err);
+    }
+
+    res.status(201).json({ message: 'Application submitted successfully', application: newApp });
+  });
+
+  // Public GET /careers/:slug MUST be the final careers route
+  router.get('/careers/:slug', (req, res, next) => {
+    const slugOrId = req.params.slug;
+    if (slugOrId === 'admin') return next();
+    const job = jobPostings.find(j => (j.slug === slugOrId || j.id === slugOrId) && j.status === 'PUBLISHED');
+    if (!job) return res.status(404).json({ message: 'Job not found' });
+    res.json(job);
+  });
+
+    // --- Documents & Contracts Endpoints (Tier 4: GET/POST/PUT/DELETE, file-backed) ---
   router.get('/documents', (req, res) => res.json(hrDocuments));
   router.post('/documents', (req, res) => {
     const newDoc = {
