@@ -1,4 +1,3 @@
-import { validateRoleDepartment } from '../src/shared/roles';
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
@@ -1698,6 +1697,26 @@ export function createApp() {
 
   const router = express.Router();
 
+
+function validateRoleDepartment(role: any, dept: any, isOnboarding: boolean = false): string | null {
+  const ROLES = ['Admin', 'CEO', 'COO', 'CTO', 'TL', 'Member'];
+  const DEPARTMENTS = ['HRM', 'CRM', 'PM'];
+  
+  if (!role || !ROLES.includes(role)) return 'Invalid role';
+  if (dept && !DEPARTMENTS.includes(dept)) return 'Invalid department';
+  
+  const isExecutiveRole = ['Admin', 'CEO', 'COO', 'CTO'].includes(role);
+  if (isExecutiveRole && dept) {
+    return 'Admin/CEO/COO/CTO cannot have a department';
+  }
+  
+  if (['TL', 'Member'].includes(role)) {
+    if (!dept && !isOnboarding) return 'TL and Member roles require a department';
+  }
+  
+  return null;
+}
+
 const validateEmployee = (req, res, next) => {
   if (!['POST', 'PUT', 'PATCH'].includes(req.method)) return next();
   
@@ -1709,7 +1728,6 @@ const validateEmployee = (req, res, next) => {
   if (req.method === 'PUT' || req.method === 'PATCH') {
     const id = req.params.id || req.body.id;
     let existing = employees.find(e => e.id === id);
-    if (!existing) existing = users.find(u => u.id === id);
     
     if (existing) {
       if (role === undefined) role = existing.role;
