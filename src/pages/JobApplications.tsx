@@ -175,7 +175,7 @@ export default function JobApplications() {
  <div className="flex items-center gap-2 text-xs font-semibold text-blue-600 dark:text-blue-600 ">
  <span>Careers Pipeline</span>
  <span>/</span>
- <span className="truncate">{job?.department || 'Engineering'}</span>
+ <span className="truncate">{job?.department || 'HRM'}</span>
  </div>
  <h1 className="text-xl sm:text-2xl font-bold text-slate-900 truncate">
  {job?.title || 'Applicant Pipeline'}

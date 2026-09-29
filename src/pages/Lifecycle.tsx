@@ -34,7 +34,7 @@ export default function Lifecycle() {
  employee: '',
  oldDepartment: '',
  oldRole: '',
- newDepartment: 'Engineering',
+ newDepartment: DEPARTMENTS[0] as string,
  newRole: '',
  effectiveDate: new Date().toISOString().split('T')[0],
  });
@@ -93,7 +93,7 @@ export default function Lifecycle() {
  employee: '',
  oldDepartment: '',
  oldRole: '',
- newDepartment: 'Engineering',
+ newDepartment: DEPARTMENTS[0] as string,
  newRole: '',
  effectiveDate: new Date().toISOString().split('T')[0],
  });

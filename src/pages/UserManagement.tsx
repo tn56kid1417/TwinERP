@@ -1,3 +1,4 @@
+import { DEPARTMENTS } from '../shared/roles';
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -44,7 +45,7 @@ export default function UserManagement() {
  password: '',
  phone: '',
  role: 'Member',
- department: 'Engineering',
+ department: DEPARTMENTS[0] as string,
  designation: '',
  shift: 'Morning',
  status: 'Active' as 'Active' | 'Resigned' | 'Terminated',
@@ -86,7 +87,7 @@ export default function UserManagement() {
  password: '',
  phone: '',
  role: 'Member',
- department: departments[0]?.name || 'Engineering',
+ department: departments[0]?.name || DEPARTMENTS[0],
  designation: 'Team Member',
  shift: 'Morning',
  status: 'Active',
@@ -253,7 +254,7 @@ export default function UserManagement() {
  <div>
  <p className="text-xs font-bold text-slate-500">Privileged Roles (Admin/HR/TL)</p>
  <h3 className="text-2xl font-extrabold text-purple-600 dark:text-purple-400 mt-1">
- {users.filter(u => ['admin', 'hr', 'tl', 'ceo', 'sales team leader'].includes(u.role?.toLowerCase())).length}
+ {users.filter(u => ['admin', 'ceo', 'coo', 'cto', 'tl'].includes(u.role?.toLowerCase())).length}
  </h3>
  </div>
  <div className="p-3 bg-purple-500/10 text-purple-600 dark:text-purple-400 rounded-xl">
@@ -491,7 +492,7 @@ export default function UserManagement() {
  className="w-full px-3 py-2 bg-slate-50/80 border border-slate-200 rounded-md text-xs text-slate-900 outline-none focus:border-blue-500"
  >
  {departments.map(d => <option key={d.id} value={d.name}>{d.name}</option>)}
- {departments.length === 0 && ['Engineering', 'Sales', 'HR', 'Marketing'].map(d => (
+ {departments.length === 0 && DEPARTMENTS.map(d => (
  <option key={d} value={d}>{d}</option>
  ))}
  </select>

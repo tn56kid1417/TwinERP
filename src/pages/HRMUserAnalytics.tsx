@@ -217,7 +217,7 @@ export default function HRMUserAnalytics() {
  {employeeName}'s Performance
  </h2>
  <p className="text-xs text-slate-500 mt-0.5">
- {selectedEmployee?.department || 'Engineering'} • {selectedEmployee?.role || 'Team Member'}
+ {selectedEmployee?.department || 'HRM'} • {selectedEmployee?.role || 'Member'}
  </p>
  </div>
  </div>
