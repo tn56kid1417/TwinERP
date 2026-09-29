@@ -3466,7 +3466,9 @@ function provisionEmployeeFromHire(app: any, job: any) {
 
   // Mount on both '/api' and '/' to guarantee routing works regardless of rewrite mode
   app.use('/api', router);
-  app.use('/', router);
+  if (process.env.VERCEL === '1') {
+    app.use('/', router);
+  }
 
   // Serve public folder directly in dev mode just in case
   if (process.env.NODE_ENV !== "production") {

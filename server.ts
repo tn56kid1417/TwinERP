@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path';
+import fs from 'fs';
 import dotenv from 'dotenv';
 import { createServer as createViteServer } from 'vite';
 import { createApp } from './api/index';
@@ -30,10 +31,28 @@ async function startServer() {
       appType: "spa",
     });
     app.use(vite.middlewares);
+
+    // Serve transformed index.html for all non-API SPA routes in development
+    app.use('*', async (req, res, next) => {
+      const url = req.originalUrl;
+      if (url.startsWith('/api')) {
+        return next();
+      }
+      try {
+        const indexPath = path.resolve(process.cwd(), 'index.html');
+        let template = fs.readFileSync(indexPath, 'utf-8');
+        template = await vite.transformIndexHtml(url, template);
+        res.status(200).set({ 'Content-Type': 'text/html' }).end(template);
+      } catch (e: any) {
+        vite.ssrFixStacktrace(e);
+        next(e);
+      }
+    });
   } else {
     const distPath = path.join(process.cwd(), 'dist');
     app.use(express.static(distPath));
     app.get('*', (req, res) => {
+      if (req.originalUrl.startsWith('/api')) return res.status(404).json({ error: 'Not Found' });
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }
