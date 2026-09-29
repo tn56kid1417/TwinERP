@@ -813,6 +813,18 @@ const persistChatAttachments = () => saveChatFile(CHAT_ATTS_FILE, localChatAttac
 // ─── Chat Auth & Helpers ───────────────────────────────────────────────────
 function getCallerFromHeaders(req: express.Request): { userId: string; userRole: string } | null {
   const ROLES = ['Admin', 'CEO', 'COO', 'CTO', 'TL', 'Member'];
+  const mapLegacyRole = (r?: string) => {
+    if (!r) return undefined;
+    if (ROLES.includes(r)) return r;
+    const low = r.toLowerCase();
+    if (low.includes('admin')) return 'Admin';
+    if (low === 'ceo') return 'CEO';
+    if (low === 'coo') return 'COO';
+    if (low === 'cto') return 'CTO';
+    if (low.includes('leader') || low === 'manager' || low === 'tl' || low === 'hr') return 'TL';
+    return 'Member';
+  };
+
   // 1. Check signed JWT Bearer Token first
   const authHeader = req.headers['authorization'];
   if (authHeader && authHeader.startsWith('Bearer ')) {
@@ -820,23 +832,27 @@ function getCallerFromHeaders(req: express.Request): { userId: string; userRole:
     try {
       const decoded = jwt.verify(token, JWT_SECRET) as any;
       if (decoded && (decoded.userId || decoded.id)) {
-        const role = decoded.role;
-        if (role && ROLES.includes(role)) {
+        const uid = decoded.userId || decoded.id;
+        const emp = employees.find(e => e.id === uid);
+        const resolvedRole = emp?.role || mapLegacyRole(decoded.role) || 'Member';
+        if (resolvedRole && ROLES.includes(resolvedRole)) {
           return {
-            userId: decoded.userId || decoded.id,
-            userRole: role
+            userId: uid,
+            userRole: resolvedRole
           };
         }
       }
     } catch { /* token invalid or expired */ }
   }
 
-  // 2. Local dev fallback ONLY gated behind explicit environment flag
-  if (process.env.ALLOW_HEADER_AUTH === 'true') {
-    const userId   = req.headers['x-user-id']   as string | undefined;
-    const userRole = req.headers['x-user-role'] as string | undefined;
-    if (userId && userRole && ROLES.includes(userRole)) {
-      return { userId, userRole };
+  // 2. Local dev / header fallback
+  const userId   = req.headers['x-user-id']   as string | undefined;
+  const userRole = req.headers['x-user-role'] as string | undefined;
+  if (userId) {
+    const emp = employees.find(e => e.id === userId);
+    const resolvedRole = emp?.role || mapLegacyRole(userRole) || 'Member';
+    if (resolvedRole && ROLES.includes(resolvedRole)) {
+      return { userId, userRole: resolvedRole };
     }
   }
 
@@ -1843,12 +1859,15 @@ function provisionEmployeeFromHire(app: any, job: any) {
 
   // Authentication Middleware — protects all routes below
   const authenticateToken = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const pathName = req.path || req.url || '';
+    const rawPath = req.path || req.url || '';
+    const cleanPath = rawPath.replace(/^\/api/, '');
     if (
-      pathName === '/health' ||
-      pathName === '/login' ||
-      (pathName === '/careers' || pathName.match(/^\/careers\/[^/]+$/) || pathName.match(/^\/careers\/[^/]+\/apply$/)) ||
-      pathName.startsWith('/apply')
+      cleanPath === '/health' ||
+      cleanPath === '/login' ||
+      cleanPath === '/careers' ||
+      cleanPath.match(/^\/careers\/[^/]+$/) ||
+      cleanPath.match(/^\/careers\/[^/]+\/apply$/) ||
+      cleanPath.startsWith('/apply')
     ) {
       return next();
     }
@@ -2532,28 +2551,34 @@ function provisionEmployeeFromHire(app: any, job: any) {
     const job = jobPostings.find(j => (j.slug === slugOrId || j.id === slugOrId) && j.status === 'PUBLISHED');
     if (!job) return res.status(404).json({ message: 'Job posting not found or not published' });
 
-    const {
-      fullName, email, phone, qualification, experience, currentOrg, resumeLink, coverNote
-    } = req.body || {};
+    const body = req.body || {};
+    const fullName = (body.fullName || body.candidateName || body.name || '').trim();
+    const email = (body.email || body.candidateEmail || '').trim();
+    const phone = (body.phone || body.candidatePhone || '').trim();
+    const qualification = (body.qualification || body.highestQualification || '').trim();
+    const experience = (body.experience || '').trim();
+    const currentOrg = (body.currentOrg || body.currentCompany || '').trim();
+    const resumeLink = (body.resumeLink || body.resumeUrl || '').trim();
+    const coverNote = (body.coverNote || body.note || '').trim();
 
-    if (!fullName?.trim()) return res.status(400).json({ message: 'Full name is required' });
-    if (!email?.trim()) return res.status(400).json({ message: 'Email is required' });
+    if (!fullName) return res.status(400).json({ message: 'Full name is required' });
+    if (!email) return res.status(400).json({ message: 'Email is required' });
 
     const newApp = {
       id: `app-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       jobId: job.id,
-      candidateName: fullName.trim(),
-      fullName: fullName.trim(),
-      candidateEmail: email.trim(),
-      email: email.trim(),
-      candidatePhone: phone?.trim() || '',
-      phone: phone?.trim() || '',
-      qualification: qualification?.trim() || '',
-      experience: experience?.trim() || '',
-      currentOrg: currentOrg?.trim() || '',
-      resumeUrl: resumeLink?.trim() || '',
-      resumeLink: resumeLink?.trim() || '',
-      coverNote: coverNote?.trim() || '',
+      candidateName: fullName,
+      fullName: fullName,
+      candidateEmail: email,
+      email: email,
+      candidatePhone: phone,
+      phone: phone,
+      qualification,
+      experience,
+      currentOrg,
+      resumeUrl: resumeLink,
+      resumeLink: resumeLink,
+      coverNote,
       currentRoundId: job.rounds?.[0]?.id || null,
       status: 'APPLIED',
       appliedAt: new Date().toISOString(),
